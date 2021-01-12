@@ -1,7 +1,6 @@
 ################### CALCIUM ANALYSIS WITH THRESHOLDING AND DIGITIZATION
 library(tidyverse)
 library(ggplot2)
-library(plotly)
 library(tidyr)
 library(reshape2)
 library(factoextra)
@@ -89,26 +88,25 @@ calcium.raster <- ggplot(calcium.long, aes(Time, Cell))+
 # GRID
 grid.newpage()
 print(calcium.raster, vp = viewport(x = 0.4, y = 0.5, width = 0.8, height = 1.0))
-print(calcium.dendro, vp = viewport(x = 0.90, y = 0.450, width = 0.2, height = 0.98))
+print(calcium.dendro, vp = viewport(x = 0.90, y = 0.435, width = 0.2, height = 0.92))
 
-# Calculating percentage of active cells over time
-calciumSUM <- rowSums(calcium)
-calciumSUM <- as.data.frame(calciumSUM)
-calciumSUM$Time <- rownames(calciumSUM)
-calciumSUM$calciumSUM <- calciumSUM$calciumSUM/ncol(calcium)*100
-calciumACTIVE_AKT1 <- ggplot(calciumSUM, aes(Time, calciumSUM))+
-  geom_line()+
-  stat_smooth(method = 'lm')+
-  ylim(0,100)
+# # Calculating percentage of active cells over time
+# calciumSUM <- rowSums(calcium5)
+# calciumSUM <- as.data.frame(calciumSUM)
+# calciumSUM$Time <- rownames(calciumSUM)
+# calciumSUM$calciumSUM <- calciumSUM$calciumSUM/ncol(calcium5)*100
+# calciumACTIVE_cells <- ggplot(calciumSUM, aes(Time, calciumSUM))+
+#   geom_segment()+
+#   ylim(0,100)
 
 
 
 
 # Divide in clusters
-plot(dhcc, horiz = TRUE)
-color8 <- color_branches(dhcc, k = 8, horiz = TRUE)
-plot(color5, horiz = TRUE)
-rect8 <- rect.dendrogram(dhcc, k = 8, horiz = TRUE)
+# plot(dhcc, horiz = TRUE)
+# color8 <- color_branches(dhcc, k = 8, horiz = TRUE)
+# plot(color5, horiz = TRUE)
+# rect5 <- rect.dendrogram(dhcc, k = 5, horiz = TRUE)
 
 
 
@@ -125,5 +123,6 @@ calciumXY <- calciumXY %>%
 
 ggplot(calciumXY, aes(X, Y, color = as.factor(Cluster)))+
   geom_point(size = 3)+
-  scale_color_manual(values=c('#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99'))
+  scale_color_manual(values=c('#a6cee3','#1f78b4','#b2df8a','#33a02c','#fb9a99'))+
+  theme(legend.title = element_blank())
 

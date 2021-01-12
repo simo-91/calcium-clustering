@@ -23,13 +23,10 @@ max_CCF<- function(a,b)
 for (i in 1:nc) {
   for (j in 1:nc) {
     cmat[i,j] <- max_CCF(calcium[,i],calcium[,j])
-    ## or: ccf(calcium[,i],calcium[,j],lag.max=1)$acf[3,1,1]
   }
 }
 
 
-cmat <- as.data.frame(cmat)
-colnames(cmat) <- rownames(cmat)
 # Display the resultant matrix
 library(gplots)
 Colors=c("blue","yellow","red")
