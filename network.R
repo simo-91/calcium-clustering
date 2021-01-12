@@ -18,8 +18,7 @@ calciumXY <- calciumXY %>%
     "Cell" = X.1,
   )
 
-calciumXY <- calciumXY %>%
-  select()
+
 
 graph <- graph.adjacency(as.matrix(cmat), weighted = TRUE)
 
