@@ -19,8 +19,8 @@ graph <- delete.edges(graph, which(E(graph)$weight <0.75))
 # DISPLAY NETWORK
 ggraph(graph, layout = as.matrix(posXY)[, c("X", "Y")]) +
   geom_edge_link(aes(colour = weight))+
-  geom_node_point(size = 0.5)+
-  geom_node_text(aes(label = posXY$Cell))+
+  geom_node_point(size = 1)+
+  # geom_node_text(aes(label = posXY$Cell))+
     scale_edge_color_gradient(
       low = "blue",
       high = "red",

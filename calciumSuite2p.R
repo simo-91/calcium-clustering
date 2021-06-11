@@ -1,5 +1,5 @@
 ################ CALCIUM ANALYSIS WITHOUT THRESHOLDING (ANALOGIC)
-setwd("/media/simo/Seagate/880 NBTGCaMP6s_nacre--/25042021/25042021_NBTGCaMP6s_nacre__CTRL_lexOPRFP_5dpf/CTRLfish2/hindbrain/suite2p/plane0")
+setwd("/media/simo/Seagate/880 NBTGCaMP6s_nacre--/25042021/25042021_NBTGCaMP6s_nacre__CTRL_lexOPRFP_5dpf/CTRLfish2/midbrain/suite2p/plane0")
 library(dplyr)
 library(tidyverse)
 library(ggplot2)
@@ -16,12 +16,40 @@ library(reticulate)
 use_condaenv("/home/simo/anaconda3/bin/python")
 
 np <-import("numpy")
+
+# Start with stat.npy
+stat <- np$load("stat.npy", allow_pickle = TRUE) #stats containing ROIs XY
+
+# Loop over stat.npy to access "med" (ROIs coordinates) to create list of cells coordinates. ROIs from suite2p starts with index 0
+posXY <- data.frame()
+for (i in 1:length(stat)) {
+  posXY <- rbind(posXY, stat[[i]][["med"]])
+}
+
+posXY$Cell <- as.numeric(0:(nrow(posXY)-1))
+colnames(posXY) <- c('Y','X','Cell')
+
+#iscell.npy to select only ROIs that are cells
+iscell <- as.data.frame(np$load("iscell.npy", allow_pickle = TRUE))
+iscell$Cell <- as.numeric(0:(nrow(iscell)-1))
+posXY$Positive <- iscell$V1
+posXY <- subset(posXY, Positive == 1, select = c(Y,X,Cell))
+positives <- posXY$Cell
+positives <- positives+1 ##this is needed because suite2p starts counting ROIs with the number 0 (python..)
+
 # load suite2p numpy arrays outputs
 spks <- as.data.frame(np$load("spks.npy", allow_pickle = TRUE)) #deconvolved peaks
+#need to clean it from negative-ROIs
+
 spks <- spks[,2:ncol(spks)]
 
 #Normalize each cell
 spks <- sapply(spks, function(x) (x - min(x))/(max(x)-min(x)))
+
+spks <- spks[positives,] #select only positives
+
+
+
 
 dfpeaks <- as.data.frame(t(spks))
 colnames(dfpeaks) <- 1:ncol(dfpeaks)
@@ -79,19 +107,9 @@ print(peaks.dendro, vp = viewport(x = 0.90, y = 0.455, width = 0.2, height = 0.9
 
 
 
-stat <- np$load("stat.npy", allow_pickle = TRUE) #stats containing ROIs XY
-
-# Loop over stat.npy to access "med" (ROIs coordinates) to create list of cells coordinates. ROIs from suite2p starts with 0
-# need to find a way to select only ROIs considered for signal extractions +++++++++++++++++++++++++++++++++
-posXY <- data.frame()
-for (i in 1:length(stat)) {
-  posXY <- rbind(posXY, stat[[i]][["med"]])
-}
 
 
 
-posXY$Cell <- as.numeric(0:(nrow(posXY)-1))
-colnames(posXY) <- c('Y','X','Cell')
 ggplot(posXY, aes(X, Y, color = Cell, label = Cell))+
   geom_point()+
   geom_label()+
@@ -104,3 +122,8 @@ ggplot(posXY, aes(X, Y, color = Cell, label = Cell))+
 # PCA?
 pca <-prcomp(spks, center = TRUE, scale = TRUE)
 fviz_pca_ind(pca, col.ind = spks, geom.ind = "point", axes =c(1, 2))
+
+
+
+
+
