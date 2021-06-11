@@ -1,5 +1,5 @@
 ################ CALCIUM ANALYSIS WITHOUT THRESHOLDING (ANALOGIC)
-
+setwd("/media/simo/Seagate/880 NBTGCaMP6s_nacre--/25042021/25042021_NBTGCaMP6s_nacre__CTRL_lexOPRFP_5dpf/CTRLfish2/hindbrain/suite2p/plane0")
 library(dplyr)
 library(tidyverse)
 library(ggplot2)
@@ -12,8 +12,8 @@ library(ggdendro)
 library(grid)
 library(RcppCNPy)
 # load reticulate and use it to load numpy
-use_condaenv("/home/simo/anaconda3/bin/python")
 library(reticulate)
+use_condaenv("/home/simo/anaconda3/bin/python")
 
 np <-import("numpy")
 # load suite2p numpy arrays outputs
@@ -81,13 +81,16 @@ print(peaks.dendro, vp = viewport(x = 0.90, y = 0.455, width = 0.2, height = 0.9
 
 stat <- np$load("stat.npy", allow_pickle = TRUE) #stats containing ROIs XY
 
-# Loop over stat.npy to access "med" (ROIs coordinates) to create list of cells coordinates
+# Loop over stat.npy to access "med" (ROIs coordinates) to create list of cells coordinates. ROIs from suite2p starts with 0
+# need to find a way to select only ROIs considered for signal extractions +++++++++++++++++++++++++++++++++
 posXY <- data.frame()
 for (i in 1:length(stat)) {
   posXY <- rbind(posXY, stat[[i]][["med"]])
 }
 
-posXY$Cell <- 1:nrow(posXY)
+
+
+posXY$Cell <- as.numeric(0:(nrow(posXY)-1))
 colnames(posXY) <- c('Y','X','Cell')
 ggplot(posXY, aes(X, Y, color = Cell, label = Cell))+
   geom_point()+
