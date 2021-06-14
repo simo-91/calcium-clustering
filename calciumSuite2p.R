@@ -45,6 +45,22 @@ spks <- spks[,2:ncol(spks)]
 #Normalize each cell
 spks <- sapply(spks, function(x) (x - min(x))/(max(x)-min(x)))
 
+## CALCULATE ACTIVE RFP CELLS OVER TIME
+library(mmand)
+spksthresh <- 2*sd(spks)
+spksthresholded <- threshold(spks[,1:ncol(spks)], spksthresh, method = c("literal"), binarise = TRUE)
+# Calculating percentage of active RFP cells over time
+RFP <- spks[unique(c(68,189,385,190,257,190,275,93,26,215,36,911,96,13,123,38,
+                     47,73,59,374,204,133,1023,406,245,375,119,92,50,46,7,492,
+                     452,139,1,240,223,133,20,139,600,1482,16,39,93,30,174,385,
+                     189,662,19,13,96,32)),] #select only RFP cells
+rownames(RFP) <- unique(c(68,189,385,190,257,190,275,93,26,215,36,911,96,13,123,38,
+                          47,73,59,374,204,133,1023,406,245,375,119,92,50,46,7,492,
+                          452,139,1,240,223,133,20,139,600,1482,16,39,93,30,174,385,
+                          189,662,19,13,96,32))
+RFPthresholded <- threshold(RFP[,1:ncol(RFP)], spksthresh, method = c("literal"), binarise = TRUE)
+########################################### done with this s**t
+
 spks <- spks[positives,] #select only positives
 rownames(spks) <- positives #fix rownames with actual cells numbers
 
@@ -63,35 +79,11 @@ rownames(spks) <- positives #fix rownames with actual cells numbers
 #   ylim(0,100)
 
 
-## CALCULATE ACTIVE RFP CELLS OVER TIME
-library(mmand)
-spksthresh <- 2*sd(spks)
-spksthresholded <- threshold(spks[,1:ncol(spks)], spksthresh, method = c("literal"), binarise = TRUE)
-# Calculating percentage of active RFP cells over time
-# First, make RFP array
-# RFP <- c(.....)
-#then
-RFP <- unique(RFP)
-RFP <- sort(RFP)
-# Then add 1 because suite2p starts counting ROIs with the number 0 (python..)
-# RFPplus1 <- RFP+1
-# Now select only the rows in the dataframe that are included in RFPplus1
-spkscols <- as.data.frame(spksthresholded)
-RFPspks <- spkscols[RFP, ] #now we have the spks matrix with only RFP cells
-# rownames(RFPspks) <- RFP #this way we reset the right cells numbers
-
-
-spkscols <- colSums(spksthresholded)
-spksSUM <- as.data.frame(spksSUM)
-spksSUM$Time <- 1:nrow(spksSUM)
-spksSUM$spksSUM <- spksSUM$spksSUM/nrow(spksthresholded)*100
-ggplot(spksSUM, aes(Time, spksSUM))+
-  geom_line()+
-  ylim(0,100)
 
 
 
 
+# Raster ggplot
 dfpeaks <- as.data.frame(t(spks))
 colnames(dfpeaks) <- 1:ncol(dfpeaks)
 dfpeaks$time <- 1:nrow(dfpeaks)
