@@ -39,14 +39,55 @@ positives <- positives+1 ##this is needed because suite2p starts counting ROIs w
 
 # load suite2p numpy arrays outputs
 spks <- as.data.frame(np$load("spks.npy", allow_pickle = TRUE)) #deconvolved peaks
-#need to clean it from negative-ROIs
-
+#need to clean it from first 0
 spks <- spks[,2:ncol(spks)]
 
 #Normalize each cell
 spks <- sapply(spks, function(x) (x - min(x))/(max(x)-min(x)))
 
 spks <- spks[positives,] #select only positives
+rownames(spks) <- positives #fix rownames with actual cells numbers
+
+## CALCULATE ALL ACTIVE CELLS OVER TIME
+# Threshold to calculate ALL active cells perc
+# library(mmand)
+# spksthresh <- 2*sd(spks)
+# spksthresholded <- threshold(spks[,1:ncol(spks)], spksthresh, method = c("literal"), binarise = TRUE)
+# # Calculating percentage of active cells over time
+# spksSUM <- colSums(spksthresholded)
+# spksSUM <- as.data.frame(spksSUM)
+# spksSUM$Time <- 1:nrow(spksSUM)
+# spksSUM$spksSUM <- spksSUM$spksSUM/nrow(spksthresholded)*100
+# ggplot(spksSUM, aes(Time, spksSUM))+
+#   geom_line()+
+#   ylim(0,100)
+
+
+## CALCULATE ACTIVE RFP CELLS OVER TIME
+library(mmand)
+spksthresh <- 2*sd(spks)
+spksthresholded <- threshold(spks[,1:ncol(spks)], spksthresh, method = c("literal"), binarise = TRUE)
+# Calculating percentage of active RFP cells over time
+# First, make RFP array
+# RFP <- c(.....)
+#then
+RFP <- unique(RFP)
+RFP <- sort(RFP)
+# Then add 1 because suite2p starts counting ROIs with the number 0 (python..)
+# RFPplus1 <- RFP+1
+# Now select only the rows in the dataframe that are included in RFPplus1
+spkscols <- as.data.frame(spksthresholded)
+RFPspks <- spkscols[RFP, ] #now we have the spks matrix with only RFP cells
+# rownames(RFPspks) <- RFP #this way we reset the right cells numbers
+
+
+spkscols <- colSums(spksthresholded)
+spksSUM <- as.data.frame(spksSUM)
+spksSUM$Time <- 1:nrow(spksSUM)
+spksSUM$spksSUM <- spksSUM$spksSUM/nrow(spksthresholded)*100
+ggplot(spksSUM, aes(Time, spksSUM))+
+  geom_line()+
+  ylim(0,100)
 
 
 
