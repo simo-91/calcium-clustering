@@ -39,27 +39,23 @@ positives <- positives+1 ##this is needed because suite2p starts counting ROIs w
 
 # load suite2p numpy arrays outputs
 spks <- as.data.frame(np$load("spks.npy", allow_pickle = TRUE)) #deconvolved peaks
-#need to clean it from first 0
-spks <- spks[,2:ncol(spks)]
+#need to clean it from first 0 and select best window
+spks <- spks[,25:ncol(spks)]
 
 #Normalize each cell
 spks <- sapply(spks, function(x) (x - min(x))/(max(x)-min(x)))
 
-## CALCULATE ACTIVE RFP CELLS OVER TIME
-library(mmand)
-spksthresh <- sd(spks)
-
 # Cutoff function <- anything below 2*(row sd/cell) is 0, anything above is 1
 cutoff <- function(x){
-  x[x < 2*sd(x)] <- 0
-  x[x > 2*sd(x)] <- 1
+  x[x < median(x)] <- 0
+  x[x > median(x)] <- 1
   return(x)
 } 
 
 spksthresholded <- t(apply(spks, 1, cutoff))
 
 # Calculating percentage of active RFP cells over time
-RFP <- spks[unique(c(68,189,385,190,257,190,275,93,26,215,36,911,96,13,123,38,
+RFP <- spksthresholded[unique(c(68,189,385,190,257,190,275,93,26,215,36,911,96,13,123,38,
                      47,73,59,374,204,133,1023,406,245,375,119,92,50,46,7,492,
                      452,139,1,240,223,133,20,139,600,1482,16,39,93,30,174,385,
                      189,662,19,13,96,32)),] #select only RFP cells
@@ -67,13 +63,15 @@ rownames(RFP) <- unique(c(68,189,385,190,257,190,275,93,26,215,36,911,96,13,123,
                           47,73,59,374,204,133,1023,406,245,375,119,92,50,46,7,492,
                           452,139,1,240,223,133,20,139,600,1482,16,39,93,30,174,385,
                           189,662,19,13,96,32))
-RFPthresholded <- threshold(RFP[,1:ncol(RFP)], spksthresh, method = c("literal"), binarise = TRUE)
+
 ########################################### done with this s**t
 ##ggplot to show percentage of RPF+ cells over time
-RFPsum <- as.data.frame(colSums(RFPthresholded))
+RFPsum <- as.data.frame(colSums(RFP))
 RFPsum$Time <- 1:nrow(RFPsum)
-RFPsum$Perc <- RFPsum$`colSums(RFPthresholded)`/nrow(RFPsum) *100
-
+RFPsum$Perc <- RFPsum$`colSums(RFP)`/nrow(RFP)*100
+ggplot(RFPsum, aes(Time, Perc))+
+  geom_line()+
+  ylim(0,100)
 
 
 spks <- spks[positives,] #select only positives
@@ -81,17 +79,15 @@ rownames(spks) <- positives #fix rownames with actual cells numbers
 
 ## CALCULATE ALL ACTIVE CELLS OVER TIME
 # Threshold to calculate ALL active cells perc
-# library(mmand)
-# spksthresh <- 2*sd(spks)
-# spksthresholded <- threshold(spks[,1:ncol(spks)], spksthresh, method = c("literal"), binarise = TRUE)
-# # Calculating percentage of active cells over time
-# spksSUM <- colSums(spksthresholded)
-# spksSUM <- as.data.frame(spksSUM)
-# spksSUM$Time <- 1:nrow(spksSUM)
-# spksSUM$spksSUM <- spksSUM$spksSUM/nrow(spksthresholded)*100
-# ggplot(spksSUM, aes(Time, spksSUM))+
-#   geom_line()+
-#   ylim(0,100)
+library(mmand)
+# Calculating percentage of active cells over time
+spksSUM <- colSums(spksthresholded)
+spksSUM <- as.data.frame(spksSUM)
+spksSUM$Time <- 1:nrow(spksSUM)
+spksSUM$Perc <- spksSUM$spksSUM/nrow(spksthresholded)*100
+ggplot(spksSUM, aes(Time, Perc))+
+  geom_line()+
+  ylim(0,100)
 
 
 
