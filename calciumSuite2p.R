@@ -47,8 +47,17 @@ spks <- sapply(spks, function(x) (x - min(x))/(max(x)-min(x)))
 
 ## CALCULATE ACTIVE RFP CELLS OVER TIME
 library(mmand)
-spksthresh <- 2*sd(spks)
-spksthresholded <- threshold(spks[,1:ncol(spks)], spksthresh, method = c("literal"), binarise = TRUE)
+spksthresh <- sd(spks)
+
+# Cutoff function <- anything below 2*(row sd/cell) is 0, anything above is 1
+cutoff <- function(x){
+  x[x < 2*sd(x)] <- 0
+  x[x > 2*sd(x)] <- 1
+  return(x)
+} 
+
+spksthresholded <- t(apply(spks, 1, cutoff))
+
 # Calculating percentage of active RFP cells over time
 RFP <- spks[unique(c(68,189,385,190,257,190,275,93,26,215,36,911,96,13,123,38,
                      47,73,59,374,204,133,1023,406,245,375,119,92,50,46,7,492,
@@ -60,6 +69,12 @@ rownames(RFP) <- unique(c(68,189,385,190,257,190,275,93,26,215,36,911,96,13,123,
                           189,662,19,13,96,32))
 RFPthresholded <- threshold(RFP[,1:ncol(RFP)], spksthresh, method = c("literal"), binarise = TRUE)
 ########################################### done with this s**t
+##ggplot to show percentage of RPF+ cells over time
+RFPsum <- as.data.frame(colSums(RFPthresholded))
+RFPsum$Time <- 1:nrow(RFPsum)
+RFPsum$Perc <- RFPsum$`colSums(RFPthresholded)`/nrow(RFPsum) *100
+
+
 
 spks <- spks[positives,] #select only positives
 rownames(spks) <- positives #fix rownames with actual cells numbers
