@@ -29,13 +29,13 @@ for (i in 1:length(stat)) {
 posXY$Cell <- as.numeric(0:(nrow(posXY)-1))
 colnames(posXY) <- c('Y','X','Cell')
 
-#iscell.npy to select only ROIs that are cells
+#iscell.npy to select only ROIs that are recognized as cells
 iscell <- as.data.frame(np$load("iscell.npy", allow_pickle = TRUE))
 iscell$Cell <- as.numeric(0:(nrow(iscell)-1))
 posXY$Positive <- iscell$V1
 posXY <- subset(posXY, Positive == 1, select = c(Y,X,Cell))
 positives <- posXY$Cell
-positives <- positives+1 ##this is needed because suite2p starts counting ROIs with the number 0 (python..)
+positivesPLUSone <- positives+1 ##this is needed because suite2p starts counting ROIs with the number 0 (python..)
 
 # load suite2p numpy arrays outputs
 spks <- as.data.frame(np$load("spks.npy", allow_pickle = TRUE)) #deconvolved peaks
@@ -44,6 +44,10 @@ spks <- spks[,25:ncol(spks)]
 
 #Normalize each cell
 spks <- sapply(spks, function(x) (x - min(x))/(max(x)-min(x)))
+spks <- spks[positivesPLUSone,] #select only positives
+rownames(spks) <- positives #fix rownames with actual cells numbers
+
+
 
 # Cutoff function <- anything below 2*(row sd/cell) is 0, anything above is 1
 cutoff <- function(x){
@@ -55,14 +59,8 @@ cutoff <- function(x){
 spksthresholded <- t(apply(spks, 1, cutoff))
 
 # Calculating percentage of active RFP cells over time
-RFP <- spksthresholded[unique(c(68,189,385,190,257,190,275,93,26,215,36,911,96,13,123,38,
-                     47,73,59,374,204,133,1023,406,245,375,119,92,50,46,7,492,
-                     452,139,1,240,223,133,20,139,600,1482,16,39,93,30,174,385,
-                     189,662,19,13,96,32)),] #select only RFP cells
-rownames(RFP) <- unique(c(68,189,385,190,257,190,275,93,26,215,36,911,96,13,123,38,
-                          47,73,59,374,204,133,1023,406,245,375,119,92,50,46,7,492,
-                          452,139,1,240,223,133,20,139,600,1482,16,39,93,30,174,385,
-                          189,662,19,13,96,32))
+RFPcells <- unique(c(68,189,385,190,257,190,275,93,26,215,36,911,96,13,123,38,47,73,59,374,204,133,1023,406,245,375,119,92,50,46,7,492,452,139,1,240,223,133,20,139,600,1482,16,39,93,30,174,385,189,662,19,13,96,32))
+RFP <- subset(spksthresholded, rownames(spksthresholded) %in% RFPcells) #select only RFP cells
 
 ########################################### done with this s**t
 ##ggplot to show percentage of RPF+ cells over time
@@ -74,8 +72,7 @@ ggplot(RFPsum, aes(Time, Perc))+
   ylim(0,100)
 
 
-spks <- spks[positives,] #select only positives
-rownames(spks) <- positives #fix rownames with actual cells numbers
+
 
 ## CALCULATE ALL ACTIVE CELLS OVER TIME
 # Threshold to calculate ALL active cells perc
@@ -88,10 +85,6 @@ spksSUM$Perc <- spksSUM$spksSUM/nrow(spksthresholded)*100
 ggplot(spksSUM, aes(Time, Perc))+
   geom_line()+
   ylim(0,100)
-
-
-
-
 
 
 # Raster ggplot
@@ -141,11 +134,62 @@ peaks.raster <- ggplot(meltPeaks, aes(time, cell))+
 # GRID
 grid.newpage()
 print(peaks.raster, vp = viewport(x = 0.4, y = 0.5, width = 0.8, height = 1.0))
-print(peaks.dendro, vp = viewport(x = 0.90, y = 0.455, width = 0.2, height = 0.94))
+print(peaks.dendro, vp = viewport(x = 0.90, y = 0.453, width = 0.2, height = 0.89))
+
+########################################### RFP ####################################
+# RFPcells for raster/dendrogram. Take care of using already normalized spks array
+RFPnothresh <- subset(spks, rownames(spks) %in% RFPcells) #select only RFP cells
+rownames(RFPnothresh) <- unique(c(68,189,385,190,257,190,275,93,26,215,36,911,96,13,123,38,47,73,59,374,204,133,1023,406,245,375,119,92,50,46,7,492,452,139,1,240,223,133,20,139,600,1482,16,39,93,30,174,385,189,662,19,13,96,32))
+
+# Raster ggplot
+dfpeaks <- as.data.frame(t(RFPnothresh))
+colnames(dfpeaks) <- 1:ncol(dfpeaks)
+dfpeaks$time <- 1:nrow(dfpeaks)
+meltPeaks <- melt(dfpeaks, id = "time")
+colnames(meltPeaks) <- c('time','cell','Ca2+')
+
+#ggplot(meltPeaks, aes(time, cell)) +
+# geom_raster(aes(fill = `Ca2+`))
 
 
+# Hierarchical clustering
+hc <- hclust(dist(RFPnothresh, method = "euclidean"), method = "ward.D2")
+dhc <- as.dendrogram(hc)
 
 
+# Dendrogram
+peaks.dendro <- ggdendrogram(dhc, rotate = TRUE, labels = FALSE)+
+  theme(panel.grid = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())
+
+# GRID to put together dendrograms and rasters
+peaks.order <- order.dendrogram(dhc)
+
+## Order the levels according to their position in the cluster
+peaks.rows <- rownames(meltPeaks)
+peaks.rows <- as.data.frame(peaks.rows)
+meltPeaks$cell <- factor(x = meltPeaks$cell,
+                         levels = peaks.rows$peaks.rows[peaks.order], 
+                         ordered = TRUE)
+
+# Ggplot rasterwith dendro order
+peaks.raster <- ggplot(meltPeaks, aes(time, cell))+
+  geom_raster(aes(fill = `Ca2+`))+
+  scale_fill_gradientn(colours=c("white", "black"))+
+  theme(legend.position = "top",
+        panel.grid = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())
+
+# GRID
+grid.newpage()
+print(peaks.raster, vp = viewport(x = 0.4, y = 0.5, width = 0.8, height = 1.0))
+print(peaks.dendro, vp = viewport(x = 0.90, y = 0.453, width = 0.2, height = 0.89))
+########################################################################################
 
 
 
@@ -156,7 +200,7 @@ print(peaks.dendro, vp = viewport(x = 0.90, y = 0.455, width = 0.2, height = 0.9
 
 ggplot(posXY, aes(X, Y, color = Cell, label = Cell))+
   geom_point()+
-  geom_label()+
+  # geom_label()+
   scale_y_reverse()
 
 
