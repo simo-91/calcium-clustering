@@ -59,7 +59,7 @@ cutoff <- function(x){
 spksthresholded <- t(apply(spks, 1, cutoff))
 
 # Calculating percentage of active RFP cells over time
-RFPcells <- unique(c(86,114,315,42,728,205,0,228,556,979,171,172,13,122,442,665,14,823,78,446,714,132,29,141,185,144,285,683,551,319,193,226,91))
+RFPcells <- unique(c(68,189,385,190,257,190,275,93,26,215,36,911,96,13,123,38,47,73,59,374,204,133,1023,406,245,375,119,92,50,46,7,492,452,139,1,240,223,133,20,139,600,1482,16,39,93,30,174,385,189,662,19,13,96,32))
 RFP <- subset(spksthresholded, rownames(spksthresholded) %in% RFPcells) #select only RFP cells
 
 ########################################### done with this s**t
@@ -102,7 +102,6 @@ colnames(meltPeaks) <- c('time','cell','Ca2+')
 hc <- hclust(dist(spks, method = "euclidean"), method = "ward.D2")
 dhc <- as.dendrogram(hc)
 
-
 # Dendrogram
 peaks.dendro <- ggdendrogram(dhc, rotate = TRUE, labels = FALSE)+
                   theme(panel.grid = element_blank(),
@@ -122,6 +121,8 @@ meltPeaks$cell <- factor(x = meltPeaks$cell,
                          ordered = TRUE)
 
 # Ggplot rasterwith dendro order
+meltPeaks$RFP <- meltPeaks$cell %in% RFPcells #highlight RFP cells
+
 peaks.raster <- ggplot(meltPeaks, aes(time, cell))+
   geom_raster(aes(fill = `Ca2+`))+
   scale_fill_gradientn(colours=c("white", "black"))+
@@ -139,7 +140,7 @@ print(peaks.dendro, vp = viewport(x = 0.90, y = 0.453, width = 0.2, height = 0.8
 ########################################### RFP ####################################
 # RFPcells for raster/dendrogram. Take care of using already normalized spks array
 RFPnothresh <- subset(spks, rownames(spks) %in% RFPcells) #select only RFP cells
-rownames(RFPnothresh) <- unique(c(86,114,315,42,728,205,0,228,556,979,171,172,13,122,442,665,14,823,78,446,714,132,29,141,185,144,285,683,551,319,193,226,91))
+rownames(RFPnothresh) <- unique(c(68,189,385,190,257,190,275,93,26,215,36,911,96,13,123,38,47,73,59,374,204,133,1023,406,245,375,119,92,50,46,7,492,452,139,1,240,223,133,20,139,600,1482,16,39,93,30,174,385,189,662,19,13,96,32))
 
 # Raster ggplot
 dfpeaks <- as.data.frame(t(RFPnothresh))

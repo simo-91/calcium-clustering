@@ -3,24 +3,21 @@ library(igraph)
 library(ggraph)
 library(visNetwork) 
 library(tidyverse)
-
-#Ignore this if already done in crosscorrlag1.R
-#cmat <- as.data.frame(cmat)
-#colnames(cmat) <- rownames(cmat)
-############################################
-
-
+library(tidygraph)
 
 graph <- graph.adjacency(as.matrix(cmat), weighted = TRUE)
 
-# Threshold correlation
+# Threshold correlation degree
 graph <- delete.edges(graph, which(E(graph)$weight <0.75))
 
+
+# Label RFP cells as such
+posXY$RFP <- posXY$Cell %in% RFPcells
 # DISPLAY NETWORK
 ggraph(graph, layout = as.matrix(posXY)[, c("X", "Y")]) +
   geom_edge_link(aes(colour = weight))+
-  geom_node_point(size = 1)+
-  # geom_node_text(aes(label = posXY$Cell))+
+  geom_node_point(aes(colour = posXY$RFP, size = posXY$RFP))+ #RFP cells are bigger and blue
+  # geom_node_text(aes(label = posXY$RFP))+
     scale_edge_color_gradient(
       low = "blue",
       high = "red",
