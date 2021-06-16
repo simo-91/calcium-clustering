@@ -59,7 +59,7 @@ cutoff <- function(x){
 spksthresholded <- t(apply(spks, 1, cutoff))
 
 # Calculating percentage of active RFP cells over time
-RFPcells <- unique(c(68,189,385,190,257,190,275,93,26,215,36,911,96,13,123,38,47,73,59,374,204,133,1023,406,245,375,119,92,50,46,7,492,452,139,1,240,223,133,20,139,600,1482,16,39,93,30,174,385,189,662,19,13,96,32))
+RFPcells <- unique(c(86,114,315,42,728,205,0,228,556,979,171,172,13,122,442,665,14,823,78,446,714,132,29,141,185,144,285,683,551,319,193,226,91))
 RFP <- subset(spksthresholded, rownames(spksthresholded) %in% RFPcells) #select only RFP cells
 
 ########################################### done with this s**t
@@ -139,7 +139,7 @@ print(peaks.dendro, vp = viewport(x = 0.90, y = 0.453, width = 0.2, height = 0.8
 ########################################### RFP ####################################
 # RFPcells for raster/dendrogram. Take care of using already normalized spks array
 RFPnothresh <- subset(spks, rownames(spks) %in% RFPcells) #select only RFP cells
-rownames(RFPnothresh) <- unique(c(68,189,385,190,257,190,275,93,26,215,36,911,96,13,123,38,47,73,59,374,204,133,1023,406,245,375,119,92,50,46,7,492,452,139,1,240,223,133,20,139,600,1482,16,39,93,30,174,385,189,662,19,13,96,32))
+rownames(RFPnothresh) <- unique(c(86,114,315,42,728,205,0,228,556,979,171,172,13,122,442,665,14,823,78,446,714,132,29,141,185,144,285,683,551,319,193,226,91))
 
 # Raster ggplot
 dfpeaks <- as.data.frame(t(RFPnothresh))
@@ -190,18 +190,35 @@ grid.newpage()
 print(peaks.raster, vp = viewport(x = 0.4, y = 0.5, width = 0.8, height = 1.0))
 print(peaks.dendro, vp = viewport(x = 0.90, y = 0.453, width = 0.2, height = 0.89))
 ########################################################################################
-
-
-
-
-
-
-
-
+# Simple ggplot cells on coordinates
 ggplot(posXY, aes(X, Y, color = Cell, label = Cell))+
   geom_point()+
   # geom_label()+
   scale_y_reverse()
+
+
+# Average calcium levels over time of each RFP cell
+# For this I use the raw fluorescence
+F <- as.data.frame(np$load("F.npy", allow_pickle = TRUE)) #raw calcium levels
+Fneu <- as.data.frame(np$load("Fneu.npy", allow_pickle = TRUE)) #neuropil (background)
+Fraw <- F-Fneu #background removed
+#need to clean it from first 0 and select best window
+Fraw <- Fraw[,25:ncol(Fraw)]
+# Fraw <- sapply(Fraw, function(x) (x - min(x))/(max(x)-min(x))) #normalize
+FrawRFP <- Fraw[RFPcells+1,]
+rownames(FrawRFP) <- RFPcells
+
+#Averaging per timepoint
+FrawRFPx <- as.data.frame(colSums(FrawRFP)/nrow(FrawRFP))
+FrawRFPx$Time <- 0:(nrow(FrawRFPx)-1)
+#plot
+ggplot(FrawRFPx, aes(Time, `colSums(FrawRFP)/nrow(FrawRFP)`))+
+  geom_line()+
+  ylab("Average Ca2+")
+
+
+# Plot RFP deconvolved curves all together
+
 
 
 
