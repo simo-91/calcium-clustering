@@ -1,5 +1,4 @@
 ################ CALCIUM ANALYSIS WITHOUT THRESHOLDING (ANALOGIC)
-setwd("/media/simo/Seagate/880 NBTGCaMP6s_nacre--/25042021/25042021_NBTGCaMP6s_nacre__CTRL_lexOPRFP_5dpf/CTRLfish2/midbrain/suite2p/plane0")
 library(dplyr)
 library(tidyverse)
 library(ggplot2)
@@ -39,6 +38,7 @@ positivesPLUSone <- positives+1 ##this is needed because suite2p starts counting
 
 # load suite2p numpy arrays outputs
 spks <- as.data.frame(np$load("spks.npy", allow_pickle = TRUE)) #deconvolved peaks
+spks[is.na(spks)] <- 0 #NAs replaced with 0
 #need to clean it from first 0 and select best window
 spks <- spks[,25:ncol(spks)]
 
@@ -62,15 +62,14 @@ spksthresholded <- t(apply(spks, 1, cutoff))
 RFPcells <- unique(c(68,189,385,190,257,190,275,93,26,215,36,911,96,13,123,38,47,73,59,374,204,133,1023,406,245,375,119,92,50,46,7,492,452,139,1,240,223,133,20,139,600,1482,16,39,93,30,174,385,189,662,19,13,96,32))
 RFP <- subset(spksthresholded, rownames(spksthresholded) %in% RFPcells) #select only RFP cells
 
-########################################### done with this s**t
 ##ggplot to show percentage of RPF+ cells over time
 RFPsum <- as.data.frame(colSums(RFP))
 RFPsum$Time <- 1:nrow(RFPsum)
 RFPsum$Perc <- RFPsum$`colSums(RFP)`/nrow(RFP)*100
 ggplot(RFPsum, aes(Time, Perc))+
   geom_line()+
-  ylim(0,100)
-
+  ylim(0,100)+
+  geom_smooth(method = "loess")
 
 
 
@@ -84,7 +83,8 @@ spksSUM$Time <- 1:nrow(spksSUM)
 spksSUM$Perc <- spksSUM$spksSUM/nrow(spksthresholded)*100
 ggplot(spksSUM, aes(Time, Perc))+
   geom_line()+
-  ylim(0,100)
+  ylim(0,100)+
+  geom_smooth(method = "loess")
 
 
 # Raster ggplot
@@ -125,17 +125,18 @@ meltPeaks$RFP <- meltPeaks$cell %in% RFPcells #highlight RFP cells
 
 peaks.raster <- ggplot(meltPeaks, aes(time, cell))+
   geom_raster(aes(fill = `Ca2+`))+
+  # geom_line(aes(color = RFP), alpha = .2)+
+  scale_y_discrete(breaks = levels(meltPeaks$RFP))+
   scale_fill_gradientn(colours=c("white", "black"))+
   theme(legend.position = "top",
         panel.grid = element_blank(),
         axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks = element_blank())
+        axis.text.y = element_blank())
 
 # GRID
 grid.newpage()
 print(peaks.raster, vp = viewport(x = 0.4, y = 0.5, width = 0.8, height = 1.0))
-print(peaks.dendro, vp = viewport(x = 0.90, y = 0.453, width = 0.2, height = 0.89))
+print(peaks.dendro, vp = viewport(x = 0.90, y = 0.455, width = 0.2, height = 0.94))
 
 ########################################### RFP ####################################
 # RFPcells for raster/dendrogram. Take care of using already normalized spks array
@@ -215,7 +216,36 @@ FrawRFPx$Time <- 0:(nrow(FrawRFPx)-1)
 #plot
 ggplot(FrawRFPx, aes(Time, `colSums(FrawRFP)/nrow(FrawRFP)`))+
   geom_line()+
-  ylab("Average Ca2+")
+  ylab("Average Ca2+")+
+  geom_smooth(method = "loess")
+
+
+#Averaging per cell
+Frawsinglecell <- as.data.frame(rowSums(Fraw)/ncol(Fraw))
+Frawsinglecell$Cell <- 0:(nrow(Frawsinglecell)-1)
+
+
+posXY2 <- data.frame()
+for (i in 1:length(stat)) {
+  posXY2 <- rbind(posXY2, stat[[i]][["med"]])
+}
+
+posXY2$Cell <- as.numeric(0:(nrow(posXY2)-1))
+colnames(posXY2) <- c('Y','X','Cell')
+posXY2$Calcium <- Frawsinglecell$`rowSums(Fraw)/ncol(Fraw)`
+# Spatial plot with average activity/cell
+ggplot(Frawsinglecell, aes(posXY$X, posXY$Y, color = `rowSums(Fraw)/ncol(Fraw)`, label = Cell))+
+  geom_point()+
+  # geom_label()+
+  scale_y_reverse()
+
+
+
+
+
+
+
+
 
 
 # Plot RFP deconvolved curves all together
@@ -226,10 +256,18 @@ ggplot(FrawRFPx, aes(Time, `colSums(FrawRFP)/nrow(FrawRFP)`))+
 
 
 # PCA?
+pcaRFP <- matrix(NA, nrow(spks), 2)
+pcaRFP[,1] <- rownames(spks)
+pcaRFP[,2] <- pcaRFP[,1] %in% RFPcells
+
 pca <-prcomp(spks, center = TRUE, scale = TRUE)
-fviz_pca_ind(pca, col.ind = spks, geom.ind = "point", axes =c(1, 2))
+fviz_pca_ind(pca, col.ind = pcaRFP[,2], geom.ind = "point", axes =c(3, 10))
 
+#k-means
+km <-kmeans(pca$x, 2)
+fviz_pca_ind(pca, col.ind =as.factor(km$cluster), geom.ind = pcaRFP[,2])
 
+             
 
 
 
