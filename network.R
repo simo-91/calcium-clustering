@@ -7,8 +7,8 @@ library(tidygraph)
 
 graph <- graph.adjacency(as.matrix(cmat), weighted = TRUE)
 
-# Threshold correlation degree. An interval is chosen because the Pearson correlation coeff goes -1 to 1)
-graph <- delete.edges(graph, which(E(graph)$weight > -0.75 & E(graph)$weight <0.75))
+# Threshold correlation degree. An interval is chosen because the Pearson correlation coeff goes -1 to 1, BUT -1 means anti-correlation.. so one neuron is active when the other isn't)
+graph <- delete.edges(graph, which(E(graph)$weight <0.75))
 
 
 # Label RFP cells as such
