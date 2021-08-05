@@ -5,16 +5,16 @@ library(visNetwork)
 library(tidyverse)
 library(tidygraph)
 
-graph <- graph.adjacency(as.matrix(cmat), weighted = TRUE)
+graph <- graph.adjacency(as.matrix(cmat.RFP), weighted = TRUE)
 
 # Threshold correlation degree. An interval is chosen because the Pearson correlation coeff goes -1 to 1, BUT -1 means anti-correlation.. so one neuron is active when the other isn't)
-graph <- delete.edges(graph, which(E(graph)$weight <0.75))
+graph <- delete.edges(graph, which(E(graph)$weight <0.50))
 
 
 # Label RFP cells as such
 posXY$RFP <- posXY$Cell %in% RFPcells
 # DISPLAY NETWORK
-ggraph(graph, layout = as.matrix(posXY)[, c("X", "Y")]) +
+ggraph(graph, layout = as.matrix(posXY.RFP)[, c("X", "Y")]) +
   geom_edge_link(aes(colour = weight))+
   geom_node_point(aes(colour = posXY$RFP, size = posXY$RFP))+ #RFP cells are bigger and blue
   # geom_node_text(aes(label = posXY$RFP))+
@@ -27,6 +27,8 @@ ggraph(graph, layout = as.matrix(posXY)[, c("X", "Y")]) +
     )+
   theme(rect = element_rect(fill = "transparent"),
         legend.position = "none")+
+ # annotate(geom="text", x=200, y=30, label=CTRL4dpfhi1_trans,
+        #   color="red")+
   scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
 
 

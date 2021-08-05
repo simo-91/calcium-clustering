@@ -7,7 +7,7 @@
 # will take 0.786 as corr coefficient
 ##########################################
 
-# Create empty matrix that will host corr coefficents. This is a bit voodoo, no touchy!
+# Create empty matrix that will host corr coefficents. 
 tspks <- t(spks)
 
 nc <- nrow(spks)
@@ -20,6 +20,7 @@ max_CCF<- function(a,b)
   cor = d$acf[,,1]
   return(max(cor))
 } 
+
 
 # Actual crosscorrelation; loop for every combination of column pairs (one column - one curve)
 for (i in 1:nc) {
@@ -36,3 +37,29 @@ Colors=colorRampPalette(Colors)(100)
 heatmap.2(as.matrix(cmat), dendrogram = "none",
           col = Colors, trace = "none", density.info =  "none", keysize = 0.50,
           cexRow = 0.5, cexCol=0.5, key.par = list(cex=0.4), na.rm = TRUE)
+
+
+
+## Synchronicity
+# Create empty matrix that will host corr coefficents. This is a bit voodoo, no touchy!
+tRFP <- t(RFP)
+
+nc <- nrow(RFP)
+cmat.RFP <- matrix(NA,nc,nc)
+
+# Function to find max CCF between a and b in ±1 lag range
+max_CCF<- function(a,b)
+{
+  d <- ccf(a, b, plot = FALSE, lag.max = 1)
+  cor = d$acf[,,1]
+  return(max(cor))
+} 
+
+
+# Actual crosscorrelation; loop for every combination of column pairs (one column - one curve)
+for (i in 1:nc) {
+  for (j in 1:nc) {
+    cmat.RFP[i,j] <- max_CCF(tRFP[,i],tRFP[,j])
+  }
+}
+
