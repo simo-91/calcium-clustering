@@ -91,14 +91,7 @@ spksSUM.plt <- ggplot(spksSUM, aes(Time, Perc))+
                   ylim(0,100)+
                   geom_smooth(method = "loess")
 
-# Calculating percentage of active cells over time after extracting highly corr cells
-hiSUM <- rowSums(sync.raster[,-ncol(sync.raster)])
-hiSUM <- as.data.frame(hiSUM)
-hiSUM$Time <- 1:nrow(hiSUM)
-hiSUM$Perc <- hiSUM$hiSUM/ncol(sync.raster)*100
-hiSUM.plt <- ggplot(hiSUM, aes(Time, Perc))+
-  geom_line()+ 
-  theme_pubr()
+
 
 # # Plot total calcium activity/time --------------------------------------
 spksSUM2 <- colSums(spks)
@@ -113,15 +106,7 @@ spksSUM2.plt <- ggplot(spksSUM2, aes(Time, spksSUM2))+
         axis.text.y = element_blank(),
         axis.line.y = element_blank())
 
-# # Plot total calcium activity/time ONLY highly corr cells
-syncSUM2 <- rowSums(sync.raster2[,-ncol(sync.raster2)])
-syncSUM2 <- as.data.frame(syncSUM2)
-syncSUM2$Time <- 1:nrow(syncSUM2)
 
-syncSUM2.plt <- ggplot(syncSUM2, aes(Time, syncSUM2))+
-  geom_line()+ 
-  theme_pubr()+
-  ylab("Ca2+")
 
 # # Raster+dendro all cells/time ggplot ------------------------------------------
 dfpeaks <- as.data.frame(t(spks))  # Doing this coercion will apply +1 to all cells numbers
