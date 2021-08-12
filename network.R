@@ -5,31 +5,30 @@ library(visNetwork)
 library(tidyverse)
 library(tidygraph)
 
-graph <- graph.adjacency(as.matrix(cmat.RFP), weighted = TRUE)
+graph <- graph.adjacency(as.matrix(cmat), weighted = TRUE)
 
 # Threshold correlation degree. An interval is chosen because the Pearson correlation coeff goes -1 to 1, BUT -1 means anti-correlation.. so one neuron is active when the other isn't)
-graph <- delete.edges(graph, which(E(graph)$weight <0.50))
+graph <- delete.edges(graph, which(E(graph)$weight <0.70))
 
 
 # Label RFP cells as such
 posXY$RFP <- posXY$Cell %in% RFPcells
 # DISPLAY NETWORK
-ggraph(graph, layout = as.matrix(posXY.RFP)[, c("X", "Y")]) +
-  geom_edge_link(aes(colour = weight))+
-  geom_node_point(aes(colour = posXY$RFP, size = posXY$RFP))+ #RFP cells are bigger and blue
-  # geom_node_text(aes(label = posXY$RFP))+
-    scale_edge_color_gradient(
-      low = "blue",
-      high = "red",
-      space = "Lab",
-      na.value = "grey50",
-      guide = "edge_colourbar"
-    )+
-  theme(rect = element_rect(fill = "transparent"),
-        legend.position = "none")+
- # annotate(geom="text", x=200, y=30, label=CTRL4dpfhi1_trans,
-        #   color="red")+
-  scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
+AKT1_hindbrain_1.graph <- ggraph(graph, layout = as.matrix(posXY)[, c("X", "Y")]) +
+                            geom_edge_link(aes(colour = weight))+
+                            geom_node_point(aes(colour = posXY$RFP, size = posXY$RFP))+ #RFP cells bigger and blue
+                              scale_edge_color_gradient(
+                                low = "blue",
+                                high = "red",
+                                space = "Lab",
+                                na.value = "grey50",
+                                guide = "edge_colourbar"
+                              )+
+                            theme(rect = element_rect(fill = "transparent"),
+                                  legend.position = "none",
+                                  plot.title = element_text(colour = "red", hjust = .5))+
+                            ggtitle("AKT1 hindbrain 1")+
+                            scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
 
 
 

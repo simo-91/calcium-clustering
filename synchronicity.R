@@ -67,7 +67,7 @@ AKT1_hindbrain_1_sync.raster.hc.plt <- ggplot(sync.raster2.melt, aes(time, cell)
         axis.ticks.y = element_blank(),
         axis.text.y = element_blank(),
         plot.title = element_text(colour = "red", hjust = .5))+
-  ggtitle("AKT1 hindbrain 1")
+  ggtitle("AKT1 hindbrain 1 corr > 0.5")
 
 # # Plot total calcium activity/time ONLY highly corr cells
 syncSUM2 <- rowSums(sync.raster2[,-ncol(sync.raster2)])
@@ -94,6 +94,3 @@ sync.plots <- align_plots(AKT1_hindbrain_1_sync.raster.hc.plt, hiSUM.plt, align 
 sync.AKT1hindbrain1.grid <- plot_grid(sync.plots[[1]], AKT1_hindbrain_1_hiSUM.plt, ncol = 1, rel_heights = c(4.5,1))
 
 
-
-
-hiSUM.thresh <- rowSums(sync.raster[,-ncol(sync.raster)])
