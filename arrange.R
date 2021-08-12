@@ -19,8 +19,16 @@ ggarrange(CTRL4dpfhi1.grid, CTRL5dpfhi1.grid, AKT14dpfhi2.grid, AKT14dpflo2.grid
 
 
 # Comparing all cells against highly corr ones to highlight oscillations
-AKT1hindbrain1_vs_sync <- ggarrange(AKT1hindbrain1.grid, sync.AKT1hindbrain1.grid, AKT1hindbrain1.POS.aveF, AKT1hindbrain1.RFP.aveF, AKT1_hindbrain_1.graph)
+AKT1hindbrain1_vs_sync <- ggarrange(AKT1hindbrain1.grid, sync.AKT1hindbrain1.grid, AKT1hindbrain1.POS.aveF, AKT1hindbrain1.RFP.aveF, AKT1hindbrain1.RFP.grid, AKT1_hindbrain_1.graph)
 
+AKT1midbrain1_vs_sync <- ggarrange(AKT1midbrain1.grid, sync.AKT1midbrain1.grid, AKT1midbrain1.POS.aveF, AKT1midbrain1.RFP.aveF, AKT1midbrain1.RFP.grid, AKT1_midbrain1.graph)
 
+AKT1hindbrain2_vs_sync <- ggarrange(AKT1hindbrain2.grid, sync.AKT1hindbrain2.grid, AKT1hindbrain2.POS.aveF, AKT1hindbrain2.RFP.aveF, AKT1hindbrain2.RFP.grid, AKT1_hindbrain_2.graph)
+
+AKT1hindbrain2b_vs_sync <- ggarrange(AKT1hindbrain2b.grid, sync.AKT1hindbrain2b.grid, AKT1hindbrain2b.POS.aveF, AKT1hindbrain2b.RFP.aveF, AKT1hindbrain2b.RFP.grid, AKT1_hindbrain2b.graph)
+
+AKT1hindbrain3_vs_sync <- ggarrange(AKT1hindbrain3.grid, sync.AKT1hindbrain3.grid, AKT1hindbrain3.POS.aveF, AKT1hindbrain3.RFP.aveF, AKT1hindbrain3.RFP.grid, AKT1_hindbrain3.graph)
+
+AKT1midbrain3_vs_sync <- ggarrange(AKT1midbrain3.grid, sync.AKT1midbrain3.grid, AKT1midbrain3.POS.aveF, AKT1midbrain3.RFP.aveF, AKT1midbrain3.RFP.grid, AKT1_midbrain3.graph)
 
 # Calculate Inter-spike Intervals?

@@ -41,7 +41,7 @@ heatmap.2(as.matrix(cmat), dendrogram = "none",
 
 
 ## Synchronicity
-# Create empty matrix that will host corr coefficents. This is a bit voodoo, no touchy!
+# Create empty matrix that will host corr coefficents. 
 tRFP <- t(RFP)
 
 nc <- nrow(RFP)

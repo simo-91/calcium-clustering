@@ -14,7 +14,7 @@ graph <- delete.edges(graph, which(E(graph)$weight <0.70))
 # Label RFP cells as such
 posXY$RFP <- posXY$Cell %in% RFPcells
 # DISPLAY NETWORK
-AKT1_hindbrain_1.graph <- ggraph(graph, layout = as.matrix(posXY)[, c("X", "Y")]) +
+AKT1_midbrain3.graph <- ggraph(graph, layout = as.matrix(posXY)[, c("X", "Y")]) +
                             geom_edge_link(aes(colour = weight))+
                             geom_node_point(aes(colour = posXY$RFP, size = posXY$RFP))+ #RFP cells bigger and blue
                               scale_edge_color_gradient(
@@ -27,7 +27,7 @@ AKT1_hindbrain_1.graph <- ggraph(graph, layout = as.matrix(posXY)[, c("X", "Y")]
                             theme(rect = element_rect(fill = "transparent"),
                                   legend.position = "none",
                                   plot.title = element_text(colour = "red", hjust = .5))+
-                            ggtitle("AKT1 hindbrain 1")+
+                            ggtitle("AKT1 midbrain 3")+
                             scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
 
 
