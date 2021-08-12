@@ -28,6 +28,7 @@ for (i in 1:nc) {
     cmat[i,j] <- max_CCF(tspks[,i],tspks[,j])
   }
 }
+cmat[is.na(cmat)] <- 0 #NaN replaced with 0. This happens when two timeseries issue originates from Suite2p, as it doesn't generate the  deconvolved signal for a manually added ROI
 
 
 # Display the resultant matrix

@@ -45,12 +45,13 @@ hindbrains <- ggarrange(sync.AKT1hindbrain1.grid,sync.AKT1hindbrain2.grid, sync.
 midbrains <- ggarrange(sync.AKT1midbrain1.grid,sync.AKT1midbrain3.grid, sync.CTRLmidbrain3.grid)
 
 
-
+# grid structure: (1) raster+ratio (2) sync.raster+ratio (3) (deconvolved)activity/time (4) sync.(deconvolved)activity/time #
 # 30min single planes whole brain -----------------------------------------
 CTRL4dpfhi1_vs_sync <- ggarrange(CTRL4dpfhi1.grid, sync.CTRL4dpfhi1.grid, CTRL4dpfhi1.POS.aveF) #larva moves too much!
 # , CTRL4dpfhi1.RFP.aveF, CTRL4dpfhi1.RFP.grid, CTRL_4dpfhi1.graph)
 
 CTRL4dpflo1_vs_sync <- ggarrange(CTRL4dpflo1.grid, sync.CTRL4dpflo1.grid, CTRL4dpflo1.POS.aveF)
 
+AKT14dpfhi2_vs_sync <- ggarrange(AKT14dpfhi2.grid, sync.AKT14dpfhi2.grid, AKT14dpfhi2.spksSUM2.plt, AKT14dpfhi2.syncSUM2.plt)
 
-
+AKT14dpflo2_vs_sync <- ggarrange(AKT14dpflo2.grid, sync.AKT14dpflo2.grid, AKT14dpflo2.spksSUM2.plt, AKT14dpflo2.syncSUM2.plt)

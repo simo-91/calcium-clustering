@@ -53,7 +53,7 @@ sync.raster2.melt$cell <- factor(x = sync.raster2.melt$cell,
                          levels = sync.rows$sync.rows[sync.order], 
                          ordered = TRUE)
 #Rasterplot
-CTRL_4dpflo1_sync.raster.hc.plt <- ggplot(sync.raster2.melt, aes(time, cell))+
+AKT14dpflo2.sync.raster.hc.plt <- ggplot(sync.raster2.melt, aes(time, cell))+
   geom_raster(aes(fill = `Ca2+`))+
   scale_fill_gradientn(colours=c("white", "grey20", "grey10", "black"))+
   theme_pubr()+
@@ -64,17 +64,19 @@ CTRL_4dpflo1_sync.raster.hc.plt <- ggplot(sync.raster2.melt, aes(time, cell))+
         axis.ticks.y = element_blank(),
         axis.text.y = element_blank(),
         plot.title = element_text(colour = "red", hjust = .5))+
-  ggtitle("CTRL 4dpf lo 1 corr > 0.5")
+  ggtitle("AKT1 4dpf lo 2 corr > 0.5")
 
 # # Plot total calcium activity/time ONLY highly corr cells
 syncSUM2 <- rowSums(sync.raster2[,-ncol(sync.raster2)])
 syncSUM2 <- as.data.frame(syncSUM2)
 syncSUM2$Time <- 1:nrow(syncSUM2)
 
-syncSUM2.plt <- ggplot(syncSUM2, aes(Time, syncSUM2))+
+AKT14dpflo2.syncSUM2.plt <- ggplot(syncSUM2, aes(Time, syncSUM2))+
   geom_line()+ 
+  geom_smooth()+
   theme_pubr()+
-  ylab("Ca2+")
+  ylab("Ca2+")+
+  ylim(AKT14dpflo2.spksSUM2.ylim)
 
 # Calculating percentage of active cells over time after extracting highly corr cells
 # With thresholding
@@ -86,13 +88,12 @@ hiSUM <- rowSums(sync.raster[,-ncol(sync.raster)])
 hiSUM <- as.data.frame(hiSUM)
 hiSUM$Time <- 1:nrow(hiSUM)
 hiSUM$Perc <- hiSUM$hiSUM/ncol(sync.raster)*100
-CTRL_4dpflo1_hiSUM.plt <- ggplot(hiSUM, aes(Time, Perc))+
-  geom_line()+ 
+AKT14dpflo2.hiSUM.plt <- ggplot(hiSUM, aes(Time, Perc))+
+  geom_line()+
   theme_pubr()
 
 
 # GRID raster/sums
-sync.plots <- align_plots(CTRL_4dpflo1_sync.raster.hc.plt, hiSUM.plt, align = 'v', axis = 'l')
-sync.CTRL4dpflo1.grid <- plot_grid(sync.plots[[1]], CTRL_4dpflo1_hiSUM.plt, ncol = 1, rel_heights = c(4.5,1))
-
+sync.plots <- align_plots(AKT14dpflo2.sync.raster.hc.plt, AKT14dpflo2.hiSUM.plt, align = 'v', axis = 'l')
+sync.AKT14dpflo2.grid <- plot_grid(sync.plots[[1]], AKT14dpflo2.hiSUM.plt, ncol = 1, rel_heights = c(4.5,1))
 
