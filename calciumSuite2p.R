@@ -46,7 +46,7 @@ spks[is.na(spks)] <- 0 #NAs replaced with 0
 spks <- spks[,25:ncol(spks)]
 
 #Normalize each cell
-spks <- sapply(spks, function(x) (x - min(x))/(max(x)-min(x)))
+spks <- t(apply(spks, 1, function(x) (x - min(x))/(max(x)-min(x))))
 spks <- spks[positivesPLUSone,] #select only positives
 rownames(spks) <- positives #fix rownames with actual cells numbers
 
@@ -93,7 +93,7 @@ AKT14dpflo2.spksSUM2.ylim <- layer_scales(AKT14dpflo2.spksSUM2.plt)$y$get_limits
 
 # # Raster+dendro all cells/time ggplot ------------------------------------------
 dfpeaks <- as.data.frame(t(spks))  # Doing this coercion will apply +1 to all cells numbers
-colnames(dfpeaks) <- 1:ncol(dfpeaks)
+# colnames(dfpeaks) <- 1:ncol(dfpeaks)
 dfpeaks$time <- 1:nrow(dfpeaks)
 meltPeaks <- melt(dfpeaks, id = "time")
 colnames(meltPeaks) <- c('time','cell','Ca2+')
@@ -115,7 +115,7 @@ peaks.dendro <- ggdendrogram(dhc, rotate = TRUE, labels = FALSE)+
 peaks.order <- order.dendrogram(dhc)
 
 ## Order the levels according to their position in the cluster
-peaks.rows <- rownames(meltPeaks)
+peaks.rows <- rownames(spks)
 peaks.rows <- as.data.frame(peaks.rows)
 meltPeaks$cell <- factor(x = meltPeaks$cell,
                          levels = peaks.rows$peaks.rows[peaks.order], 
