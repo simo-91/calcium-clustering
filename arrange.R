@@ -50,8 +50,11 @@ midbrains <- ggarrange(sync.AKT1midbrain1.grid,sync.AKT1midbrain3.grid, sync.CTR
 CTRL4dpfhi1_vs_sync <- ggarrange(CTRL4dpfhi1.grid, sync.CTRL4dpfhi1.grid, CTRL4dpfhi1.POS.aveF) #larva moves too much!
 # , CTRL4dpfhi1.RFP.aveF, CTRL4dpfhi1.RFP.grid, CTRL_4dpfhi1.graph)
 
-CTRL4dpflo1_vs_sync <- ggarrange(CTRL4dpflo1.grid, sync.CTRL4dpflo1.grid, CTRL4dpflo1.POS.aveF)
+CTRL4dpflo1_vs_sync <- ggarrange(CTRL4dpflo1.grid, sync.CTRL4dpflo1.grid, CTRL4dpflo1.spksSUM2.plt, CTRL4dpflo1.syncSUM2.plt)
 
 AKT14dpfhi2_vs_sync <- ggarrange(AKT14dpfhi2.grid, sync.AKT14dpfhi2.grid, AKT14dpfhi2.spksSUM2.plt, AKT14dpfhi2.syncSUM2.plt)
 
 AKT14dpflo2_vs_sync <- ggarrange(AKT14dpflo2.grid, sync.AKT14dpflo2.grid, AKT14dpflo2.spksSUM2.plt, AKT14dpflo2.syncSUM2.plt)
+
+
+ggarrange(CTRL4dpflo1.raster.k, AKT14dpfhi2.raster.k), sync.CTRL4dpflo1.grid)

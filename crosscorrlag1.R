@@ -21,14 +21,21 @@ max_CCF<- function(a,b)
   return(max(cor))
 } 
 
-
+pb <- txtProgressBar(min = 0, max = nc, style = 3)
 # Actual crosscorrelation; loop for every combination of column pairs (one column - one curve)
 for (i in 1:nc) {
-  for (j in 1:nc) {
+  for (j in i:nc) {
     cmat[i,j] <- max_CCF(tspks[,i],tspks[,j])
+    setTxtProgressBar(pb, i)
   }
 }
-cmat[is.na(cmat)] <- 0 #NaN replaced with 0. This happens when two timeseries issue originates from Suite2p, as it doesn't generate the  deconvolved signal for a manually added ROI
+close(pb)
+
+cmat[is.na(cmat)] <- 0 #(Temporary fix) NaN replaced with 0. This happens when manually adding a ROI on Suite2p mistakenly results in a constant time-series of zeroes (hence ccf() tries to divide by 0)
+
+
+
+
 
 
 # Display the resultant matrix

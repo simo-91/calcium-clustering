@@ -50,6 +50,8 @@ spks <- t(apply(spks, 1, function(x) (x - min(x))/(max(x)-min(x))))
 spks <- spks[positivesPLUSone,] #select only positives
 rownames(spks) <- positives #fix rownames with actual cells numbers
 
+spks[is.na(spks)] <- 0 #NAs replaced with 0
+
 
 
 # Cutoff function <- anything below 1*(row sd/cell) is 0, anything above is 1
@@ -71,7 +73,7 @@ spksSUM <- colSums(spksthresholded)
 spksSUM <- as.data.frame(spksSUM)
 spksSUM$Time <- 1:nrow(spksSUM)
 spksSUM$Perc <- spksSUM$spksSUM/nrow(spksthresholded)*100
-AKT14dpflo2.spksSUM.plt <- ggplot(spksSUM, aes(Time, Perc))+
+AKT14dpfhi2.spksSUM.plt <- ggplot(spksSUM, aes(Time, Perc))+
                   geom_line()+ 
                   theme_pubr()
 
@@ -82,13 +84,13 @@ spksSUM2 <- colSums(spks)
 spksSUM2 <- as.data.frame(spksSUM2)
 spksSUM2$Time <- 1:nrow(spksSUM2)
 
-AKT14dpflo2.spksSUM2.plt <- ggplot(spksSUM2, aes(Time, spksSUM2))+
+AKT14dpfhi2.spksSUM2.plt <- ggplot(spksSUM2, aes(Time, spksSUM2))+
   geom_line()+ 
   theme_pubr()+
   geom_smooth()+
   ylab("Ca2+")+
   ylim(0, NA)
-AKT14dpflo2.spksSUM2.ylim <- layer_scales(AKT14dpflo2.spksSUM2.plt)$y$get_limits()
+AKT14dpfhi2.spksSUM2.ylim <- layer_scales(AKT14dpfhi2.spksSUM2.plt)$y$get_limits()
 
 
 # # Raster+dendro all cells/time ggplot ------------------------------------------
@@ -125,11 +127,11 @@ meltPeaks$cell <- factor(x = meltPeaks$cell,
 RFPcells <- unique(c(669,1163,1011,394,113,871,148,1162,27,147,102,253,1231,257,117,63,840,326,950,1272,548,327,292,131,1334,208,103,666,517,68,128,1088,611,94,609,0,354,821))
 meltPeaks$RFP <- meltPeaks$cell %in% RFPcells #highlight RFP cells
 
-AKT14dpflo2.raster <- ggplot(meltPeaks, aes(time, cell))+
+AKT14dpfhi2.raster.hc <- ggplot(meltPeaks, aes(time, cell))+
   geom_raster(aes(fill = `Ca2+`))+
   # geom_line(aes(color = RFP), alpha = .2)+
   #scale_y_discrete(breaks = levels(meltPeaks$RFP))+
-  scale_fill_gradientn(colours=c("white", "grey20", "grey10", "black"))+
+  scale_fill_gradientn(colours=c("white", "black"))+
   theme_pubr()+
   theme(legend.position = "none",
         axis.title.x = element_blank(),
@@ -138,7 +140,7 @@ AKT14dpflo2.raster <- ggplot(meltPeaks, aes(time, cell))+
         axis.ticks.y = element_blank(),
         axis.text.y = element_blank(),
         plot.title = element_text(colour = "red", hjust = .5))+
-  ggtitle("AKT1 4dpf lo 2")
+  ggtitle("AKT1 4dpf hi 2 hclust")
 
 # GRID
 # grid.newpage()
@@ -146,8 +148,8 @@ AKT14dpflo2.raster <- ggplot(meltPeaks, aes(time, cell))+
 # print(peaks.dendro, vp = viewport(x = 0.90, y = 0.455, width = 0.2, height = 0.94))
 
 # GRID raster/sums
-plots <- align_plots(AKT14dpflo2.raster, AKT14dpflo2.spksSUM.plt, align = 'v', axis = 'l')
-AKT14dpflo2.grid <- plot_grid(plots[[1]], AKT14dpflo2.spksSUM.plt, ncol = 1, rel_heights = c(4.5,1))
+plots <- align_plots(AKT14dpfhi2.raster.hc, AKT14dpfhi2.spksSUM.plt, align = 'v', axis = 'l')
+AKT14dpfhi2.grid <- plot_grid(plots[[1]], AKT14dpfhi2.spksSUM.plt, ncol = 1, rel_heights = c(4.5,1))
 
 
 ########################################### RFP ####################################
@@ -159,7 +161,7 @@ RFP <- subset(spksthresholded, rownames(spksthresholded) %in% RFPcells) #select 
 RFPsum <- as.data.frame(colSums(RFP))
 RFPsum$Time <- 1:nrow(RFPsum)
 RFPsum$Perc <- RFPsum$`colSums(RFP)`/nrow(RFP)*100
-AKT14dpflo2_RFPsum.plt <- ggplot(RFPsum, aes(Time, Perc))+
+AKT14dpfhi2_RFPsum.plt <- ggplot(RFPsum, aes(Time, Perc))+
   geom_line()+
   theme_pubr()
 
@@ -213,7 +215,7 @@ RFP.raster <- ggplot(meltPeaks.RFP, aes(time, cell))+
         axis.ticks.y = element_blank(),
         axis.text.y = element_blank(),
         plot.title = element_text(colour = "red", hjust = .5))+
-  ggtitle("AKT1 4dpf hi 2 RFP+")
+  ggtitle("CTRL 4dpf hi 2 RFP+")
 
 # # GRID
 # grid.newpage()
@@ -221,8 +223,8 @@ RFP.raster <- ggplot(meltPeaks.RFP, aes(time, cell))+
 # print(peaks.dendro, vp = viewport(x = 0.90, y = 0.453, width = 0.2, height = 0.89))
 
 # GRID raster/sums
-plots <- align_plots(RFP.raster, AKT14dpflo2_RFPsum.plt, align = 'v', axis = 'l')
-AKT14dpflo2.RFP.grid <- plot_grid(plots[[1]], AKT14dpflo2_RFPsum.plt, ncol = 1, rel_heights = c(4.5,1))
+plots <- align_plots(RFP.raster, AKT14dpfhi2_RFPsum.plt, align = 'v', axis = 'l')
+AKT14dpfhi2.RFP.grid <- plot_grid(plots[[1]], AKT14dpfhi2_RFPsum.plt, ncol = 1, rel_heights = c(4.5,1))
 
 ########################################################################################
 # Simple ggplot cells on coordinates
@@ -247,7 +249,7 @@ rownames(FrawPOS) <- positives
 FrawPOSx <- as.data.frame(colSums(FrawPOS)/nrow(FrawPOS))
 FrawPOSx$Time <- 0:(nrow(FrawPOSx)-1)
 #plot
-AKT14dpflo2.POS.aveF <- ggplot(FrawPOSx, aes(Time, `colSums(FrawPOS)/nrow(FrawPOS)`))+
+AKT14dpfhi2.POS.aveF <- ggplot(FrawPOSx, aes(Time, `colSums(FrawPOS)/nrow(FrawPOS)`))+
   geom_line()+
   theme_pubr()+
   ylab("Average Ca2+")+
@@ -264,7 +266,7 @@ rownames(FrawRFP) <- RFPcells
 FrawRFPx <- as.data.frame(colSums(FrawRFP)/nrow(FrawRFP))
 FrawRFPx$Time <- 0:(nrow(FrawRFPx)-1)
 #plot
-AKT14dpflo2.RFP.aveF <- ggplot(FrawRFPx, aes(Time, `colSums(FrawRFP)/nrow(FrawRFP)`))+
+AKT14dpfhi2.RFP.aveF <- ggplot(FrawRFPx, aes(Time, `colSums(FrawRFP)/nrow(FrawRFP)`))+
                               geom_line()+
                               theme_pubr()+
                               ylab("Average Ca2+ (RFP+)")+
