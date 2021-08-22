@@ -56,5 +56,7 @@ AKT14dpfhi2_vs_sync <- ggarrange(AKT14dpfhi2.grid, sync.AKT14dpfhi2.grid, AKT14d
 
 AKT14dpflo2_vs_sync <- ggarrange(AKT14dpflo2.grid, sync.AKT14dpflo2.grid, AKT14dpflo2.spksSUM2.plt, AKT14dpflo2.syncSUM2.plt)
 
+# Wholebrains
+ggarrange(CTRL4dpflo1.grid, AKT14dpflo2.grid, AKT14dpfhi2.grid,
+          CTRL5dpfhi1.grid)
 
-ggarrange(CTRL4dpflo1.raster.k, AKT14dpfhi2.raster.k), sync.CTRL4dpflo1.grid)

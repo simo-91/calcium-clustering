@@ -7,7 +7,7 @@
 # will take 0.786 as corr coefficient
 ##########################################
 
-# Create empty matrix that will host corr coefficents. 
+# Create empty matrix that will host corr coefficients. 
 tspks <- t(spks)
 
 nc <- nrow(spks)
@@ -34,6 +34,7 @@ close(pb)
 cmat[is.na(cmat)] <- 0 #(Temporary fix) NaN replaced with 0. This happens when manually adding a ROI on Suite2p mistakenly results in a constant time-series of zeroes (hence ccf() tries to divide by 0)
 
 
+cmat[lower.tri(cmat)] <- t(cmat)[lower.tri(cmat)] 
 
 
 
@@ -48,7 +49,7 @@ heatmap.2(as.matrix(cmat), dendrogram = "none",
 
 
 
-## Synchronicity
+
 # Create empty matrix that will host corr coefficents. 
 tRFP <- t(RFP)
 
