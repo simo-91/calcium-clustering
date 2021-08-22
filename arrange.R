@@ -60,3 +60,28 @@ AKT14dpflo2_vs_sync <- ggarrange(AKT14dpflo2.grid, sync.AKT14dpflo2.grid, AKT14d
 ggarrange(CTRL4dpflo1.grid, AKT14dpflo2.grid, AKT14dpfhi2.grid,
           CTRL5dpfhi1.grid)
 
+## Compare levels of calcium activity
+ggarrange(AKT1hindbrain1.spksSUM2.plt+ylim(0,100), AKT1midbrain1.spksSUM2.plt+ylim(0,100),AKT1hindbrain2.spksSUM2.plt+ylim(0,100),AKT1hindbrain22.spksSUM2.plt+ylim(0,100),
+          AKT1hindbrain3.spksSUM2.plt+ylim(0,100), AKT1midbrain3.spksSUM2.plt+ylim(0,100), CTRLhindbrain2.spksSUM2.plt+ylim(0,100), CTRLhindbrain3.spksSUM2.plt+ylim(0,100),
+          CTRLmidbrain3.spksSUM2.plt+ylim(0,100), labels = c("AKT1hindbrain1", "AKT1midbrain1", "AKT1hindbrain2", "AKT1hindbrain22", "AKT1hindbrain3", "AKT1midbrain3", "CTRLhindbrain2","CTRLhindbrain3", "CTRLmidbrain3"))
+
+
+ggarrange(AKT1hindbrain1.RFPsum2.plt+ylim(0,100), AKT1midbrain1.RFPsum2.plt+ylim(0,100),AKT1hindbrain2.RFPsum2.plt+ylim(0,100),AKT1hindbrain22.RFPsum2.plt+ylim(0,100),
+          AKT1hindbrain3.RFPsum2.plt+ylim(0,100), AKT1midbrain3.RFPsum2.plt+ylim(0,100), CTRLhindbrain2.RFPsum2.plt+ylim(0,100), CTRLhindbrain3.RFPsum2.plt+ylim(0,100),
+          CTRLmidbrain3.RFPsum2.plt+ylim(0,100), labels = c("AKT1hindbrain1", "AKT1midbrain1", "AKT1hindbrain2", "AKT1hindbrain22", "AKT1hindbrain3", "AKT1midbrain3", "CTRLhindbrain2","CTRLhindbrain3", "CTRLmidbrain3"))
+
+
+
+
+ggplot(spksSUM2.all.melt, aes(Time, value))+
+  geom_line(aes(color = variable))+ 
+  facet_wrap(vars(variable))+
+  theme_pubr()
+
+ggplot(RFPsum2.all.melt, aes(Time, `Ca2+`))+
+  geom_line(aes(color = Condition))+
+  facet_wrap(vars(Condition))+
+  theme_pubr()
+
+distributions of calcium levels??
+

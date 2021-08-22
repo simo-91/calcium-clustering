@@ -1,5 +1,56 @@
 # # Synchronicity
+# Create empty matrix-vector that will host corr coefficients. 
+tspks <- t(spks)
 
+nc <- nrow(spks)
+cmat.synchron <- matrix(NA,1,nc)
+
+# Function to find max CCF between a and b in ±1 lag range
+max_CCF<- function(a,b)
+{
+  d <- ccf(a, b, plot = FALSE, lag.max = 1)
+  cor = d$acf[,,1]
+  return(max(cor))
+} 
+
+pb <- txtProgressBar(min = 0, max = nc, style = 3)
+# Actual crosscorrelation; all time-series are cross-correlated with the synchronous time-series pattern
+for (i in 1:nc) {
+    cmat.synchron[,i] <- max_CCF(synchron[,1], tspks[,i])
+    setTxtProgressBar(pb, i)
+}
+close(pb)
+
+synchron.cluster <- which(cmat.synchron > 0.7, arr.ind = T) #select the cells with highest correlation to the pattern
+synchron.cluster <- sort(unique(synchron.cluster[,2]))
+
+# No thresholding
+synchron.raster <- as.data.frame(tspks[, synchron.cluster])
+
+synchron.raster$time <- 1:nrow(synchron.raster)
+synchron.raster.melt <- melt(synchron.raster, id = "time")
+colnames(synchron.raster.melt) <- c('time','cell','Ca2+')
+
+#Rasterplot
+AKT1hindbrain1.synchron.raster.plt <- ggplot(synchron.raster.melt, aes(time, `Ca2+`))+
+  # geom_raster(aes(fill = `Ca2+`))+
+  geom_line(aes(color = cell))+
+  facet_wrap(vars(cell), ncol = 1, strip.position = "right")
+  scale_fill_gradientn(colours=c("white", "black"))+
+  theme_pubr()+
+  theme(legend.position = "none",
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(),
+        plot.title = element_text(colour = "red", hjust = .5))+
+  ggtitle("AKT1 hindbrain 1 synchron cluster")
+
+
+
+
+# Isolate coactive cells (highest crosscorrelation coeff)
 cmat.hi <- cmat
 cmat.hi[lower.tri(cmat, diag=TRUE)] = NA  #Prepare to drop duplicates and meaningless information
 

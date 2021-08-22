@@ -73,7 +73,7 @@ spksSUM <- colSums(spksthresholded)
 spksSUM <- as.data.frame(spksSUM)
 spksSUM$Time <- 1:nrow(spksSUM)
 spksSUM$Perc <- spksSUM$spksSUM/nrow(spksthresholded)*100
-AKT1hindbrain1.spksSUM.plt <- ggplot(spksSUM, aes(Time, Perc))+
+AKT1midbrain3.spksSUM.plt <- ggplot(spksSUM, aes(Time, Perc))+
                   geom_line()+ 
                   theme_pubr()
 
@@ -84,13 +84,13 @@ spksSUM2 <- colSums(spks)
 spksSUM2 <- as.data.frame(spksSUM2)
 spksSUM2$Time <- 1:nrow(spksSUM2)
 
-AKT1hindbrain1.spksSUM2.plt <- ggplot(spksSUM2, aes(Time, spksSUM2))+
+AKT1midbrain3.spksSUM2.plt <- ggplot(spksSUM2, aes(Time, spksSUM2))+
   geom_line()+ 
   theme_pubr()+
   geom_smooth()+
   ylab("Ca2+")+
   ylim(0, NA)
-AKT1hindbrain1.spksSUM2.ylim <- layer_scales(AKT1hindbrain1.spksSUM2.plt)$y$get_limits()
+AKT1midbrain3.spksSUM2.ylim <- layer_scales(AKT1midbrain3.spksSUM2.plt)$y$get_limits()
 
 
 # # Raster+dendro all cells/time ggplot ------------------------------------------
@@ -124,13 +124,13 @@ meltPeaks$cell <- factor(x = meltPeaks$cell,
                          ordered = TRUE)
 
 # Ggplot rasterwith dendro order
-RFPcells <- unique(c(68,189,385,190,257,190,275,93,26,215,36,911,96,13,123,38,47,73,59,374,204,133,1023,406,245,375,119,92,50,46,7,492,452,139,1,240,223,133,20,139,600,1482,16,39,93,30,174,385,189,662,19,13,96,32))
+RFPcells <- unique(c(150, 48, 398, 118, 223, 20, 3, 224, 24, 130, 199, 320,184,176,97, 13, 2, 735, 1, 216, 74, 16, 79, 266, 85, 6, 200, 576, 257, 21, 56, 18, 502, 204, 64, 93, 31, 0, 399, 122))
 meltPeaks$RFP <- meltPeaks$cell %in% RFPcells #loghlight RFP cells
 
-AKT1hindbrain1.raster.hc <- ggplot(meltPeaks, aes(time, cell))+
+AKT1midbrain3.raster.hc <- ggplot(meltPeaks, aes(time, cell))+
   geom_raster(aes(fill = `Ca2+`))+
-  geom_line(aes(color = RFP), alpha = .2)+
-  scale_y_discrete(breaks = levels(meltPeaks$RFP))+
+  # geom_line(aes(color = RFP), alpha = .2)+
+  # scale_y_discrete(breaks = levels(meltPeaks$RFP))+
   scale_fill_gradientn(colours=c("white", "black"))+
   theme_pubr()+
   theme(legend.position = "none",
@@ -140,7 +140,7 @@ AKT1hindbrain1.raster.hc <- ggplot(meltPeaks, aes(time, cell))+
         axis.ticks.y = element_blank(),
         axis.text.y = element_blank(),
         plot.title = element_text(colour = "red", hjust = .5))+
-  ggtitle("AKT1 hindbrain 1 hclust")
+  ggtitle("AKT1 midbrain 3 hclust")
 
 # GRID
 # grid.newpage()
@@ -148,8 +148,8 @@ AKT1hindbrain1.raster.hc <- ggplot(meltPeaks, aes(time, cell))+
 # print(peaks.dendro, vp = viewport(x = 0.90, y = 0.455, width = 0.2, height = 0.94))
 
 # GRID raster/sums
-plots <- align_plots(AKT1hindbrain1.raster.hc, AKT1hindbrain1.spksSUM.plt, align = 'v', axis = 'l')
-AKT1hindbrain1.grid <- plot_grid(plots[[1]], AKT1hindbrain1.spksSUM.plt, ncol = 1, rel_heights = c(4.5,1))
+plots <- align_plots(AKT1midbrain3.raster.hc, AKT1midbrain3.spksSUM.plt, align = 'v', axis = 'l')
+AKT1midbrain3.grid <- plot_grid(plots[[1]], AKT1midbrain3.spksSUM.plt, ncol = 1, rel_heights = c(4.5,1))
 
 
 ########################################### RFP ####################################
@@ -161,13 +161,30 @@ RFP <- subset(spksthresholded, rownames(spksthresholded) %in% RFPcells) #select 
 RFPsum <- as.data.frame(colSums(RFP))
 RFPsum$Time <- 1:nrow(RFPsum)
 RFPsum$Perc <- RFPsum$`colSums(RFP)`/nrow(RFP)*100
-AKT1hindbrain1_RFPsum.plt <- ggplot(RFPsum, aes(Time, Perc))+
+AKT1midbrain3_RFPsum.plt <- ggplot(RFPsum, aes(Time, Perc))+
   geom_line()+
   theme_pubr()
 
-# RFPcells for raster/dendrogram. Take care of using already normalized spks array
+# RFPcells for activity/raster/dendrogram. Take care of using already normalized spks array
 RFPnothresh <- subset(spks, rownames(spks) %in% RFPcells) #select only RFP cells
-rownames(RFPnothresh) <- unique(c(68,189,385,190,257,190,275,93,26,215,36,911,96,13,123,38,47,73,59,374,204,133,1023,406,245,375,119,92,50,46,7,492,452,139,1,240,223,133,20,139,600,1482,16,39,93,30,174,385,189,662,19,13,96,32))
+rownames(RFPnothresh) <- unique(c(150, 48, 398, 118, 223, 20, 3, 224, 24, 130, 199, 320,184,176,97, 13, 2, 735, 1, 216, 74, 16, 79, 266, 85, 6, 200, 576, 257, 21, 56, 18, 502, 204, 64, 93, 31, 0, 399, 122))
+
+
+# Sum of all activity over time RFP+
+RFP <- subset(spks, rownames(spks) %in% RFPcells) #select only RFP cells
+RFPsum2 <- as.data.frame(colSums(RFP))
+RFPsum2$Time <- 1:nrow(RFPsum2)
+
+AKT1midbrain3.RFPsum2.plt <- ggplot(RFPsum2, aes(Time, AKT1midbrain3))+
+  geom_line()+ 
+  theme_pubr()+
+  geom_smooth()+
+  ylab("Ca2+")+
+  ylim(0, NA)
+AKT1midbrain3.RFPsum2.ylim <- layer_scales(AKT1midbrain3.RFPsum2.plt)$y$get_limits()
+
+
+
 
 # Raster ggplot
 dfpeaks.RFP <- as.data.frame(t(RFPnothresh))
@@ -215,7 +232,7 @@ RFP.raster <- ggplot(meltPeaks.RFP, aes(time, cell))+
         axis.ticks.y = element_blank(),
         axis.text.y = element_blank(),
         plot.title = element_text(colour = "red", hjust = .5))+
-  ggtitle("AKT1 hindbrain 1 RFP+")
+  ggtitle("AKT1 midbrain 3 RFP+")
 
 # # GRID
 # grid.newpage()
@@ -223,16 +240,10 @@ RFP.raster <- ggplot(meltPeaks.RFP, aes(time, cell))+
 # print(peaks.dendro, vp = viewport(x = 0.90, y = 0.453, width = 0.2, height = 0.89))
 
 # GRID raster/sums
-plots <- align_plots(RFP.raster, AKT1hindbrain1_RFPsum.plt, align = 'v', axis = 'l')
-AKT1hindbrain1.RFP.grid <- plot_grid(plots[[1]], AKT1hindbrain1_RFPsum.plt, ncol = 1, rel_heights = c(4.5,1))
+plots <- align_plots(RFP.raster, AKT1midbrain3_RFPsum.plt, align = 'v', axis = 'l')
+AKT1midbrain3.RFP.grid <- plot_grid(plots[[1]], AKT1midbrain3_RFPsum.plt, ncol = 1, rel_heights = c(4.5,1))
 
 ########################################################################################
-# Simple ggplot cells on coordinates
-# ggplot(posXY, aes(X, Y, color = Cell, label = Cell))+
-#   geom_point()+
-#   # geom_label()+
-#   scale_y_reverse()
-
 
 # Average calcium levels over time. Here by using raw fluorescence traces, but tlos is probably
 # not the best approach, as they have to be detrended first. Better sticking to deconvolved traces (spksSUM2)
@@ -249,7 +260,7 @@ rownames(FrawPOS) <- positives
 FrawPOSx <- as.data.frame(colSums(FrawPOS)/nrow(FrawPOS))
 FrawPOSx$Time <- 0:(nrow(FrawPOSx)-1)
 #plot
-AKT1hindbrain1.POS.aveF <- ggplot(FrawPOSx, aes(Time, `colSums(FrawPOS)/nrow(FrawPOS)`))+
+AKT1midbrain3.POS.aveF <- ggplot(FrawPOSx, aes(Time, `colSums(FrawPOS)/nrow(FrawPOS)`))+
   geom_line()+
   theme_pubr()+
   ylab("Average Ca2+")+
@@ -266,7 +277,7 @@ rownames(FrawRFP) <- RFPcells
 FrawRFPx <- as.data.frame(colSums(FrawRFP)/nrow(FrawRFP))
 FrawRFPx$Time <- 0:(nrow(FrawRFPx)-1)
 #plot
-AKT1hindbrain1.RFP.aveF <- ggplot(FrawRFPx, aes(Time, `colSums(FrawRFP)/nrow(FrawRFP)`))+
+AKT1midbrain3.RFP.aveF <- ggplot(FrawRFPx, aes(Time, `colSums(FrawRFP)/nrow(FrawRFP)`))+
                               geom_line()+
                               theme_pubr()+
                               ylab("Average Ca2+ (RFP+)")+
