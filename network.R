@@ -6,33 +6,50 @@ library(tidyverse)
 library(tidygraph)
 library(ggiraph)
 
-graph <- graph.adjacency(as.matrix(cmat), weighted = TRUE)
+HRAS5dpf_hind2_15min.graph <- graph.adjacency(as.matrix(cmat), mode = "undirected", weighted = TRUE, diag = FALSE)
 
 # Threshold correlation degree. An interval is chosen because the Pearson correlation coeff goes -1 to 1, BUT -1 means anti-correlation.. so one neuron is active when the other isn't)
-graph <- delete.edges(graph, which(E(graph)$weight <0.70))
+HRAS5dpf_hind2_15min.graph <- delete.edges(HRAS5dpf_hind2_15min.graph, which(E(HRAS5dpf_hind2_15min.graph)$weight <0.70))
 
 
 # Label RFP cells as such
-posXY$RFP <- posXY$Cell %in% RFPcells
+# posXY$RFP <- posXY$Cell %in% RFPcells
 # DISPLAY NETWORK
-AKT1hindbrain1.graph <- ggraph(graph, layout = as.matrix(posXY)[, c("X", "Y")]) +
-                            geom_edge_link(aes(colour = weight, edge_width = weight))+
-                            scale_edge_width_continuous(range = c(0.1, 1))+
-                            geom_node_point(aes(shape = as.factor(posXY$Cluster), colour = as.factor(posXY$Cluster), size = as.factor(posXY$RFP)))+
-                          # geom_point_interactive(aes(x = posXY$X, y = posXY$Y, shape = as.factor(posXY$Cluster), colour = as.factor(posXY$Cluster), tooltip = as.factor(posXY$Cluster), data_id = as.factor(posXY$Cluster)), size  = 2)+
-                            scale_edge_color_viridis(
-                              alpha = 0.6,
+
+
+g.palette <- c("TRUE" = "green","FALSE" = "grey")
+g.sizes <- c("TRUE" = 2.5,"FALSE" = 1)
+g.shapes <- c("TRUE" = 23, "FALSE" = 21)
+
+HRAS5dpf_hind2_15min.graph.plt <- ggraph(HRAS5dpf_hind2_15min.graph, layout = as.matrix(HRAS5dpf_hind2_15min.posXY)[, c("X", "Y")]) +
+                            geom_edge_link(aes(colour = weight, alpha = weight))+
+                            scale_edge_alpha_continuous(range = c(0.1, 1), guide = "none")+
+                            geom_node_point(aes(fill = as.factor(HRAS5dpf_hind2_15min.posXY$synchron), size = as.factor(HRAS5dpf_hind2_15min.posXY$synchron), shape = as.factor(HRAS5dpf_hind2_15min.posXY$synchron)))+
+                            geom_node_label(aes(label = HRAS5dpf_hind2_15min.posXY$Cell), repel = TRUE)+
+                            scale_size_manual(values = g.sizes, name = "Synchronous")+
+                            scale_fill_manual(values = g.palette, name = "Synchronous")+
+                            scale_shape_manual(values = g.shapes, name = "Synchronous")+
+                            scale_edge_color_viridis(name = "Correlation",
+                              alpha = 1,
                               begin = 0,
                               end = 1,
                               discrete = FALSE,
                               option = "inferno",
                               direction = 1
                             )+
-                            theme_graph()+
-                            ggtitle("AKT1 hindbrain 1")+
+                            theme_graph(plot_margin = margin(5, 5, 5, 5))+
+                            theme(legend.position = "right",
+                                  legend.margin	= margin(1,1,1,1),
+                                  legend.key.size = unit(0.5, 'cm'), #change legend key size
+                                  # legend.key.height = unit(1, 'pt'), #change legend key height
+                                  # legend.key.width = unit(1, 'pt'), #change legend key width
+                                  # legend.title = element_text(size=5), #change legend title font size
+                                  # legend.text = element_text(size=4),
+                                  # legend.text.align = 0
+                          )+
+                            ggtitle("HRAS5dpf_hind2_15min")+
                             scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
 
-girafe(ggobj = AKT1hindbrain1.graph)
 
 # OVERLAY
 transparentgraph <- ggraph(graph, layout = as.matrix(posXY)[, c("X", "Y")]) +
@@ -53,6 +70,6 @@ transparentgraph <- ggraph(graph, layout = as.matrix(posXY)[, c("X", "Y")]) +
 
 
 #Save transparent graph
-ggsave(plot = CTRL5dpfhi1.graph, file = "CTRL5dpfhi1.graph.png", 
+ggsave(plot = HRAS5dpf_hind2_15min.graph, file = "HRAS5dpf_hind2_15min.graph.png", 
        device = "png",  bg = "transparent",
        width = 20, height = 15, units = "cm", dpi = 800)

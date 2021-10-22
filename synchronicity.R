@@ -1,7 +1,7 @@
 # # Synchronicity
 
-synchron <- as.matrix(spksSUM$Perc)
-synchron <- t(apply(synchron, 2, function(x) (x - min(x))/(max(x)-min(x))))
+synchron <- as.matrix(spksSUM$Perc) # The synchron trace is the pattern created by the activity of the whole population
+synchron <- apply(synchron, 2, function(x) (x - min(x))/(max(x)-min(x))) #normalized to be comparable for next cross-corr
 
 # Create empty matrix-vector that will host corr coefficients. 
 tspks <- t(spks)
@@ -25,29 +25,49 @@ for (i in 1:nc) {
 }
 close(pb)
 
-synchron.cluster <- which(cmat.synchron > 0.65, arr.ind = T) #select the cells with highest correlation to the pattern
-synchron.cluster <- sort(unique(synchron.cluster[,2]))
+cmat.synchron <- as.data.frame(cmat.synchron)
+colnames(cmat.synchron) <- colnames(tspks)
+
+synchron.cluster <- colnames(cmat.synchron[,which(cmat.synchron > 0.50)]) #select the cells with highest correlation to the pattern
+
+
 
 # No thresholding
-synchron.raster <- as.data.frame(tspks[, synchron.cluster])
+synchron.raster <- as.data.frame(tspks[, (synchron.cluster)])
 
 synchron.raster$time <- 1:nrow(synchron.raster)
-synchron.raster.melt <- melt(synchron.raster, id = "time")
-colnames(synchron.raster.melt) <- c('time','cell','Ca2+')
+HRAS5dpf_hind2_15min.synchron.raster.melt <- melt(synchron.raster, id = "time")
+colnames(HRAS5dpf_hind2_15min.synchron.raster.melt) <- c('time','cell','Ca2+')
 
-#Plot Coactive cells
-CTRL5dpfhi1.synchron.traces.plt <- ggplot(synchron.raster.melt, aes(time, `Ca2+`))+
+#Plot Coactive cells traces
+HRAS5dpf_hind2_15min.synchron.traces.plt <- ggplot(HRAS5dpf_hind2_15min.synchron.raster.melt, aes(time, `Ca2+`))+
   geom_line(aes(color = cell))+
-  facet_wrap(vars(cell), ncol = 1, strip.position = "left")+
+  facet_wrap(vars(cell), strip.position = "left")+
   theme_pubr(legend = "none", margin = FALSE)+
   theme(axis.text.y = element_blank(),
         axis.ticks = element_blank(),
         axis.line.y = element_blank())+
   ylab(NULL)+
-  ggtitle("CTRL 5dpf hi 1 synchron cluster")
+  ggtitle("HRAS5dpf_hind2_15min synchron traces")
+
+#rasterplot
+HRAS5dpf_hind2_15min.synchron.raster.plt <- ggplot(HRAS5dpf_hind2_15min.synchron.raster.melt, aes(time, cell))+
+  geom_raster(aes(fill = `Ca2+`))+
+  scale_fill_gradientn(colours=c("white", "black"))+
+  theme_pubr(legend = "none", margin = FALSE)+
+  theme(
+        axis.ticks = element_blank(),
+        axis.line.y = element_blank())+
+  ylab(NULL)+
+  ggtitle("HRAS5dpf_hind2_15min synchron raster")
 
 # Label synchronous cells as such
-posXY$synchron <- posXY$Cell %in% synchron.cluster
+HRAS5dpf_hind2_15min.posXY$synchron <- HRAS5dpf_hind2_15min.posXY$Cell %in% synchron.cluster
+
+
+
+
+
 
 # Isolate coactive cells (highest crosscorrelation coeff)
 cmat.hi <- cmat
@@ -89,7 +109,7 @@ sync.raster2.melt$cell <- factor(x = sync.raster2.melt$cell,
                          levels = sync.rows$sync.rows[sync.order], 
                          ordered = TRUE)
 #Rasterplot
-CTRL5dpfhi1.sync.raster.hc.plt <- ggplot(sync.raster2.melt, aes(time, cell))+
+HRAS5dpf_hind2_15min.sync.raster.hc.plt <- ggplot(sync.raster2.melt, aes(time, cell))+
   geom_raster(aes(fill = `Ca2+`))+
   scale_fill_gradientn(colours=c("white", "black"))+
   theme_pubr()+
@@ -100,19 +120,19 @@ CTRL5dpfhi1.sync.raster.hc.plt <- ggplot(sync.raster2.melt, aes(time, cell))+
         axis.ticks.y = element_blank(),
         axis.text.y = element_blank(),
         plot.title = element_text(colour = "red", hjust = .5))+
-  ggtitle("CTRL 5dpf hi 1 corr > 0.5 hc")
+  ggtitle("AKT1 4dpf hi 2 corr > 0.5 hc")
 
 # # Plot total calcium activity/time ONLY highly corr cells
 syncSUM2 <- rowSums(sync.raster2[,-ncol(sync.raster2)])
 syncSUM2 <- as.data.frame(syncSUM2)
 syncSUM2$Time <- 1:nrow(syncSUM2)
 
-CTRL5dpfhi1.syncSUM2.plt <- ggplot(syncSUM2, aes(Time, syncSUM2))+
+HRAS5dpf_hind2_15min.syncSUM2.plt <- ggplot(syncSUM2, aes(Time, syncSUM2))+
   geom_line()+ 
   geom_smooth()+
   theme_pubr()+
   ylab("Ca2+")+
-  ylim(CTRL5dpfhi1.spksSUM2.ylim)
+  ylim(HRAS5dpf_hind2_15min.spksSUM2.ylim)
 
 # Calculating percentage of active cells over time after extracting highly corr cells
 # With thresholding
@@ -124,12 +144,12 @@ hiSUM <- rowSums(sync.raster[,-ncol(sync.raster)])
 hiSUM <- as.data.frame(hiSUM)
 hiSUM$Time <- 1:nrow(hiSUM)
 hiSUM$Perc <- hiSUM$hiSUM/ncol(sync.raster)*100
-CTRL5dpfhi1.hiSUM.plt <- ggplot(hiSUM, aes(Time, Perc))+
+HRAS5dpf_hind2_15min.hiSUM.plt <- ggplot(hiSUM, aes(Time, Perc))+
   geom_line()+
   theme_pubr()
 
 
 # GRID raster/sums
-sync.plots <- align_plots(CTRL5dpfhi1.sync.raster.hc.plt, CTRL5dpfhi1.hiSUM.plt, align = 'v', axis = 'l')
-sync.CTRL5dpfhi1.grid <- plot_grid(sync.plots[[1]], CTRL5dpfhi1.hiSUM.plt, ncol = 1, rel_heights = c(4.5,1))
+sync.plots <- align_plots(HRAS5dpf_hind2_15min.sync.raster.hc.plt, HRAS5dpf_hind2_15min.hiSUM.plt, align = 'v', axis = 'l')
+sync.HRAS5dpf_hind2_15min.grid <- plot_grid(sync.plots[[1]], HRAS5dpf_hind2_15min.hiSUM.plt, ncol = 1, rel_heights = c(4.5,1))
 

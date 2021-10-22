@@ -31,8 +31,10 @@ for (i in 1:nc) {
 }
 close(pb)
 
-cmat[is.na(cmat)] <- 0 #(Temporary fix) NaN replaced with 0. This happens when manually adding a ROI on Suite2p mistakenly results in a constant time-series of zeroes (hence ccf() tries to divide by 0)
+colnames(cmat) <- colnames(tspks)
+rownames(cmat) <- colnames(tspks)
 
+cmat[is.na(cmat)] <- 0 #(Temporary fix) NaN replaced with 0. This happens when manually adding a ROI on Suite2p mistakenly results in a constant time-series of zeroes (hence ccf() tries to divide by 0)
 
 cmat[lower.tri(cmat)] <- t(cmat)[lower.tri(cmat)] 
 
@@ -41,12 +43,15 @@ cmat[lower.tri(cmat)] <- t(cmat)[lower.tri(cmat)]
 
 # Display the resultant matrix
 library(gplots)
-Colors=c("blue","yellow","red")
+Colors=c('white','#fee0d2','#fcbba1','#fc9272','#fb6a4a','#ef3b2c','#cb181d','#a50f15','#67000d')
 Colors=colorRampPalette(Colors)(100)
-heatmap.2(as.matrix(cmat), dendrogram = "none",
-          col = Colors, trace = "none", density.info =  "none", keysize = 0.50,
-          cexRow = 0.5, cexCol=0.5, key.par = list(cex=0.4), na.rm = TRUE)
-
+quartz(width = 20, height = 20)
+CTRL4dpflo1.heatmap <- heatmap.2(as.matrix(cmat), dendrogram = "none",
+          col = Colors, trace = "none", density.info =  "none", keysize = 0.25,
+          cexRow = 0.1, cexCol=0.1, labRow = "none", labCol = "none", main = NULL,
+          xlab = NULL,
+          ylab = NULL, na.rm = TRUE)
+dev.off()
 
 
 
