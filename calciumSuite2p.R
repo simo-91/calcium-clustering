@@ -1,4 +1,4 @@
-################ CALCIUM ANALYSIS WITHOUT THRESHOLDING (ANALOGIC)
+################ CALCIUM ANALYSIS WITHOUT THRESHOLDING
 library(dplyr)
 library(tidyverse)
 library(ggplot2)
@@ -14,7 +14,7 @@ library(cowplot)
 library(ggpubr)
 # load reticulate and use it to load numpy
 library(reticulate)
-use_condaenv("/home/simo/anaconda3/bin/python")
+use_condaenv("/Users/Simo/suite2p/")
 
 np <-import("numpy")
 
@@ -153,10 +153,9 @@ HRAS5dpf_hind2_15min.grid <- plot_grid(plots[[1]], HRAS5dpf_hind2_15min.spksSUM.
 
 
 ########################################### RFP ####################################
+RFPcells <- scan("RFPcells.R", sep = ",")
 # Calculating percentage of active RFP cells over time
-
 RFP <- subset(spksthresholded, rownames(spksthresholded) %in% RFPcells) #select only RFP cells
-
 ##ggplot to show percentage of RPF+ cells over time
 RFPsum <- as.data.frame(colSums(RFP))
 RFPsum$Time <- 1:nrow(RFPsum)
@@ -165,18 +164,13 @@ HRAS5dpf_hind2_15min_RFPsum.plt <- ggplot(RFPsum, aes(Time, Perc))+
   geom_line()+
   theme_pubr()
 
-# RFPcells for activity/raster/dendrogram. Take care of using already normalized spks array
-RFPnothresh <- subset(spks, rownames(spks) %in% RFPcells) #select only RFP cells
-rownames(RFPnothresh) <- unique(c(150, 48, 398, 118, 223, 20, 3, 224, 24, 130, 199, 320,184,176,97, 13, 2, 735, 1, 216, 74, 16, 79, 266, 85, 6, 200, 576, 257, 21, 56, 18, 502, 204, 64, 93, 31, 0, 399, 122))
-
-
-# Sum of all activity over time RFP+
+# # Sum of all activity over time RFP+
 RFP <- subset(spks, rownames(spks) %in% RFPcells) #select only RFP cells
 RFPsum2 <- as.data.frame(colSums(RFP))
 RFPsum2$Time <- 1:nrow(RFPsum2)
 
-HRAS5dpf_hind2_15min.RFPsum2.plt <- ggplot(RFPsum2, aes(Time, HRAS5dpf_hind2_15min))+
-  geom_line()+ 
+HRAS5dpf_hind2_15min.RFPsum2.plt <- ggplot(RFPsum2, aes(Time, `colSums(RFP)`))+
+  geom_line()+
   theme_pubr()+
   geom_smooth()+
   ylab("Ca2+")+
@@ -184,20 +178,17 @@ HRAS5dpf_hind2_15min.RFPsum2.plt <- ggplot(RFPsum2, aes(Time, HRAS5dpf_hind2_15m
 HRAS5dpf_hind2_15min.RFPsum2.ylim <- layer_scales(HRAS5dpf_hind2_15min.RFPsum2.plt)$y$get_limits()
 
 
-
+# RFPcells for activity/raster/dendrogram. Take care of using already normalized spks array
+# RFPnothresh <- subset(spks, rownames(spks) %in% RFPcells) #select only RFP cells
 
 # Raster ggplot
 dfpeaks.RFP <- as.data.frame(t(RFPnothresh))
-colnames(dfpeaks.RFP) <- 1:ncol(dfpeaks.RFP)
+# colnames(dfpeaks.RFP) <- 1:ncol(dfpeaks.RFP)
 dfpeaks.RFP$time <- 1:nrow(dfpeaks.RFP)
 meltPeaks.RFP <- melt(dfpeaks.RFP, id = "time")
 colnames(meltPeaks.RFP) <- c('time','cell','Ca2+')
 
-#ggplot(meltPeaks, aes(time, cell)) +
-# geom_raster(aes(fill = `Ca2+`))
-
-
-# loerarclocal clustering
+# Hierarchical clustering
 hc.RFP <- hclust(dist(RFPnothresh, method = "euclidean"), method = "ward.D2")
 dhc.RFP <- as.dendrogram(hc.RFP)
 
@@ -232,43 +223,37 @@ RFP.raster <- ggplot(meltPeaks.RFP, aes(time, cell))+
         axis.ticks.y = element_blank(),
         axis.text.y = element_blank(),
         plot.title = element_text(colour = "red", hjust = .5))+
-  ggtitle("AKT1 midbrain 3 RFP+")
-
-# # GRID
-# grid.newpage()
-# print(peaks.raster, vp = viewport(x = 0.4, y = 0.5, width = 0.8, height = 1.0))
-# print(peaks.dendro, vp = viewport(x = 0.90, y = 0.453, width = 0.2, height = 0.89))
+  ggtitle("HRAS5dpf_hind2_15min RFP+")
 
 # GRID raster/sums
 plots <- align_plots(RFP.raster, HRAS5dpf_hind2_15min_RFPsum.plt, align = 'v', axis = 'l')
 HRAS5dpf_hind2_15min.RFP.grid <- plot_grid(plots[[1]], HRAS5dpf_hind2_15min_RFPsum.plt, ncol = 1, rel_heights = c(4.5,1))
 
 ########################################################################################
+######################################### dF/F #########################################
+########################################################################################
 
-# Average calcium levels over time. Here by using dFtraces after some coding in python suite2p-environment.
-dF <- as.data.frame(np$load("dF.npy", allow_pickle = TRUE)) #raw calcium levels
+# Average calcium levels over time. Here by using dF traces after some coding in python suite2p-environment
+dF <- as.data.frame(np$load("dF.npy", allow_pickle = TRUE)) #delta F calcium levels of all cells
+dF <- dF[,50:ncol(dF)] #select window
+dF <- t(apply(dF, 1, function(x) (x - min(x))/(max(x)-min(x)))) # Normalize
+dFPOS <- dF[positivesPLUSone,]
 
-dF <- dF[,200:ncol(dF)]
 
 #Averaging per timepoint (all cells)
-dFPOS <- dF[positivesPLUSone,]
+
 rownames(dFPOS) <- positives
 
-dFPOSx <- as.data.frame(colSums(dFPOS)/nrow(dFPOS))
-dFPOSx$Time <- 0:(nrow(dFPOSx)-1)
+dFx <- as.data.frame(colSums(dFPOS)/nrow(dFPOS))
+dFx$Time <- 0:(nrow(dFx)-1)
 #plot
-HRAS5dpf_hind2_15min.POS.aveF <- ggplot(dFPOSx, aes(Time, `colSums(dFPOS)/nrow(dFPOS)`))+
+HRAS5dpf_hind2_15min.POS.aveF <- ggplot(dFx, aes(Time, `colSums(dFPOS)/nrow(dFPOS)`))+
   geom_line()+
   theme_pubr()+
   ylab("Average dF/F")+
   geom_smooth(method = "loess")
 
-
-
 #Averaging per timepoint (RFP only)
-# Fraw <- sapply(Fraw, function(x) (x - min(x))/(max(x)-min(x))) #normalize?
-FrawRFP <- Fraw[RFPcells+1,]
-rownames(FrawRFP) <- RFPcells
 
 
 FrawRFPx <- as.data.frame(colSums(FrawRFP)/nrow(FrawRFP))
@@ -282,32 +267,20 @@ HRAS5dpf_hind2_15min.RFP.aveF <- ggplot(FrawRFPx, aes(Time, `colSums(FrawRFP)/nr
 
 
 
+# Calculating percentage of active RFP cells over time
+dF.RFP <- subset(spksthresholded, rownames(dFPOS) %in% RFPcells) #select only RFP cells
+##ggplot to show percentage of RPF+ cells over time
+RFPsum <- as.data.frame(colSums(RFP))
+RFPsum$Time <- 1:nrow(RFPsum)
+RFPsum$Perc <- RFPsum$`colSums(RFP)`/nrow(RFP)*100
+HRAS5dpf_hind2_15min_RFPsum.plt <- ggplot(RFPsum, aes(Time, Perc))+
+  geom_line()+
+  theme_pubr()
 
 
 
 
 
-
-
-
-#Averaging per cell
-Frawsinglecell <- as.data.frame(rowSums(Fraw)/ncol(Fraw))
-Frawsinglecell$Cell <- 0:(nrow(Frawsinglecell)-1)
-
-
-HRAS5dpf_hind2_15min.posXY2 <- data.frame()
-for (i in 1:length(stat)) {
-  HRAS5dpf_hind2_15min.posXY2 <- rbind(HRAS5dpf_hind2_15min.posXY2, stat[[i]][["med"]])
-}
-
-HRAS5dpf_hind2_15min.posXY2$Cell <- as.numeric(0:(nrow(HRAS5dpf_hind2_15min.posXY2)-1))
-colnames(HRAS5dpf_hind2_15min.posXY2) <- c('Y','X','Cell')
-HRAS5dpf_hind2_15min.posXY2$Calcium <- Frawsinglecell$`rowSums(Fraw)/ncol(Fraw)`
-# Spatial plot with average activity/cell
-ggplot(Frawsinglecell, aes(HRAS5dpf_hind2_15min.posXY$X, HRAS5dpf_hind2_15min.posXY$Y, color = `rowSums(Fraw)/ncol(Fraw)`, label = Cell))+
-  geom_point()+
-  # geom_label()+
-  scale_y_reverse()
 
 
 
@@ -317,7 +290,10 @@ ggplot(Frawsinglecell, aes(HRAS5dpf_hind2_15min.posXY$X, HRAS5dpf_hind2_15min.po
 
 
 #RFP XY
-HRAS5dpf_hind2_15min.posXY.RFP <- subset(HRAS5dpf_hind2_15min.posXY, HRAS5dpf_hind2_15min.posXY$Cell %in% RFPcells)
+HRAS5dpf_hind2_15min.posXY$RFP <- HRAS5dpf_hind2_15min.posXY$Cell %in% RFPcells
+
+
+
 
 # Plot RFP deconvolved curves all together
 
@@ -333,21 +309,18 @@ ggplot(HRAS5dpf_hind2_15min.posXY, aes(X, Y, color = as.factor(Cluster), shape =
   scale_y_reverse()
 
 
-
-
-# PCA?
-pcaRFP <- matrix(NA, nrow(spks), 2)
-pcaRFP[,1] <- rownames(spks)
-pcaRFP[,2] <- pcaRFP[,1] %in% RFPcells
-
-pca <-prcomp(spks, center = TRUE, scale = TRUE)
-fviz_pca_ind(pca, col.ind = pcaRFP[,2], geom.ind = "point", axes =c(3, 10))
-
-#k-means
-km <-kmeans(pca$x, 2)
-fviz_pca_ind(pca, col.ind =as.factor(km$cluster), geom.ind = pcaRFP[,2])
-
-             
+# Average activity per cell (dF peaks)
+HRAS5dpf_hind2_15min.posXY$Mean.dF <- rowMeans(dFPOS)
 
 
 
+
+# Average activity per cell (deconvolved peaks)
+# then plot on graph
+HRAS5dpf_hind2_15min.posXY$Mean <- rowMeans(spks)
+
+
+
+
+# Color clusters
+# put on graph

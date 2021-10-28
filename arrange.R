@@ -10,7 +10,7 @@ grid.arrange(AKT1hindbrain1.grid, AKT1hindbrain2.grid, AKT1hindbrain22.grid,
 
 
 ggarrange(AKT1hindbrain1.grid, AKT1hindbrain2.grid, AKT1hindbrain22.grid, 
-          AKT1hindbrain3.grid, AKT1midbrain.grid, AKT1midbrain3.grid, 
+          AKT1hindbrain3.grid, AKT1midbrain1.grid, AKT1midbrain3.grid, 
           CTRLhindbrain2.grid, CTRLhindbrain3.grid, CTRLmidbrain3.grid,
           ncol = 3, nrow = 3)
 
@@ -85,3 +85,22 @@ ggplot(RFPsum2.all.melt, aes(Time, `Ca2+`))+
 
 distributions of calcium levels??
 
+ggarrange(CTRL4dpflo1.grid, CTRL4dpflo1.graph)
+
+ggarrange(CTRL4dpflo1.grid,CTRL4dpflo1.graph)
+CTRL5dpfhi1_grid_graph <- ggarrange(CTRL5dpfhi1.grid, CTRL5dpfhi1.graph+labs(title = NULL))
+AKT15dpflo2_grid_graph <- ggarrange(AKT15dpflo2.grid, AKT15dpflo2.graph+labs(title = NULL))
+
+
+
+CTRL_AKT1_Ca_ave <- ggarrange(CTRL5dpfhi1.spksSUM2.plt, AKT15dpflo2.spksSUM2.plt+
+            ylim(CTRL5dpfhi1.spksSUM2.ylim)+
+            labs(y = NULL))
+
+ggsave(plot = CTRL5dpfhi1_grid_graph, file = "CTRL5dpfhi1_grid_graph.png", 
+       device = "png",  bg = "transparent",
+      units = "cm", dpi = 800)
+
+
+ggarrange(HRAS5dpf_hind2_15min_RFPsum.plt, HRAS5dpf_hind2_15min.graph.plt)
+ggarrange(HRAS5dpf_mid2_15min_RFPsum.plt, HRAS5dpf_mid2_15min.graph.plt)

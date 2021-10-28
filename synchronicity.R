@@ -42,7 +42,7 @@ colnames(HRAS5dpf_hind2_15min.synchron.raster.melt) <- c('time','cell','Ca2+')
 #Plot Coactive cells traces
 HRAS5dpf_hind2_15min.synchron.traces.plt <- ggplot(HRAS5dpf_hind2_15min.synchron.raster.melt, aes(time, `Ca2+`))+
   geom_line(aes(color = cell))+
-  facet_wrap(vars(cell), strip.position = "left")+
+  facet_wrap(vars(cell), strip.position = "left", ncol = 1)+
   theme_pubr(legend = "none", margin = FALSE)+
   theme(axis.text.y = element_blank(),
         axis.ticks = element_blank(),
@@ -120,7 +120,7 @@ HRAS5dpf_hind2_15min.sync.raster.hc.plt <- ggplot(sync.raster2.melt, aes(time, c
         axis.ticks.y = element_blank(),
         axis.text.y = element_blank(),
         plot.title = element_text(colour = "red", hjust = .5))+
-  ggtitle("AKT1 4dpf hi 2 corr > 0.5 hc")
+  ggtitle("HRAS 5dpf hind 2 corr > 0.5 hc")
 
 # # Plot total calcium activity/time ONLY highly corr cells
 syncSUM2 <- rowSums(sync.raster2[,-ncol(sync.raster2)])

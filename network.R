@@ -5,30 +5,47 @@ library(visNetwork)
 library(tidyverse)
 library(tidygraph)
 library(ggiraph)
+library(ggnewscale)
 
 HRAS5dpf_hind2_15min.graph <- graph.adjacency(as.matrix(cmat), mode = "undirected", weighted = TRUE, diag = FALSE)
 
 # Threshold correlation degree. An interval is chosen because the Pearson correlation coeff goes -1 to 1, BUT -1 means anti-correlation.. so one neuron is active when the other isn't)
-HRAS5dpf_hind2_15min.graph <- delete.edges(HRAS5dpf_hind2_15min.graph, which(E(HRAS5dpf_hind2_15min.graph)$weight <0.70))
+HRAS5dpf_hind2_15min.graph <- delete.edges(HRAS5dpf_hind2_15min.graph, which(E(HRAS5dpf_hind2_15min.graph)$weight <0.60))
 
+##### Plot network
+g.palette.Sync <- c("TRUE" = "green","FALSE" = "grey")
+g.sizes.Sync <- c("TRUE" = 2.5,"FALSE" = 1)
+g.shapes.Sync <- c("TRUE" = 23, "FALSE" = 21)
 
-# Label RFP cells as such
-# posXY$RFP <- posXY$Cell %in% RFPcells
-# DISPLAY NETWORK
+g.palette.RFP <- c("TRUE" = "red","FALSE" = "grey")
+g.sizes.RFP <- c("TRUE" = 2.5,"FALSE" = 1)
+g.shapes.RFP <- c("TRUE" = 21, "FALSE" = 21)
 
+g.palette.Ca <- brewer.pal(10, )
 
-g.palette <- c("TRUE" = "green","FALSE" = "grey")
-g.sizes <- c("TRUE" = 2.5,"FALSE" = 1)
-g.shapes <- c("TRUE" = 23, "FALSE" = 21)
-
-HRAS5dpf_hind2_15min.graph.plt <- ggraph(HRAS5dpf_hind2_15min.graph, layout = as.matrix(HRAS5dpf_hind2_15min.posXY)[, c("X", "Y")]) +
+HRAS5dpf_hind2_15min.graph.plt <- ggraph(HRAS5dpf_hind2_15min.graph, 
+                                         layout = as.matrix(HRAS5dpf_hind2_15min.posXY)[, c("X", "Y")]) +
                             geom_edge_link(aes(colour = weight, alpha = weight))+
                             scale_edge_alpha_continuous(range = c(0.1, 1), guide = "none")+
-                            geom_node_point(aes(fill = as.factor(HRAS5dpf_hind2_15min.posXY$synchron), size = as.factor(HRAS5dpf_hind2_15min.posXY$synchron), shape = as.factor(HRAS5dpf_hind2_15min.posXY$synchron)))+
-                            geom_node_label(aes(label = HRAS5dpf_hind2_15min.posXY$Cell), repel = TRUE)+
-                            scale_size_manual(values = g.sizes, name = "Synchronous")+
-                            scale_fill_manual(values = g.palette, name = "Synchronous")+
-                            scale_shape_manual(values = g.shapes, name = "Synchronous")+
+                         # calcium levels
+                            geom_node_point(aes(colour = HRAS5dpf_hind2_15min.posXY$Mean.dF), size = 3)+
+                            scale_colour_gradient(low = "black", high = "green")+
+                         # RFP positives
+                            new_scale("fill")+
+                            new_scale("shape")+
+                            geom_node_point(aes(fill = as.factor(HRAS5dpf_hind2_15min.posXY$RFP),
+                                                size = as.factor(HRAS5dpf_hind2_15min.posXY$RFP),
+                                                shape = as.factor(HRAS5dpf_hind2_15min.posXY$RFP)))+
+                            scale_fill_manual(values = g.palette.RFP, name = "RFP")+
+                            scale_shape_manual(values = g.shapes.RFP, name = "RFP")+
+                            scale_size_manual(values = g.sizes.RFP, name = "RFP")+
+                            # geom_node_point(aes(fill = as.factor(HRAS5dpf_hind2_15min.posXY$synchron),
+                            #                     size = as.factor(HRAS5dpf_hind2_15min.posXY$synchron),
+                            #                     shape = as.factor(HRAS5dpf_hind2_15min.posXY$synchron)))+
+                            # scale_size_manual(values = g.sizes.Sync, name = "Synchronous")+
+                            # scale_fill_manual(values = g.palette.Sync, name = "Synchronous")+
+                            # scale_shape_manual(values = g.shapes.Sync, name = "Synchronous")+
+                            # # geom_node_label(aes(label = HRAS5dpf_hind2_15min.posXY$Cell), repel = FALSE)+
                             scale_edge_color_viridis(name = "Correlation",
                               alpha = 1,
                               begin = 0,

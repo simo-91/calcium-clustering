@@ -43,15 +43,11 @@ cmat[lower.tri(cmat)] <- t(cmat)[lower.tri(cmat)]
 
 # Display the resultant matrix
 library(gplots)
-Colors=c('white','#fee0d2','#fcbba1','#fc9272','#fb6a4a','#ef3b2c','#cb181d','#a50f15','#67000d')
-Colors=colorRampPalette(Colors)(100)
-quartz(width = 20, height = 20)
-CTRL4dpflo1.heatmap <- heatmap.2(as.matrix(cmat), dendrogram = "none",
-          col = Colors, trace = "none", density.info =  "none", keysize = 0.25,
+heatmap.2(as.matrix(cmat), dendrogram = "none",
+                                 trace = "none", density.info =  "none", keysize = 0.25,
           cexRow = 0.1, cexCol=0.1, labRow = "none", labCol = "none", main = NULL,
           xlab = NULL,
           ylab = NULL, na.rm = TRUE)
-dev.off()
 
 
 
