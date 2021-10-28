@@ -22,20 +22,20 @@ np <-import("numpy")
 stat <- np$load("stat.npy", allow_pickle = TRUE) #stats containing ROIs XY
 
 # Loop over stat.npy to access "med" (ROIs coordinates) to create list of cells coordinates. ROIs from suite2p starts with index 0
-HRAS5dpf_hind2_15min.posXY <- data.frame()
+HRAS4dpf_hind_2_15min.posXY <- data.frame()
 for (i in 1:length(stat)) {
-  HRAS5dpf_hind2_15min.posXY <- rbind(HRAS5dpf_hind2_15min.posXY, stat[[i]][["med"]])
+  HRAS4dpf_hind_2_15min.posXY <- rbind(HRAS4dpf_hind_2_15min.posXY, stat[[i]][["med"]])
 }
 
-HRAS5dpf_hind2_15min.posXY$Cell <- as.numeric(0:(nrow(HRAS5dpf_hind2_15min.posXY)-1))
-colnames(HRAS5dpf_hind2_15min.posXY) <- c('Y','X','Cell')
+HRAS4dpf_hind_2_15min.posXY$Cell <- as.numeric(0:(nrow(HRAS4dpf_hind_2_15min.posXY)-1))
+colnames(HRAS4dpf_hind_2_15min.posXY) <- c('Y','X','Cell')
 
 #iscell.npy to select only ROIs that are recognized as cells
 iscell <- as.data.frame(np$load("iscell.npy", allow_pickle = TRUE))
 iscell$Cell <- as.numeric(0:(nrow(iscell)-1))
-HRAS5dpf_hind2_15min.posXY$Positive <- iscell$V1
-HRAS5dpf_hind2_15min.posXY <- subset(HRAS5dpf_hind2_15min.posXY, Positive == 1, select = c(Y,X,Cell))
-positives <- HRAS5dpf_hind2_15min.posXY$Cell
+HRAS4dpf_hind_2_15min.posXY$Positive <- iscell$V1
+HRAS4dpf_hind_2_15min.posXY <- subset(HRAS4dpf_hind_2_15min.posXY, Positive == 1, select = c(Y,X,Cell))
+positives <- HRAS4dpf_hind_2_15min.posXY$Cell
 positivesPLUSone <- positives+1 ##tlos is needed because suite2p starts counting ROIs with the number 0 (python..)
 
 # load suite2p numpy arrays outputs
@@ -73,7 +73,7 @@ spksSUM <- colSums(spksthresholded)
 spksSUM <- as.data.frame(spksSUM)
 spksSUM$Time <- 1:nrow(spksSUM)
 spksSUM$Perc <- spksSUM$spksSUM/nrow(spksthresholded)*100
-HRAS5dpf_hind2_15min.spksSUM.plt <- ggplot(spksSUM, aes(Time, Perc))+
+HRAS4dpf_hind_2_15min.spksSUM.plt <- ggplot(spksSUM, aes(Time, Perc))+
                   geom_line()+ 
                   theme_pubr()
 
@@ -84,13 +84,13 @@ spksSUM2 <- colSums(spks)
 spksSUM2 <- as.data.frame(spksSUM2)
 spksSUM2$Time <- 1:nrow(spksSUM2)
 
-HRAS5dpf_hind2_15min.spksSUM2.plt <- ggplot(spksSUM2, aes(Time, spksSUM2))+
+HRAS4dpf_hind_2_15min.spksSUM2.plt <- ggplot(spksSUM2, aes(Time, spksSUM2))+
   geom_line()+ 
   theme_pubr()+
   geom_smooth()+
   ylab("Ca2+")+
   ylim(0, NA)
-HRAS5dpf_hind2_15min.spksSUM2.ylim <- layer_scales(HRAS5dpf_hind2_15min.spksSUM2.plt)$y$get_limits()
+HRAS4dpf_hind_2_15min.spksSUM2.ylim <- layer_scales(HRAS4dpf_hind_2_15min.spksSUM2.plt)$y$get_limits()
 
 
 # # Raster+dendro all cells/time ggplot ------------------------------------------
@@ -127,7 +127,7 @@ meltPeaks$cell <- factor(x = meltPeaks$cell,
 # RFPcells <- unique(c(150, 48, 398, 118, 223, 20, 3, 224, 24, 130, 199, 320,184,176,97, 13, 2, 735, 1, 216, 74, 16, 79, 266, 85, 6, 200, 576, 257, 21, 56, 18, 502, 204, 64, 93, 31, 0, 399, 122))
 # meltPeaks$RFP <- meltPeaks$cell %in% RFPcells #highlight RFP cells
 
-HRAS5dpf_hind2_15min.raster.hc <- ggplot(meltPeaks, aes(time, cell))+
+HRAS4dpf_hind_2_15min.raster.hc <- ggplot(meltPeaks, aes(time, cell))+
   geom_raster(aes(fill = `Ca2+`))+
   # geom_line(aes(color = RFP), alpha = .2)+
   # scale_y_discrete(breaks = levels(meltPeaks$RFP))+
@@ -140,7 +140,7 @@ HRAS5dpf_hind2_15min.raster.hc <- ggplot(meltPeaks, aes(time, cell))+
         axis.ticks.y = element_blank(),
         axis.text.y = element_blank(),
         plot.title = element_text(colour = "red", hjust = .5))+
-  ggtitle("HRAS5dpf_hind2_15min hclust")
+  ggtitle("HRAS4dpf_hind_2_15min hclust")
 
 # GRID
 # grid.newpage()
@@ -148,19 +148,19 @@ HRAS5dpf_hind2_15min.raster.hc <- ggplot(meltPeaks, aes(time, cell))+
 # print(peaks.dendro, vp = viewport(x = 0.90, y = 0.455, width = 0.2, height = 0.94))
 
 # GRID raster/sums
-plots <- align_plots(HRAS5dpf_hind2_15min.raster.hc, HRAS5dpf_hind2_15min.spksSUM.plt, align = 'v', axis = 'l')
-HRAS5dpf_hind2_15min.grid <- plot_grid(plots[[1]], HRAS5dpf_hind2_15min.spksSUM.plt, ncol = 1, rel_heights = c(4.5,1))
+plots <- align_plots(HRAS4dpf_hind_2_15min.raster.hc, HRAS4dpf_hind_2_15min.spksSUM.plt, align = 'v', axis = 'l')
+HRAS4dpf_hind_2_15min.grid <- plot_grid(plots[[1]], HRAS4dpf_hind_2_15min.spksSUM.plt, ncol = 1, rel_heights = c(4.5,1))
 
 
 ########################################### RFP ####################################
 RFPcells <- scan("RFPcells.R", sep = ",")
 # Calculating percentage of active RFP cells over time
-RFP <- subset(spksthresholded, rownames(spksthresholded) %in% RFPcells) #select only RFP cells
+RFPt <- subset(spksthresholded, rownames(spksthresholded) %in% RFPcells) #select only RFP cells
 ##ggplot to show percentage of RPF+ cells over time
-RFPsum <- as.data.frame(colSums(RFP))
+RFPsum <- as.data.frame(colSums(RFPt))
 RFPsum$Time <- 1:nrow(RFPsum)
-RFPsum$Perc <- RFPsum$`colSums(RFP)`/nrow(RFP)*100
-HRAS5dpf_hind2_15min_RFPsum.plt <- ggplot(RFPsum, aes(Time, Perc))+
+RFPsum$Perc <- RFPsum$`colSums(RFPt)`/nrow(RFPt)*100
+HRAS4dpf_hind_2_15min_RFPsum.plt <- ggplot(RFPsum, aes(Time, Perc))+
   geom_line()+
   theme_pubr()
 
@@ -169,13 +169,13 @@ RFP <- subset(spks, rownames(spks) %in% RFPcells) #select only RFP cells
 RFPsum2 <- as.data.frame(colSums(RFP))
 RFPsum2$Time <- 1:nrow(RFPsum2)
 
-HRAS5dpf_hind2_15min.RFPsum2.plt <- ggplot(RFPsum2, aes(Time, `colSums(RFP)`))+
+HRAS4dpf_hind_2_15min.RFPsum2.plt <- ggplot(RFPsum2, aes(Time, `colSums(RFP)`))+
   geom_line()+
   theme_pubr()+
   geom_smooth()+
   ylab("Ca2+")+
   ylim(0, NA)
-HRAS5dpf_hind2_15min.RFPsum2.ylim <- layer_scales(HRAS5dpf_hind2_15min.RFPsum2.plt)$y$get_limits()
+HRAS4dpf_hind_2_15min.RFPsum2.ylim <- layer_scales(HRAS4dpf_hind_2_15min.RFPsum2.plt)$y$get_limits()
 
 
 # RFPcells for activity/raster/dendrogram. Take care of using already normalized spks array
@@ -223,11 +223,11 @@ RFP.raster <- ggplot(meltPeaks.RFP, aes(time, cell))+
         axis.ticks.y = element_blank(),
         axis.text.y = element_blank(),
         plot.title = element_text(colour = "red", hjust = .5))+
-  ggtitle("HRAS5dpf_hind2_15min RFP+")
+  ggtitle("HRAS4dpf_hind_2_15min RFP+")
 
 # GRID raster/sums
-plots <- align_plots(RFP.raster, HRAS5dpf_hind2_15min_RFPsum.plt, align = 'v', axis = 'l')
-HRAS5dpf_hind2_15min.RFP.grid <- plot_grid(plots[[1]], HRAS5dpf_hind2_15min_RFPsum.plt, ncol = 1, rel_heights = c(4.5,1))
+plots <- align_plots(RFP.raster, HRAS4dpf_hind_2_15min_RFPsum.plt, align = 'v', axis = 'l')
+HRAS4dpf_hind_2_15min.RFP.grid <- plot_grid(plots[[1]], HRAS4dpf_hind_2_15min_RFPsum.plt, ncol = 1, rel_heights = c(4.5,1))
 
 ########################################################################################
 ######################################### dF/F #########################################
@@ -240,28 +240,45 @@ dF <- dF[,50:ncol(dF)] #select window
 dFPOS <- dF[positivesPLUSone,]
 rownames(dFPOS) <- positives
 
+# Average activity per cell (dF peaks)
+HRAS4dpf_hind_2_15min.posXY$Mean.dF <- rowMeans(dFPOS)
+HRAS4dpf_hind_2_15min.posXY$Mean.dF.N <- apply(as.matrix(HRAS4dpf_hind_2_15min.posXY$Mean.dF), 2,
+                                             function(x) (x - min(x))/(max(x)-min(x)))
+
+
+
+# Average activity per cell (deconvolved peaks)
+# then plot on graph
+HRAS4dpf_hind_2_15min.posXY$Mean <- rowMeans(spks)
+
+
+
+
+
 #Averaging per timepoint (all cells)
+# dFx <- as.data.frame(colSums(dFPOS)/nrow(dFPOS))
+# dFx$Time <- 0:(nrow(dFx)-1)
+# #plot
+# HRAS4dpf_hind_2_15min.POS.aveF <- ggplot(dFx, aes(Time, `colSums(dFPOS)/nrow(dFPOS)`))+
+#   geom_line()+
+#   theme_pubr()+
+#   ylab("Average dF/F")+
+#   geom_smooth(method = "loess")
+# 
+# 
+# 
 
-dFx <- as.data.frame(colSums(dFPOS)/nrow(dFPOS))
-dFx$Time <- 0:(nrow(dFx)-1)
-#plot
-HRAS5dpf_hind2_15min.POS.aveF <- ggplot(dFx, aes(Time, `colSums(dFPOS)/nrow(dFPOS)`))+
-  geom_line()+
-  theme_pubr()+
-  ylab("Average dF/F")+
-  geom_smooth(method = "loess")
-
-#Averaging per timepoint (RFP only)
 
 
-FrawRFPx <- as.data.frame(colSums(FrawRFP)/nrow(FrawRFP))
-FrawRFPx$Time <- 0:(nrow(FrawRFPx)-1)
-#plot
-HRAS5dpf_hind2_15min.RFP.aveF <- ggplot(FrawRFPx, aes(Time, `colSums(FrawRFP)/nrow(FrawRFP)`))+
-                              geom_line()+
-                              theme_pubr()+
-                              ylab("Average Ca2+ (RFP+)")+
-                              geom_smooth(method = "loess")
+# Averaging per timepoint (RFP only)
+# FrawRFPx <- as.data.frame(colSums(FrawRFP)/nrow(FrawRFP))
+# FrawRFPx$Time <- 0:(nrow(FrawRFPx)-1)
+# #plot
+# HRAS4dpf_hind_2_15min.RFP.aveF <- ggplot(FrawRFPx, aes(Time, `colSums(FrawRFP)/nrow(FrawRFP)`))+
+#                               geom_line()+
+#                               theme_pubr()+
+#                               ylab("Average Ca2+ (RFP+)")+
+#                               geom_smooth(method = "loess")
 
 
 
@@ -271,7 +288,7 @@ dF.RFP <- subset(spksthresholded, rownames(dFPOS) %in% RFPcells) #select only RF
 RFPsum <- as.data.frame(colSums(RFP))
 RFPsum$Time <- 1:nrow(RFPsum)
 RFPsum$Perc <- RFPsum$`colSums(RFP)`/nrow(RFP)*100
-HRAS5dpf_hind2_15min_RFPsum.plt <- ggplot(RFPsum, aes(Time, Perc))+
+HRAS4dpf_hind_2_15min_RFPsum.plt <- ggplot(RFPsum, aes(Time, Perc))+
   geom_line()+
   theme_pubr()
 
@@ -288,7 +305,7 @@ HRAS5dpf_hind2_15min_RFPsum.plt <- ggplot(RFPsum, aes(Time, Perc))+
 
 
 #RFP XY
-HRAS5dpf_hind2_15min.posXY$RFP <- HRAS5dpf_hind2_15min.posXY$Cell %in% RFPcells
+HRAS4dpf_hind_2_15min.posXY$RFP <- HRAS4dpf_hind_2_15min.posXY$Cell %in% RFPcells
 
 
 
@@ -298,24 +315,16 @@ HRAS5dpf_hind2_15min.posXY$RFP <- HRAS5dpf_hind2_15min.posXY$Cell %in% RFPcells
 # POSITION ANALYSIS
 cut3 <- cutree(hc, k = 3)
 
-HRAS5dpf_hind2_15min.posXY$Cluster <- cut3
+HRAS4dpf_hind_2_15min.posXY$Cluster <- cut3
 
-ggplot(HRAS5dpf_hind2_15min.posXY, aes(X, Y, color = as.factor(Cluster), shape = as.factor(Cluster)))+
+ggplot(HRAS4dpf_hind_2_15min.posXY, aes(X, Y, color = as.factor(Cluster), shape = as.factor(Cluster)))+
   geom_point(size = 2)+
   # scale_color_manual(values=c('red','blue','green'))+
   theme_graph()+
   scale_y_reverse()
 
 
-# Average activity per cell (dF peaks)
-HRAS5dpf_hind2_15min.posXY$Mean.dF <- rowMeans(dFPOS)
 
-
-
-
-# Average activity per cell (deconvolved peaks)
-# then plot on graph
-HRAS5dpf_hind2_15min.posXY$Mean <- rowMeans(spks)
 
 
 

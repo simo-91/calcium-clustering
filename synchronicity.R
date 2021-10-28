@@ -36,11 +36,11 @@ synchron.cluster <- colnames(cmat.synchron[,which(cmat.synchron > 0.50)]) #selec
 synchron.raster <- as.data.frame(tspks[, (synchron.cluster)])
 
 synchron.raster$time <- 1:nrow(synchron.raster)
-HRAS5dpf_hind2_15min.synchron.raster.melt <- melt(synchron.raster, id = "time")
-colnames(HRAS5dpf_hind2_15min.synchron.raster.melt) <- c('time','cell','Ca2+')
+HRAS5dpf_mid2_15min.synchron.raster.melt <- melt(synchron.raster, id = "time")
+colnames(HRAS5dpf_mid2_15min.synchron.raster.melt) <- c('time','cell','Ca2+')
 
 #Plot Coactive cells traces
-HRAS5dpf_hind2_15min.synchron.traces.plt <- ggplot(HRAS5dpf_hind2_15min.synchron.raster.melt, aes(time, `Ca2+`))+
+HRAS5dpf_mid2_15min.synchron.traces.plt <- ggplot(HRAS5dpf_mid2_15min.synchron.raster.melt, aes(time, `Ca2+`))+
   geom_line(aes(color = cell))+
   facet_wrap(vars(cell), strip.position = "left", ncol = 1)+
   theme_pubr(legend = "none", margin = FALSE)+
@@ -48,10 +48,10 @@ HRAS5dpf_hind2_15min.synchron.traces.plt <- ggplot(HRAS5dpf_hind2_15min.synchron
         axis.ticks = element_blank(),
         axis.line.y = element_blank())+
   ylab(NULL)+
-  ggtitle("HRAS5dpf_hind2_15min synchron traces")
+  ggtitle("HRAS5dpf_mid2_15min synchron traces")
 
 #rasterplot
-HRAS5dpf_hind2_15min.synchron.raster.plt <- ggplot(HRAS5dpf_hind2_15min.synchron.raster.melt, aes(time, cell))+
+HRAS5dpf_mid2_15min.synchron.raster.plt <- ggplot(HRAS5dpf_mid2_15min.synchron.raster.melt, aes(time, cell))+
   geom_raster(aes(fill = `Ca2+`))+
   scale_fill_gradientn(colours=c("white", "black"))+
   theme_pubr(legend = "none", margin = FALSE)+
@@ -59,10 +59,10 @@ HRAS5dpf_hind2_15min.synchron.raster.plt <- ggplot(HRAS5dpf_hind2_15min.synchron
         axis.ticks = element_blank(),
         axis.line.y = element_blank())+
   ylab(NULL)+
-  ggtitle("HRAS5dpf_hind2_15min synchron raster")
+  ggtitle("HRAS5dpf_mid2_15min synchron raster")
 
 # Label synchronous cells as such
-HRAS5dpf_hind2_15min.posXY$synchron <- HRAS5dpf_hind2_15min.posXY$Cell %in% synchron.cluster
+HRAS5dpf_mid2_15min.posXY$synchron <- HRAS5dpf_mid2_15min.posXY$Cell %in% synchron.cluster
 
 
 
@@ -109,7 +109,7 @@ sync.raster2.melt$cell <- factor(x = sync.raster2.melt$cell,
                          levels = sync.rows$sync.rows[sync.order], 
                          ordered = TRUE)
 #Rasterplot
-HRAS5dpf_hind2_15min.sync.raster.hc.plt <- ggplot(sync.raster2.melt, aes(time, cell))+
+HRAS5dpf_mid2_15min.sync.raster.hc.plt <- ggplot(sync.raster2.melt, aes(time, cell))+
   geom_raster(aes(fill = `Ca2+`))+
   scale_fill_gradientn(colours=c("white", "black"))+
   theme_pubr()+
@@ -120,19 +120,19 @@ HRAS5dpf_hind2_15min.sync.raster.hc.plt <- ggplot(sync.raster2.melt, aes(time, c
         axis.ticks.y = element_blank(),
         axis.text.y = element_blank(),
         plot.title = element_text(colour = "red", hjust = .5))+
-  ggtitle("HRAS 5dpf hind 2 corr > 0.5 hc")
+  ggtitle("HRAS 5dpf mid 2 corr > 0.5 hc")
 
 # # Plot total calcium activity/time ONLY highly corr cells
 syncSUM2 <- rowSums(sync.raster2[,-ncol(sync.raster2)])
 syncSUM2 <- as.data.frame(syncSUM2)
 syncSUM2$Time <- 1:nrow(syncSUM2)
 
-HRAS5dpf_hind2_15min.syncSUM2.plt <- ggplot(syncSUM2, aes(Time, syncSUM2))+
+HRAS5dpf_mid2_15min.syncSUM2.plt <- ggplot(syncSUM2, aes(Time, syncSUM2))+
   geom_line()+ 
   geom_smooth()+
   theme_pubr()+
   ylab("Ca2+")+
-  ylim(HRAS5dpf_hind2_15min.spksSUM2.ylim)
+  ylim(HRAS5dpf_mid2_15min.spksSUM2.ylim)
 
 # Calculating percentage of active cells over time after extracting highly corr cells
 # With thresholding
@@ -144,12 +144,12 @@ hiSUM <- rowSums(sync.raster[,-ncol(sync.raster)])
 hiSUM <- as.data.frame(hiSUM)
 hiSUM$Time <- 1:nrow(hiSUM)
 hiSUM$Perc <- hiSUM$hiSUM/ncol(sync.raster)*100
-HRAS5dpf_hind2_15min.hiSUM.plt <- ggplot(hiSUM, aes(Time, Perc))+
+HRAS5dpf_mid2_15min.hiSUM.plt <- ggplot(hiSUM, aes(Time, Perc))+
   geom_line()+
   theme_pubr()
 
 
 # GRID raster/sums
-sync.plots <- align_plots(HRAS5dpf_hind2_15min.sync.raster.hc.plt, HRAS5dpf_hind2_15min.hiSUM.plt, align = 'v', axis = 'l')
-sync.HRAS5dpf_hind2_15min.grid <- plot_grid(sync.plots[[1]], HRAS5dpf_hind2_15min.hiSUM.plt, ncol = 1, rel_heights = c(4.5,1))
+sync.plots <- align_plots(HRAS5dpf_mid2_15min.sync.raster.hc.plt, HRAS5dpf_mid2_15min.hiSUM.plt, align = 'v', axis = 'l')
+sync.HRAS5dpf_mid2_15min.grid <- plot_grid(sync.plots[[1]], HRAS5dpf_mid2_15min.hiSUM.plt, ncol = 1, rel_heights = c(4.5,1))
 

@@ -7,10 +7,10 @@ library(tidygraph)
 library(ggiraph)
 library(ggnewscale)
 
-HRAS5dpf_hind2_15min.graph <- graph.adjacency(as.matrix(cmat), mode = "undirected", weighted = TRUE, diag = FALSE)
+HRAS4dpf_hind_2_15min.graph <- graph.adjacency(as.matrix(cmat), mode = "undirected", weighted = TRUE, diag = FALSE)
 
 # Threshold correlation degree. An interval is chosen because the Pearson correlation coeff goes -1 to 1, BUT -1 means anti-correlation.. so one neuron is active when the other isn't)
-HRAS5dpf_hind2_15min.graph <- delete.edges(HRAS5dpf_hind2_15min.graph, which(E(HRAS5dpf_hind2_15min.graph)$weight <0.70))
+HRAS4dpf_hind_2_15min.graph <- delete.edges(HRAS4dpf_hind_2_15min.graph, which(E(HRAS4dpf_hind_2_15min.graph)$weight <0.75))
 
 ##### Plot network
 g.palette.Sync <- c("TRUE" = "green","FALSE" = "grey")
@@ -21,12 +21,16 @@ g.shapes.Sync <- c("TRUE" = 23, "FALSE" = 21)
 g.sizes.RFP <- c("TRUE" = 6)
 g.shapes.RFP <- c("TRUE" = 25)
 
+# Hubs
+HRAS4dpf_hind_2_15min.hub_score <- round(hub_score(HRAS4dpf_hind_2_15min.graph)$value)
 
-HRAS5dpf_hind2_15min.graph.plt <- ggraph(HRAS5dpf_hind2_15min.graph, 
-                                         layout = as.matrix(HRAS5dpf_hind2_15min.posXY)[, c("X", "Y")]) +
+
+
+HRAS4dpf_hind_2_15min.graph.plt <- ggraph(HRAS4dpf_hind_2_15min.graph, 
+                                         layout = as.matrix(HRAS4dpf_hind_2_15min.posXY)[, c("X", "Y")]) +
                             geom_edge_link(aes(colour = weight, alpha = weight))+
                             scale_edge_alpha_continuous(range = c(0.1, 1), guide = "none")+
-                            scale_edge_color_viridis(name = "Correlation",
+                            scale_edge_color_viridis(name = "F. Corr",
                                                      alpha = 1,
                                                      begin = 0,
                                                      end = 1,
@@ -34,24 +38,29 @@ HRAS5dpf_hind2_15min.graph.plt <- ggraph(HRAS5dpf_hind2_15min.graph,
                                                      option = "inferno",
                                                      direction = 1
                             )+
-                          # Calcium levels
-                            geom_node_point(aes(fill = HRAS5dpf_hind2_15min.posXY$Mean.dF,
-                                                size = as.factor(HRAS5dpf_hind2_15min.posXY$RFP),
-                                                shape = as.factor(HRAS5dpf_hind2_15min.posXY$RFP),
-                                                colour = as.factor(HRAS5dpf_hind2_15min.posXY$RFP)))+
+                          # Calcium levels and RFP positives
+                            geom_node_point(aes(fill = HRAS4dpf_hind_2_15min.posXY$Mean.dF,
+                                                size = as.factor(HRAS4dpf_hind_2_15min.posXY$RFP),
+                                                shape = as.factor(HRAS4dpf_hind_2_15min.posXY$RFP),
+                                                colour = as.factor(HRAS4dpf_hind_2_15min.posXY$RFP)))+
                             scale_fill_continuous(type = "viridis")+
                             scale_size_manual(values = c("TRUE" = 3.5, "FALSE" = 2.5))+
                             scale_shape_manual(values = c("TRUE" = 25, "FALSE" = 21))+
                             scale_colour_manual(values = c("TRUE" = "#fc9272", "FALSE" = "black"))+
-                          # RFP positives
-
-                            # geom_node_point(aes(fill = as.factor(HRAS5dpf_hind2_15min.posXY$synchron),
-                            #                     size = as.factor(HRAS5dpf_hind2_15min.posXY$synchron),
-                            #                     shape = as.factor(HRAS5dpf_hind2_15min.posXY$synchron)))+
+                            labs(shape = "RFP",
+                                 colour = "RFP",
+                                 size = "RFP",
+                                 fill = "Ca")+
+                          # Hubs
+                            annotate("text", x=10, y=10, 
+                                     label = HRAS4dpf_hind_2_15min.hub_score)+
+                            # geom_node_point(aes(fill = as.factor(HRAS5dpf_mid2_15min.posXY$synchron),
+                            #                     size = as.factor(HRAS5dpf_mid2_15min.posXY$synchron),
+                            #                     shape = as.factor(HRAS5dpf_mid2_15min.posXY$synchron)))+
                             # scale_size_manual(values = g.sizes.Sync, name = "Synchronous")+
                             # scale_fill_manual(values = g.palette.Sync, name = "Synchronous")+
                             # scale_shape_manual(values = g.shapes.Sync, name = "Synchronous")+
-                            # geom_node_label(aes(label = HRAS5dpf_hind2_15min.posXY$Cell), repel = TRUE)+
+                            # geom_node_label(aes(label = HRAS5dpf_mid2_15min.posXY$Cell), repel = TRUE)+
                             
                             theme_graph(plot_margin = margin(5, 5, 5, 5))+
                             theme(legend.position = "right",
@@ -63,7 +72,7 @@ HRAS5dpf_hind2_15min.graph.plt <- ggraph(HRAS5dpf_hind2_15min.graph,
                                   # legend.text = element_text(size=4),
                                   # legend.text.align = 0
                           )+
-                            ggtitle("HRAS5dpf_hind2_15min")+
+                            ggtitle("HRAS4dpf_hind_2_15min")+
                             scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
 
 
@@ -86,6 +95,6 @@ transparentgraph <- ggraph(graph, layout = as.matrix(posXY)[, c("X", "Y")]) +
 
 
 #Save transparent graph
-ggsave(plot = HRAS5dpf_hind2_15min.graph, file = "HRAS5dpf_hind2_15min.graph.png", 
+ggsave(plot = HRAS5dpf_mid2_15min.graph, file = "HRAS5dpf_mid2_15min.graph.png", 
        device = "png",  bg = "transparent",
        width = 20, height = 15, units = "cm", dpi = 800)
