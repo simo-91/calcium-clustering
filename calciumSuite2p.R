@@ -236,13 +236,11 @@ HRAS5dpf_hind2_15min.RFP.grid <- plot_grid(plots[[1]], HRAS5dpf_hind2_15min_RFPs
 # Average calcium levels over time. Here by using dF traces after some coding in python suite2p-environment
 dF <- as.data.frame(np$load("dF.npy", allow_pickle = TRUE)) #delta F calcium levels of all cells
 dF <- dF[,50:ncol(dF)] #select window
-dF <- t(apply(dF, 1, function(x) (x - min(x))/(max(x)-min(x)))) # Normalize
+# dF <- t(apply(dF, 1, function(x) (x - min(x))/(max(x)-min(x)))) # Normalize?
 dFPOS <- dF[positivesPLUSone,]
-
+rownames(dFPOS) <- positives
 
 #Averaging per timepoint (all cells)
-
-rownames(dFPOS) <- positives
 
 dFx <- as.data.frame(colSums(dFPOS)/nrow(dFPOS))
 dFx$Time <- 0:(nrow(dFx)-1)
