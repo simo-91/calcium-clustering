@@ -1,7 +1,6 @@
 ################ CALCIUM ANALYSIS WITHOUT THRESHOLDING
 # sampleID <- readline('Please input ID number (e.g. "ID0123")')
 
-
 # Libraries ---------------------------------------------------------------
 library(dplyr)
 library(tidyverse)
