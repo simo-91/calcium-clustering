@@ -2,6 +2,7 @@
 # sampleID <- readline('Please input ID number (e.g. "ID0123")')
 
 # Libraries ---------------------------------------------------------------
+library(utils)
 library(dplyr)
 library(tidyverse)
 library(ggplot2)
@@ -16,13 +17,13 @@ library(RcppCNPy)
 library(cowplot)
 library(ggpubr)
 library(mmand)
-library(reticulate)
 # Load raw Suite2p npy arrays using reticulate
-use_condaenv("/Users/Simo/suite2p/")
+library(reticulate)
 np <-import("numpy")
 
-
-
+workdir <- selectDirectory(caption = "Select suite2p/plane folder", 
+                           label = "Select")
+setwd(workdir)
 # Stat.npy ----------------------------------------------------------------
 stat <- np$load("stat.npy", allow_pickle = TRUE) #stats containing ROIs XY
 # Loop over stat.npy to access "med" (ROIs coordinates) to create list of cells coordinates. ROIs from suite2p starts with index 0
