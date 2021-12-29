@@ -274,7 +274,8 @@ ID0025.posXY$RFP <- ID0025.posXY$Cell %in% ID0025.RFPcells
 
 ID0025.posXY.RFP <- ID0025.posXY[which(ID0025.posXY$RFP=="TRUE"),]
 
-
+saveRDS(ID0025.posXY.RFP, file = "ID0025.posXY.RFP.rds")
+write.csv(ID0025.posXY.RFP, file = "ID0025.posXY.RFP.csv")
 
 #Averaging per timepoint (all cells)
 # dFx <- as.data.frame(colSums(dFPOS)/nrow(dFPOS))
