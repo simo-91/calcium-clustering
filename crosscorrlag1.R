@@ -51,6 +51,7 @@ heatmap.2(as.matrix(cmat), dendrogram = "none",
 
 
 
+# RFP ---------------------------------------------------------------------
 # Create empty matrix that will host corr coefficents. 
 tRFP <- t(RFP)
 

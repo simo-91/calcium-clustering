@@ -1,3 +1,5 @@
+
+# Libraries ---------------------------------------------------------------
 library(ggplot2)
 library(igraph)
 library(ggraph)
@@ -7,6 +9,8 @@ library(tidygraph)
 library(ggiraph)
 library(ggnewscale)
 
+
+# Graph setup -------------------------------------------------------------
 ID0025.graph <- graph.adjacency(as.matrix(cmat), mode = "undirected", weighted = TRUE, diag = FALSE)
 ID0025.graph.raw <- graph.adjacency(as.matrix(cmat.RFP), mode = "undirected", weighted = TRUE, diag = FALSE)
 # Threshold correlation degree. An interval is chosen because the Pearson correlation coeff goes -1 to 1, BUT -1 means anti-correlation.. so one neuron is active when the other isn't)
@@ -83,9 +87,9 @@ ID0025.graph.plt <- ggraph(ID0025.graph,
 # ################### RFP graph ########################
 # ########################################################
 ID0025.graph.RFP <- graph.adjacency(as.matrix(cmat.RFP), mode = "undirected", weighted = TRUE, diag = FALSE)
-ID0025.graph.RFP.raw <- graph.adjacency(as.matrix(cmat.RFP), mode = "undirected", weighted = TRUE, diag = FALSE)
+
 # Threshold correlation degree. An interval is chosen because the Pearson correlation coeff goes -1 to 1, BUT -1 means anti-correlation.. so one neuron is active when the other isn't)
-ID0025.graph.RFP <- delete.edges(ID0025.graph.RFP, which(E(ID0025.graph.RFP)$weight <0.35))
+ID0025.graph.RFP <- delete.edges(ID0025.graph.RFP, which(E(ID0025.graph.RFP)$weight <0.50))
 
 ##### Plot network
 # g.palette.Sync <- c("TRUE" = "green","FALSE" = "grey")
@@ -97,7 +101,12 @@ ID0025.graph.RFP <- delete.edges(ID0025.graph.RFP, which(E(ID0025.graph.RFP)$wei
 # g.shapes.RFP <- c("TRUE" = 25)
 
 # Hubs
-ID0025.hub_score.RFP <- (round(hub_score(ID0025.graph.RFP.raw)$value))/nrow(cmat.RFP) #normalized on absolute adj matrix!
+# ID0025.hub_score.RFP <- (round(hub_score(ID0025.graph.RFP)$value))/nrow(cmat.RFP) #normalized on absolute adj matrix!
+
+
+# Hub score of each node --------------------------------------------------
+ID0025.hub.score.RFP <- hub_score(ID0025.graph.RFP, scale = TRUE)
+ID0025.posXY.RFP$`Hub score` <- round(ID0025.hub.score.RFP$vector, digits = 2)
 
 
 ID0025.graph.RFP.plt <- ggraph(ID0025.graph.RFP, 
@@ -117,6 +126,7 @@ ID0025.graph.RFP.plt <- ggraph(ID0025.graph.RFP,
                                                               size = as.factor(ID0025.posXY.RFP$RFP),
                                                               shape = as.factor(ID0025.posXY.RFP$RFP),
                                                               colour = as.factor(ID0025.posXY.RFP$RFP)))+
+                                          geom_node_label(aes(label = ID0025.posXY.RFP$`Hub score`), repel = TRUE)+
                                           scale_fill_continuous(type = "viridis")+
                                           scale_size_manual(values = c("TRUE" = 3.5, "FALSE" = 2.5))+
                                           scale_shape_manual(values = c("TRUE" = 25, "FALSE" = 21))+
@@ -126,8 +136,8 @@ ID0025.graph.RFP.plt <- ggraph(ID0025.graph.RFP,
                                                size = "RFP",
                                                fill = "Ca")+
                                           # Hubs
-                                          annotate("text", x=10, y=10, 
-                                                   label = ID0025.hub_score)+
+                                          # annotate("text", x=10, y=10, 
+                                          #          label = ID0025.hub_score.RFP)+
                                           # geom_node_point(aes(fill = as.factor(ID0025.posXY$synchron),
                                           #                     size = as.factor(ID0025.posXY$synchron),
                                           #                     shape = as.factor(ID0025.posXY$synchron)))+
