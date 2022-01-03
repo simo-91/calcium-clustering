@@ -8,7 +8,8 @@ library(tidyverse)
 library(tidygraph)
 library(ggiraph)
 library(ggnewscale)
-
+library(grid)
+library(gridExtra)
 
 # Graph setup -------------------------------------------------------------
 ID0025.graph <- graph.adjacency(as.matrix(cmat), mode = "undirected", weighted = TRUE, diag = FALSE)
@@ -166,6 +167,16 @@ ID0025.graph.RFP.plt <- ggraph(ID0025.graph.RFP,
                                           )+
                                           ggtitle("ID0025")+
                                           scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
+
+
+# Histogram count of degrees ----------------------------------------------
+ID0025.degree.RFP.hist <- ggplot(ID0025.posXY.RFP, aes(x = degree))+ 
+                            geom_histogram(binwidth = 1)
+
+grid.arrange(
+  ID0025.graph.RFP.plt, ID0025.degree.RFP.hist,
+  ID0025.RFP.grid, ID0025.RFPsum2.plt,
+  ncol = 2)
 
 
 

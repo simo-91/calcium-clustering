@@ -232,12 +232,12 @@ ID0025.RFP.raster <- ggplot(meltPeaks.RFP, aes(time, cell))+
         axis.text.x = element_blank(),
         axis.ticks.y = element_blank(),
         axis.text.y = element_blank(),
-        plot.title = element_text(colour = "red", hjust = .5))+
-  ggtitle("ID0025 RFP+")
+        plot.title = element_text(colour = "red", hjust = .5))
+  # ggtitle("ID0025 RFP+")
 
 # GRID raster/sums
-plots <- align_plots(RFP.raster, ID0025.RFPsum.plt, align = 'v', axis = 'l')
-ID0025.RFP.grid <- plot_grid(plots[[1]], ID0025.RFPsum.plt, ncol = 1, rel_heights = c(4.5,1))
+plots <- align_plots(ID0025.RFP.raster, ID0025.RFPsum.plt, align = 'v', axis = 'l')
+ID0025.RFP.grid <- plot_grid(plots[[1]], ID0025.RFPsum.plt, ncol = 1, rel_heights = c(3.5,1))
 
 ######################################### dF/F #########################################
 
