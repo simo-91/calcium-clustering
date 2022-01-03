@@ -89,6 +89,7 @@ ID0025.graph.plt <- ggraph(ID0025.graph,
 ID0025.graph.RFP <- graph.adjacency(as.matrix(cmat.RFP), mode = "undirected", weighted = TRUE, diag = FALSE)
 
 # Threshold correlation degree. An interval is chosen because the Pearson correlation coeff goes -1 to 1, BUT -1 means anti-correlation.. so one neuron is active when the other isn't)
+# Set weight threshold
 ID0025.graph.RFP <- delete.edges(ID0025.graph.RFP, which(E(ID0025.graph.RFP)$weight <0.50))
 
 ##### Plot network
@@ -105,8 +106,9 @@ ID0025.graph.RFP <- delete.edges(ID0025.graph.RFP, which(E(ID0025.graph.RFP)$wei
 
 
 # Hub score of each node --------------------------------------------------
-ID0025.hub.score.RFP <- hub_score(ID0025.graph.RFP, scale = TRUE)
-ID0025.posXY.RFP$`Hub score` <- round(ID0025.hub.score.RFP$vector, digits = 2)
+# ID0025.hub.score.RFP <- hub_score(ID0025.graph.RFP, scale = TRUE)
+# ID0025.posXY.RFP$`Hub score` <- round(ID0025.hub.score.RFP$vector, digits = 2)
+# ID0025.posXY.RFP$HScore <- (ID0025.posXY.RFP$`Hub score`)*100
 
 
 ID0025.graph.RFP.plt <- ggraph(ID0025.graph.RFP, 
@@ -121,23 +123,23 @@ ID0025.graph.RFP.plt <- ggraph(ID0025.graph.RFP,
                                                                    option = "inferno",
                                                                    direction = 1
                                           )+
-                                          # Calcium levels and RFP positives
+                                          # Calcium levels and degrees
                                           geom_node_point(aes(fill = ID0025.posXY.RFP$Mean.dF,
-                                                              size = as.factor(ID0025.posXY.RFP$RFP),
-                                                              shape = as.factor(ID0025.posXY.RFP$RFP),
-                                                              colour = as.factor(ID0025.posXY.RFP$RFP)))+
-                                          geom_node_label(aes(label = ID0025.posXY.RFP$`Hub score`), repel = TRUE)+
+                                                              size = ordered(degree(ID0025.graph.RFP))),
+                                                          shape = 21)+
+                                          geom_node_text(aes(label = degree(ID0025.graph.RFP)),
+                                                         colour = "white",
+                                                         fontface = 2,
+                                                         size = 3)+
                                           scale_fill_continuous(type = "viridis")+
-                                          scale_size_manual(values = c("TRUE" = 3.5, "FALSE" = 2.5))+
-                                          scale_shape_manual(values = c("TRUE" = 25, "FALSE" = 21))+
-                                          scale_colour_manual(values = c("TRUE" = "#fc9272", "FALSE" = "black"))+
-                                          labs(shape = "RFP",
-                                               colour = "RFP",
-                                               size = "RFP",
-                                               fill = "Ca")+
+                                          scale_size_manual(values = c("0" = 5, "1" = 8, "2" = 9, "3" = 10))+
+                                          # scale_shape_manual(values = c("TRUE" = 25, "FALSE" = 21))+
+                                          # scale_colour_manual(values = c("TRUE" = "#fc9272", "FALSE" = "black"))+
+                                          labs(fill = "Ca",
+                                               size = "Degree (k)")+
                                           # Hubs
-                                          # annotate("text", x=10, y=10, 
-                                          #          label = ID0025.hub_score.RFP)+
+                                          annotate("text", x=60, y=20, 
+                                                    label = "W. thresh.: 0.50")+
                                           # geom_node_point(aes(fill = as.factor(ID0025.posXY$synchron),
                                           #                     size = as.factor(ID0025.posXY$synchron),
                                           #                     shape = as.factor(ID0025.posXY$synchron)))+
