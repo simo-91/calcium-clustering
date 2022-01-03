@@ -173,14 +173,20 @@ ID0025.graph.RFP.plt <- ggraph(ID0025.graph.RFP,
 ID0025.degree.RFP.hist <- ggplot(ID0025.posXY.RFP, aes(x = degree))+ 
                             geom_histogram(binwidth = 1)
 
-grid.arrange(
-  ID0025.graph.RFP.plt, ID0025.degree.RFP.hist,
-  ID0025.RFP.grid, ID0025.RFPsum2.plt,
-  ncol = 2)
+# Viz ---------------------------------------------------------------------
+gs = c(ID0025.graph.RFP.plt, ID0025.degree.RFP.hist,
+      ID0025.RFP.grid, ID0025.RFPsum2.plt)
+
+lay <- rbind(c(1,1,3,3),
+             c(1,1,3,3),
+             c(2,2,4,4))
+ID0025.arranged <- grid.arrange(ID0025.graph.RFP.plt, ID0025.degree.RFP.hist,
+                     ID0025.RFP.grid, ID0025.RFPsum2.plt, 
+                     layout_matrix = lay)
 
 
-
-#Save transparent graph
-ggsave(plot = ID0025.graph, file = "ID0025.graph.png", 
+#Save whole graph + raster + activity plot + coactive cells/time
+ggsave(plot = ID0025.arranged, file = "ID0025.whole.png", 
        device = "png",  bg = "transparent",
-       width = 20, height = 15, units = "cm", dpi = 800)
+       width = 20, height = 15, units = "cm", dpi = 320,
+       scale = 2)
