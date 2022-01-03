@@ -110,6 +110,8 @@ ID0025.graph.RFP <- delete.edges(ID0025.graph.RFP, which(E(ID0025.graph.RFP)$wei
 # ID0025.posXY.RFP$`Hub score` <- round(ID0025.hub.score.RFP$vector, digits = 2)
 # ID0025.posXY.RFP$HScore <- (ID0025.posXY.RFP$`Hub score`)*100
 
+# Robustness
+ID0025.cohesion <- cohesion(ID0025.graph.RFP)
 
 ID0025.graph.RFP.plt <- ggraph(ID0025.graph.RFP, 
                                           layout = as.matrix(ID0025.posXY.RFP)[, c("X", "Y")]) +
@@ -138,8 +140,12 @@ ID0025.graph.RFP.plt <- ggraph(ID0025.graph.RFP,
                                           labs(fill = "Ca",
                                                size = "Degree (k)")+
                                           # Hubs
-                                          annotate("text", x=60, y=20, 
-                                                    label = "W. thresh.: 0.50")+
+                                          annotate("text", x=45, y=20, 
+                                                    label = "W. thresh. = 0.50")+
+                                          annotate("text", x=40, y=35,
+                                                   label = "Cohesion = ")+
+                                          annotate("text", x=70, y=35,
+                                                   label = ID0025.cohesion)+
                                           # geom_node_point(aes(fill = as.factor(ID0025.posXY$synchron),
                                           #                     size = as.factor(ID0025.posXY$synchron),
                                           #                     shape = as.factor(ID0025.posXY$synchron)))+
