@@ -114,6 +114,14 @@ ID0025.graph.RFP <- delete.edges(ID0025.graph.RFP, which(E(ID0025.graph.RFP)$wei
 # Robustness
 ID0025.cohesion <- cohesion(ID0025.graph.RFP)
 
+# Communities detection ---------------------------------------------------
+# greedy method (hiearchical, fast method)
+graph.clusters = cluster_leading_eigen(ID0025.graph.RFP)
+ID0025.posXY.RFP$Community <- graph.clusters$membership
+ID0025.posXY.RFP$Member <- duplicated(ID0025.posXY.RFP$Community)
+
+
+# Network plot ------------------------------------------------------------
 ID0025.graph.RFP.plt <- ggraph(ID0025.graph.RFP, 
                                           layout = as.matrix(ID0025.posXY.RFP)[, c("X", "Y")]) +
                                           geom_edge_link(aes(colour = weight, alpha = weight))+
@@ -193,3 +201,10 @@ ggsave(plot = ID0025.arranged, file = "ID0025.whole.png",
        device = "png",  bg = "transparent",
        width = 20, height = 15, units = "cm", dpi = 320,
        scale = 2)
+
+
+
+
+
+# plot communities with shaded regions
+# plot(c2, ID0025.graph.RFP, layout=as.matrix(ID0025.posXY.RFP)[, c("X", "Y")])
