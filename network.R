@@ -130,6 +130,9 @@ ID0025.graph.RFP.plt <- ggraph(ID0025.graph.RFP,
                                           geom_node_point(aes(fill = ID0025.posXY.RFP$Mean.dF,
                                                               size = ordered(degree(ID0025.graph.RFP))),
                                                           shape = 21)+
+                                          geom_node_text(aes(label = ID0025.posXY.RFP$Cell), 
+                                                          repel = TRUE,
+                                                         size = 2)+
                                           geom_node_text(aes(label = degree(ID0025.graph.RFP)),
                                                          colour = "white",
                                                          fontface = 2,

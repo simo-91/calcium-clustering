@@ -230,8 +230,8 @@ ID0025.RFP.raster <- ggplot(meltPeaks.RFP, aes(time, cell))+
         axis.title.x = element_blank(),
         axis.ticks.x = element_blank(),
         axis.text.x = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.text.y = element_blank(),
+        # axis.ticks.y = element_blank(),
+        # axis.text.y = element_blank(),
         plot.title = element_text(colour = "red", hjust = .5))
   # ggtitle("ID0025 RFP+")
 
