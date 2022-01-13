@@ -116,8 +116,8 @@ ID0025.cohesion <- cohesion(ID0025.graph.RFP)
 
 # Communities detection ---------------------------------------------------
 # greedy method (hiearchical, fast method)
-graph.clusters = cluster_leading_eigen(ID0025.graph.RFP)
-ID0025.posXY.RFP$Community <- graph.clusters$membership
+ID0025.graph.clusters.RFP = cluster_leading_eigen(ID0025.graph.RFP)
+ID0025.posXY.RFP$Community <- ID0025.graph.clusters.RFP$membership
 ID0025.posXY.RFP$Member <- duplicated(ID0025.posXY.RFP$Community)
 
 
@@ -140,7 +140,7 @@ ID0025.graph.RFP.plt <- ggraph(ID0025.graph.RFP,
                                                           shape = 21)+
                                           geom_node_text(aes(label = ID0025.posXY.RFP$Cell), 
                                                           repel = TRUE,
-                                                         size = 2)+
+                                                         size = 2.5)+
                                           geom_node_text(aes(label = degree(ID0025.graph.RFP)),
                                                          colour = "white",
                                                          fontface = 2,

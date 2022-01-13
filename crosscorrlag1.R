@@ -74,3 +74,11 @@ for (i in 1:nc) {
   }
 }
 
+
+# Using thresholded values ------------------------------------------------
+T.df.RFP <- t(dF.RFP)
+for (i in 1:nc) {
+  for (j in 1:nc) {
+    cmat.t.RFP[i,j] <- max_CCF(df.RFP[,i],tRFP[,j])
+  }
+}
