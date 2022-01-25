@@ -76,9 +76,21 @@ for (i in 1:nc) {
 
 
 # Using thresholded values ------------------------------------------------
-# T.df.RFP <- t(dF.RFP)
-# for (i in 1:nc) {
-#   for (j in 1:nc) {
-#     cmat.t.RFP[i,j] <- max_CCF(df.RFP[,i],tRFP[,j])
-#   }
-# }
+# # Function to find max CCF between a and b in ±1 lag range
+max_CCF<- function(a,b)
+{
+  d <- ccf(a, b, plot = FALSE, lag.max = 1)
+  cor = d$acf[,,1]
+  return(max(cor))
+} 
+# Create empty matrix that will host corr coefficents. 
+T.RFPt <- t(RFPt)
+
+nc <- nrow(RFPt)
+cmat.RFPt <- matrix(NA,nc,nc)
+
+for (i in 1:nc) {
+  for (j in 1:nc) {
+    cmat.RFPt[i,j] <- max_CCF(T.RFPt[,i],T.RFPt[,j])
+  }
+}
