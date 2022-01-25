@@ -186,19 +186,19 @@ ID0025.degree.RFP.hist <- ggplot(ID0025.posXY.RFP, aes(x = degree))+
 
 # Viz ---------------------------------------------------------------------
 gs = c(ID0025.graph.RFP.plt, ID0025.degree.RFP.hist,
-      ID0025.RFP.grid, ID0025.RFPsum2.plt)
+      ID0025.RFP.grid, ID0025.RFPsum2.plt, ID0025.scree.RFP)
 
 lay <- rbind(c(1,1,3,3),
              c(1,1,3,3),
-             c(2,2,4,4))
+             c(2,5,4,4))
 ID0025.arranged <- grid.arrange(ID0025.graph.RFP.plt, ID0025.degree.RFP.hist,
-                     ID0025.RFP.grid, ID0025.RFPsum2.plt, 
+                     ID0025.RFP.grid, ID0025.RFPsum2.plt, ID0025.scree.RFP,
                      layout_matrix = lay)
 
 
 #Save whole graph + raster + activity plot + coactive cells/time
 ggsave(plot = ID0025.arranged, file = "ID0025.whole.png", 
-       device = "png",  bg = "transparent",
+       device = "png",  bg = "white",
        width = 20, height = 15, units = "cm", dpi = 320,
        scale = 2)
 

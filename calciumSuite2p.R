@@ -185,7 +185,7 @@ ID0025.RFPsum2.plt <- ggplot(RFPsum2, aes(Time, `colSums(RFP)/nrow(RFP)`))+
   geom_line()+
   theme_pubr()+
   geom_smooth()+
-  ylab("normalized dF/F")+
+  ylab("Deconvolved activity")+
   ylim(0, NA)
 ID0025.RFPsum2.plt.ylim <- layer_scales(ID0025.RFPsum2.plt)$y$get_limits()
 
@@ -231,7 +231,7 @@ ID0025.RFP.raster <- ggplot(meltPeaks.RFP, aes(time, cell))+
         axis.ticks.x = element_blank(),
         axis.text.x = element_blank(),
         # axis.ticks.y = element_blank(),
-        # axis.text.y = element_blank(),
+        # axis.text.y = element_text(face=ID0025.posXY.RFP$Cell[which(ID0025.posXY.RFP$Member=="TRUE"),], "bold"),
         plot.title = element_text(colour = "red", hjust = .5))
   # ggtitle("ID0025 RFP+")
 
