@@ -42,12 +42,12 @@
 # 
 # 
 # # Display the resultant matrix
-# library(gplots)
-# heatmap.2(as.matrix(cmat), dendrogram = "none",
-#                                  trace = "none", density.info =  "none", keysize = 0.25,
-#           cexRow = 0.1, cexCol=0.1, labRow = "none", labCol = "none", main = NULL,
-#           xlab = NULL,
-#           ylab = NULL, na.rm = TRUE)
+library(gplots)
+heatmap.2(as.matrix(cmat.RFPt)), dendrogram = "none",
+                                 trace = "none", density.info =  "none", keysize = 0.25,
+          cexRow = 0.1, cexCol=0.1, labRow = "none", labCol = "none", main = NULL,
+          xlab = NULL,
+          ylab = NULL, na.rm = TRUE)
 
 
 
