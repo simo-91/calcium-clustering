@@ -91,7 +91,7 @@ ID0013.graph.RFP <- graph.adjacency(as.matrix(cmat.RFPt), mode = "undirected", w
 
 # Threshold correlation degree. An interval is chosen because the Pearson correlation coeff goes -1 to 1, BUT -1 means anti-correlation.. so one neuron is active when the other isn't)
 # Set weight threshold
-ID0013.graph.RFP <- delete.edges(ID0013.graph.RFP, which(E(ID0013.graph.RFP)$weight <0.20))
+ID0013.graph.RFP <- delete.edges(ID0013.graph.RFP, which(E(ID0013.graph.RFP)$weight <0.10))
 
 ##### Plot network
 # g.palette.Sync <- c("TRUE" = "green","FALSE" = "grey")
@@ -135,24 +135,24 @@ ID0013.graph.RFP.plt <- ggraph(ID0013.graph.RFP,
                                                                    direction = 1
                                           )+
                                           # Calcium levels and degrees
-                                          geom_node_point(aes(fill = ID0013.posXY.RFP$Mean.dF,
+                                          geom_node_point(aes(fill = ordered(cluster_leading_eigen(ID0013.graph.RFP)$membership),
                                                               size = ordered(degree(ID0013.graph.RFP))),
                                                           shape = 21)+
                                           geom_node_text(aes(label = ID0013.posXY.RFP$Cell), 
                                                           repel = TRUE,
                                                          size = 2.5)+
-                                          geom_node_text(aes(label = degree(ID0013.graph.RFP)),
+                                          geom_node_text(aes(label = ordered(cluster_leading_eigen(ID0013.graph.RFP)$membership)),
                                                          colour = "white",
-                                                         fontface = 2,
+                                                         fontface = 1,
                                                          size = 3)+
-                                          scale_fill_continuous(type = "viridis")+
+                                          scale_fill_discrete(guide = "none")+
                                           scale_size_manual(values = c("0" = 5, "1" = 8, "2" = 9, "3" = 10,
                                                                        "4" = 11, "5" = 12, "6" = 13, "7" = 14,
                                                                        "8" = 15, "9" = 16, "10" = 17),
                                                             guide = "none")+
                                           # scale_shape_manual(values = c("TRUE" = 25, "FALSE" = 21))+
                                           # scale_colour_manual(values = c("TRUE" = "#fc9272", "FALSE" = "black"))+
-                                          labs(fill = "Ca")+
+                                          # labs(fill = "Ca")+
                                           # Hubs
                                           # annotate("text", x=45, y=20, 
                                           #           label = "W. thresh. = 0.50")+
@@ -168,7 +168,7 @@ ID0013.graph.RFP.plt <- ggraph(ID0013.graph.RFP,
                                           # scale_shape_manual(values = g.shapes.Sync, name = "Synchronous")+
                                           # geom_node_label(aes(label = ID0013.posXY$Cell), repel = TRUE)+
                                           
-                                          theme_graph(background = "grey",
+                                          theme_graph(background = "white",
                                                       plot_margin = margin(5, 5, 5, 5))+
                                           theme(legend.position = "right",
                                                 legend.margin	= margin(1,1,1,1),
