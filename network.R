@@ -120,6 +120,7 @@ ID0025.cohesion <- cohesion(ID0025.graph.RFP)
 # greedy method (hierarchical, fast method)
 ID0025.graph.clusters.RFP = cluster_leading_eigen(ID0025.graph.RFP)
 ID0025.posXY.RFP$Community <- ID0025.graph.clusters.RFP$membership
+ID0025.posXY.RFP$Degree <- degree(ID0025.graph.RFP)
 # ID0025.posXY.RFP$Member <- duplicated(ID0025.posXY.RFP$Community) to be fixed
 # ID0025.posXY.RFP$degree <- ordered(degree(ID0025.graph.RFP))
 
@@ -138,7 +139,7 @@ ID0025.graph.RFP.plt <- ggraph(ID0025.graph.RFP,
                                           )+
                                           # Calcium levels and degrees
                                           geom_node_point(aes(fill = ordered(cluster_leading_eigen(ID0025.graph.RFP)$membership),
-                                                              size = ordered(degree(ID0025.graph.RFP))),
+                                                              size = degree(ID0025.graph.RFP)),
                                                           shape = 21)+
                                           geom_node_text(aes(label = ID0025.posXY.RFP$Cell), 
                                                           repel = TRUE,
@@ -149,9 +150,7 @@ ID0025.graph.RFP.plt <- ggraph(ID0025.graph.RFP,
                                                          size = 3)+
                                           scale_fill_brewer(palette = "Set1",
                                                             guide = "none")+
-                                          scale_size_manual(values = c("0" = 5, "1" = 8, "2" = 9, "3" = 10,
-                                                                       "4" = 11, "5" = 12, "6" = 13, "7" = 14,
-                                                                       "8" = 15, "9" = 16, "10" = 17),
+                                          scale_size_continuous(range = c(3.5,10),
                                                             guide = "none")+
                                           # scale_shape_manual(values = c("TRUE" = 25, "FALSE" = 21))+
                                           # scale_colour_manual(values = c("TRUE" = "#fc9272", "FALSE" = "black"))+
