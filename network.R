@@ -187,8 +187,11 @@ ID0025.graph.RFP.plt <- ggraph(ID0025.graph.RFP,
 
 # Histogram count of degrees ----------------------------------------------
 
-ID0025.degree.RFP.hist <- ggplot(ID0025.posXY.RFP, aes(x = degree))+ 
-                            stat_count()
+ID0025.degree.RFP.hist <- ggplot(ID0025.posXY.RFP, aes(x = Degree))+ 
+                            stat_bin(binwidth = 1, center = 0)+
+                            scale_y_continuous(breaks = seq(0,20,1))+
+                            scale_x_continuous(breaks = seq(0,20,1))+
+                            theme_bw()
 
 # libs --------------------------------------------------------------------
 library(factoextra)
