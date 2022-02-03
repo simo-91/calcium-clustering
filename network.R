@@ -11,7 +11,7 @@ library(ggnewscale)
 library(grid)
 library(gridExtra)
 library(RColorBrewer)
-
+library(pals)
 
 # # Graph setup -------------------------------------------------------------
 # ID0025.graph <- graph.adjacency(as.matrix(cmat), mode = "undirected", weighted = TRUE, diag = FALSE)
@@ -125,6 +125,11 @@ ID0025.posXY.RFP$Community <- ID0025.graph.clusters.RFP$membership
 # ID0025.posXY.RFP$degree <- ordered(degree(ID0025.graph.RFP))
 
 # Network plot ------------------------------------------------------------
+# Make composite palette
+communities.palette <- c(brewer.pal(9,'Set1'),
+                         brewer.pal(8,'Set2'),
+                         brewer.pal(12,'Set3'))
+
 ID0025.graph.RFP.plt <- ggraph(ID0025.graph.RFP, 
                                           layout = as.matrix(ID0025.posXY.RFP)[, c("X", "Y")]) +
                                           geom_edge_link(aes(colour = weight, alpha = weight))+
@@ -142,15 +147,16 @@ ID0025.graph.RFP.plt <- ggraph(ID0025.graph.RFP,
                                                               size = degree(ID0025.graph.RFP)),
                                                           shape = 21)+
                                           geom_node_text(aes(label = ID0025.posXY.RFP$Cell), 
+                                                         colour = "red",
                                                           repel = TRUE,
                                                          size = 2.5)+
                                           geom_node_text(aes(label = ordered(cluster_leading_eigen(ID0025.graph.RFP)$membership)),
-                                                         colour = "white",
+                                                         colour = "black",
                                                          fontface = 1,
                                                          size = 3)+
-                                          scale_fill_brewer(palette = "Paired",
+                                          scale_fill_manual(values = communities.palette,
                                                             guide = "none")+
-                                          scale_size_continuous(range = c(3.5,10),
+                                          scale_size_continuous(range = c(5, 12),
                                                             guide = "none")+
                                           # scale_shape_manual(values = c("TRUE" = 25, "FALSE" = 21))+
                                           # scale_colour_manual(values = c("TRUE" = "#fc9272", "FALSE" = "black"))+
