@@ -129,6 +129,9 @@ ID0025.posXY.RFP$Community <- ID0025.graph.clusters.RFP$membership
 communities.palette <- c(brewer.pal(9,'Set1'),
                          brewer.pal(8,'Set2'),
                          brewer.pal(12,'Set3'))
+communities.guide <- guide_legend(title = element_text("Communities"),
+                                  label = FALSE,
+                                  keywidth = 0.1)
 
 ID0025.graph.RFP.plt <- ggraph(ID0025.graph.RFP, 
                                           layout = as.matrix(ID0025.posXY.RFP)[, c("X", "Y")]) +
@@ -155,7 +158,7 @@ ID0025.graph.RFP.plt <- ggraph(ID0025.graph.RFP,
                                                          fontface = 1,
                                                          size = 3)+
                                           scale_fill_manual(values = communities.palette,
-                                                            guide = "none")+
+                                                            guide = communities.guide)+
                                           scale_size_continuous(range = c(5, 12),
                                                             guide = "none")+
                                           # scale_shape_manual(values = c("TRUE" = 25, "FALSE" = 21))+
@@ -193,9 +196,10 @@ ID0025.graph.RFP.plt <- ggraph(ID0025.graph.RFP,
 
 # Histogram count of degrees ----------------------------------------------
 ID0025.posXY.RFP$Degree <- degree(ID0025.graph.RFP)
+max.y.degree <- length(ID0025.RFPcells)
 ID0025.degree.RFP.hist <- ggplot(ID0025.posXY.RFP, aes(x = Degree))+ 
                             stat_bin(binwidth = 1, center = 0)+
-                            scale_y_continuous(breaks = seq(0,20,1))+
+                            scale_y_continuous(breaks = seq(0,max.y.degree,1))+
                             scale_x_continuous(breaks = seq(0,20,1))+
                             theme_bw()
 
