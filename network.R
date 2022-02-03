@@ -92,8 +92,8 @@ library(RColorBrewer)
 ID0025.graph.RFP <- graph.adjacency(as.matrix(cmat.RFPt), mode = "undirected", weighted = TRUE, diag = FALSE)
 
 # Threshold correlation degree. An interval is chosen because the Pearson correlation coeff goes -1 to 1, BUT -1 means anti-correlation.. so one neuron is active when the other isn't)
-# Set weight threshold
-ID0025.graph.RFP <- delete.edges(ID0025.graph.RFP, which(E(ID0025.graph.RFP)$weight <0.10))
+# Set weight threshold (set to 0.30 as per literature: Avitan et al., 2017 http://dx.doi.org/10.1016/j.cub.2017.06.056)
+ID0025.graph.RFP <- delete.edges(ID0025.graph.RFP, which(E(ID0025.graph.RFP)$weight <0.30))
 
 ##### Plot network
 # g.palette.Sync <- c("TRUE" = "green","FALSE" = "grey")
@@ -120,7 +120,7 @@ ID0025.cohesion <- cohesion(ID0025.graph.RFP)
 # greedy method (hierarchical, fast method)
 ID0025.graph.clusters.RFP = cluster_leading_eigen(ID0025.graph.RFP)
 ID0025.posXY.RFP$Community <- ID0025.graph.clusters.RFP$membership
-ID0025.posXY.RFP$Degree <- degree(ID0025.graph.RFP)
+
 # ID0025.posXY.RFP$Member <- duplicated(ID0025.posXY.RFP$Community) to be fixed
 # ID0025.posXY.RFP$degree <- ordered(degree(ID0025.graph.RFP))
 
@@ -148,7 +148,7 @@ ID0025.graph.RFP.plt <- ggraph(ID0025.graph.RFP,
                                                          colour = "white",
                                                          fontface = 1,
                                                          size = 3)+
-                                          scale_fill_brewer(palette = "Set1",
+                                          scale_fill_brewer(palette = "Paired",
                                                             guide = "none")+
                                           scale_size_continuous(range = c(3.5,10),
                                                             guide = "none")+
@@ -186,12 +186,16 @@ ID0025.graph.RFP.plt <- ggraph(ID0025.graph.RFP,
 
 
 # Histogram count of degrees ----------------------------------------------
-
+ID0025.posXY.RFP$Degree <- degree(ID0025.graph.RFP)
 ID0025.degree.RFP.hist <- ggplot(ID0025.posXY.RFP, aes(x = Degree))+ 
                             stat_bin(binwidth = 1, center = 0)+
                             scale_y_continuous(breaks = seq(0,20,1))+
                             scale_x_continuous(breaks = seq(0,20,1))+
                             theme_bw()
+
+# Mean degree
+ID0025.degree.mean.RFP <- mean(degree(ID0025.graph.RFP))
+
 
 # libs --------------------------------------------------------------------
 library(factoextra)

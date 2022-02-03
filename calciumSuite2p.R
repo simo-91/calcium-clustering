@@ -43,7 +43,7 @@ iscell$Cell <- as.numeric(0:(nrow(iscell)-1))
 ID0025.posXY$Positive <- iscell$V1
 ID0025.posXY <- subset(ID0025.posXY, Positive == 1, select = c(Y,X,Cell))
 positives <- ID0025.posXY$Cell
-positivesPLUSone <- positives+1 ##tlos is needed because suite2p starts counting ROIs with the number 0 (python..)
+positivesPLUSone <- positives+1 ##this is needed because suite2p starts counting ROIs with the number 0 (python..)
 
 # spks.npy ----------------------------------------------------------------
 # load suite2p numpy arrays outputs
