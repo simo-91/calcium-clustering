@@ -89,8 +89,12 @@ T.RFPt <- t(RFPt)
 nc <- nrow(RFPt)
 cmat.RFPt <- matrix(NA,nc,nc)
 
+
+pb <- txtProgressBar(min = 0, max = nc, style = 3)
 for (i in 1:nc) {
   for (j in 1:nc) {
     cmat.RFPt[i,j] <- max_CCF(T.RFPt[,i],T.RFPt[,j])
+    setTxtProgressBar(pb, i)
   }
 }
+close(pb)
