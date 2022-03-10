@@ -194,7 +194,7 @@ ID0032.grid
 ########################################### RFP ####################################
 ID0032.RFPcells <- unique(scan("RFPcells.R", sep = ","))
 
-# Calculating percentage of active RFP cells over time --------------------
+# Calculating percentage of active RFP cells over time (using deconvolved peaks)--------------------
 RFPt <- subset(spksthresholded, rownames(spksthresholded) %in% ID0032.RFPcells) #select only RFP cells
 ##ggplot to show percentage of RPF+ cells over time
 RFPsum <- as.data.frame(colSums(RFPt))
@@ -209,6 +209,7 @@ ID0032.RFPsum.plt <- ggplot(RFPsum, aes(Time, Perc))+
   theme_pubr()
 ID0032.RFPsum.plt
 ```
+
 ```{r activity/time}
 # Sum of all activity over time RFP+ --------------------------------------
 RFP <- subset(spks, rownames(spks) %in% ID0032.RFPcells) #select only RFP cells
@@ -226,6 +227,7 @@ ID0032.RFPsum2.plt <- ggplot(RFPsum2, aes(Time, `colSums(RFP)/nrow(RFP)`))+
 ID0032.RFPsum2.plt.ylim <- layer_scales(ID0032.RFPsum2.plt)$y$get_limits()
 ID0032.RFPsum2.plt
 ```
+
 ```{r hc->raster+dendro}
 # RFPcells for activity/hc/raster/dendrogram.  -------------------------------
 ## Take care of using already normalized spks array
@@ -277,23 +279,29 @@ plots <- align_plots(ID0032.RFP.raster, ID0032.RFPsum.plt, align = 'v', axis = '
 ID0032.RFP.grid <- plot_grid(plots[[1]], ID0032.RFPsum.plt, ncol = 1, rel_heights = c(3.5,1))
 ID0032.RFP.grid
 ```
+
+
+```{r dF.npy}
 ######################################### dF/F #########################################
 # Average calcium levels over time ----------------------------------------
-## Here by using dF traces after executing "dF.py" to extract them
+## Here by using dF traces after executing "get_dF.py" to extract them
 dF <- as.data.frame(np$load("dF.npy", allow_pickle = TRUE)) #delta F calcium levels of all cells
 dF <- dF[,50:ncol(dF)] #select window
 # dF <- t(apply(dF, 1, function(x) (x - min(x))/(max(x)-min(x)))) # Normalize?
 dFPOS <- dF[positivesPLUSone,]
 rownames(dFPOS) <- positives
+dFPOS
+```
 
-
+```{r average activity/HRAS cell}
 # Average activity per RFP+ cell (dF peaks) -------------------------------
 ID0032.posXY$Mean.dF <- rowMeans(dFPOS)
 ID0032.posXY$Mean.dF.N <- apply(as.matrix(ID0032.posXY$Mean.dF), 2,
                                 function(x) (x - min(x))/(max(x)-min(x)))
+ID0032.posXY
+```
 
-
-
+```{r active cell/time using dF/F}
 # Calculating percentage of active RFP+ cells over time --------------------
 dF.RFP <- subset(spksthresholded, rownames(dFPOS) %in% ID0032.RFPcells) #select only RFP cells
 ##ggplot to show percentage of RPF+ cells over time
@@ -303,8 +311,8 @@ RFPsum$Perc <- RFPsum$`colSums(RFP)`/nrow(RFP)*100
 ID0032.RFPsum.dF.plt <- ggplot(RFPsum, aes(Time, Perc))+
   geom_line()+
   theme_pubr()
-
-
+ID0032.RFPsum.dF.plt
+```
 
 # Isolate RFP+ XY from posXY dataframe ------------------------------------
 ID0032.posXY$RFP <- ID0032.posXY$Cell %in% ID0032.RFPcells
