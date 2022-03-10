@@ -1,6 +1,5 @@
 ################ CALCIUM ANALYSIS WITHOUT THRESHOLDING
-# sampleID <- readline('Please input ID number (e.g. "ID0123")')
-
+```{r libraries, echo=FALSE}
 # Libraries ---------------------------------------------------------------
 library(utils)
 library(dplyr)
@@ -21,10 +20,15 @@ library(rstudioapi)
 # Load raw Suite2p npy arrays using reticulate
 library(reticulate)
 np <-import("numpy")
+```
 
-workdir <- selectDirectory(caption = "Select suite2p/plane folder", 
-                           label = "Select")
-setwd(workdir)
+```{r, setup, include=FALSE, echo=FALSE}
+knitr::opts_knit$set(root.dir = selectDirectory(caption = "Select suite2p/plane folder", 
+                           label = "Select"))
+```
+
+
+```{r stat.npy}
 # Stat.npy ----------------------------------------------------------------
 stat <- np$load("stat.npy", allow_pickle = TRUE) #stats containing ROIs XY
 # Loop over stat.npy to access "med" (ROIs coordinates) to create list of cells coordinates. ROIs from suite2p starts with index 0
@@ -35,7 +39,10 @@ for (i in 1:length(stat)) {
 
 ID0032.posXY$Cell <- as.numeric(0:(nrow(ID0032.posXY)-1))
 colnames(ID0032.posXY) <- c('Y','X','Cell')
+ID0032.posXY
+```
 
+```{r iscell.npy}
 # iscell.npy --------------------------------------------------------------
 #iscell.npy to select only ROIs that are recognized as cells
 iscell <- as.data.frame(np$load("iscell.npy", allow_pickle = TRUE))
@@ -44,7 +51,10 @@ ID0032.posXY$Positive <- iscell$V1
 ID0032.posXY <- subset(ID0032.posXY, Positive == 1, select = c(Y,X,Cell))
 positives <- ID0032.posXY$Cell
 positivesPLUSone <- positives+1 ##this is needed because suite2p starts counting ROIs with the number 0 (python..)
+ID0032.posXY
+```
 
+```{r spks.npy}
 # spks.npy ----------------------------------------------------------------
 # load suite2p numpy arrays outputs
 spks <- as.data.frame(np$load("spks.npy", allow_pickle = TRUE)) #deconvolved peaks
@@ -65,9 +75,10 @@ spks[is.na(spks)] <- 0 #NAs replaced with 0
 
 saveRDS(spks, file = "ID0032_spks.rds")
 write.csv(spks, "ID0032_spks.csv")
+```
 
-
-# Cutoff function <- anything below 1*(row sd/cell) is 0, anytlong above is 1
+```{r cutoff}
+# Cutoff function <- anything below 2*(row sd/cell) is 0, anytlong above is 1
 cutoff <- function(x) {
   th <- 2*sd(x)
   x[x < th] <- 0
@@ -78,6 +89,9 @@ cutoff <- function(x) {
 spksthresholded <- t(apply(spks, 1, cutoff))
 saveRDS(spksthresholded, file = "ID0032_spksthresholded.rds")
 write.csv(spksthresholded, "ID0032_spksthresholded.csv")
+```
+
+```{r all active cells over time}
 ## CALCULATE ALL ACTIVE CELLS OVER TIME
 # Calculating percentage of active cells over time -------------------------
 spksSUM <- colSums(spksthresholded)
@@ -89,7 +103,10 @@ write.csv(spksSUM, file = "ID0032_spksSUM.csv")
 ID0032.spksSUM.plt <- ggplot(spksSUM, aes(Time, Perc))+
   geom_line()+ 
   theme_pubr()
+ID0032.spksSUM.plt
+```
 
+```{r Plot total calcium activity/time}
 # # Plot total calcium activity/time --------------------------------------
 spksSUM2 <- colSums(spks)
 spksSUM2 <- as.data.frame(spksSUM2)
@@ -104,11 +121,15 @@ ID0032.spksSUM2.plt <- ggplot(spksSUM2, aes(Time, Mean))+
   ylab("Ca2+")+
   ylim(0, NA)
 ID0032.spksSUM2.ylim <- layer_scales(ID0032.spksSUM2.plt)$y$get_limits()
-
+ID0032.spksSUM2.plt
+```
+```{r average activity/cell}
 # Average activity PER CELL (deconvolved peaks) ---------------------------
 ID0032.posXY$Mean <- rowMeans(spks)
+ID0032.posXY
+```
 
-
+```{r raster+dendro all cells/time}
 # # Raster+dendro all cells/time ggplot ------------------------------------------
 dfpeaks <- as.data.frame(t(spks))  # Doing this coercion will apply +1 to all cells numbers
 # colnames(dfpeaks) <- 1:ncol(dfpeaks)
@@ -163,8 +184,13 @@ ID0032.raster.hc <- ggplot(meltPeaks, aes(time, cell))+
 # GRID raster/sums
 plots <- align_plots(ID0032.raster.hc, ID0032.spksSUM.plt, align = 'v', axis = 'l')
 ID0032.grid <- plot_grid(plots[[1]], ID0032.spksSUM.plt, ncol = 1, rel_heights = c(4.5,1))
+ID0032.grid
+```
 
 
+
+
+```{r HRAS/AKT1 cells}
 ########################################### RFP ####################################
 ID0032.RFPcells <- unique(scan("RFPcells.R", sep = ","))
 
@@ -181,9 +207,9 @@ write.csv(RFPsum, file = "ID0032_RFPsum.csv")
 ID0032.RFPsum.plt <- ggplot(RFPsum, aes(Time, Perc))+
   geom_line()+
   theme_pubr()
-
-
-
+ID0032.RFPsum.plt
+```
+```{r activity/time}
 # Sum of all activity over time RFP+ --------------------------------------
 RFP <- subset(spks, rownames(spks) %in% ID0032.RFPcells) #select only RFP cells
 RFPsum2 <- as.data.frame(colSums(RFP)/nrow(RFP)) #normalized by number of RFP cells
@@ -198,8 +224,9 @@ ID0032.RFPsum2.plt <- ggplot(RFPsum2, aes(Time, `colSums(RFP)/nrow(RFP)`))+
   ylab("Deconvolved activity")+
   ylim(0, NA)
 ID0032.RFPsum2.plt.ylim <- layer_scales(ID0032.RFPsum2.plt)$y$get_limits()
-
-
+ID0032.RFPsum2.plt
+```
+```{r hc->raster+dendro}
 # RFPcells for activity/hc/raster/dendrogram.  -------------------------------
 ## Take care of using already normalized spks array
 # Raster ggplot
@@ -248,7 +275,8 @@ ID0032.RFP.raster <- ggplot(meltPeaks.RFP, aes(time, cell))+
 # GRID raster/sums
 plots <- align_plots(ID0032.RFP.raster, ID0032.RFPsum.plt, align = 'v', axis = 'l')
 ID0032.RFP.grid <- plot_grid(plots[[1]], ID0032.RFPsum.plt, ncol = 1, rel_heights = c(3.5,1))
-
+ID0032.RFP.grid
+```
 ######################################### dF/F #########################################
 # Average calcium levels over time ----------------------------------------
 ## Here by using dF traces after executing "dF.py" to extract them
