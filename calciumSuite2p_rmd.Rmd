@@ -32,14 +32,14 @@ knitr::opts_knit$set(root.dir = selectDirectory(caption = "Select suite2p/plane 
 # Stat.npy ----------------------------------------------------------------
 stat <- np$load("stat.npy", allow_pickle = TRUE) #stats containing ROIs XY
 # Loop over stat.npy to access "med" (ROIs coordinates) to create list of cells coordinates. ROIs from suite2p starts with index 0
-ID0032.posXY <- data.frame()
+ID0031.posXY <- data.frame()
 for (i in 1:length(stat)) {
-  ID0032.posXY <- rbind(ID0032.posXY, stat[[i]][["med"]])
+  ID0031.posXY <- rbind(ID0031.posXY, stat[[i]][["med"]])
 }
 
-ID0032.posXY$Cell <- as.numeric(0:(nrow(ID0032.posXY)-1))
-colnames(ID0032.posXY) <- c('Y','X','Cell')
-ID0032.posXY
+ID0031.posXY$Cell <- as.numeric(0:(nrow(ID0031.posXY)-1))
+colnames(ID0031.posXY) <- c('Y','X','Cell')
+ID0031.posXY
 ```
 
 ```{r iscell.npy}
@@ -47,11 +47,11 @@ ID0032.posXY
 #iscell.npy to select only ROIs that are recognized as cells
 iscell <- as.data.frame(np$load("iscell.npy", allow_pickle = TRUE))
 iscell$Cell <- as.numeric(0:(nrow(iscell)-1))
-ID0032.posXY$Positive <- iscell$V1
-ID0032.posXY <- subset(ID0032.posXY, Positive == 1, select = c(Y,X,Cell))
-positives <- ID0032.posXY$Cell
+ID0031.posXY$Positive <- iscell$V1
+ID0031.posXY <- subset(ID0031.posXY, Positive == 1, select = c(Y,X,Cell))
+positives <- ID0031.posXY$Cell
 positivesPLUSone <- positives+1 ##this is needed because suite2p starts counting ROIs with the number 0 (python..)
-ID0032.posXY
+ID0031.posXY
 ```
 
 ```{r spks.npy}
@@ -73,8 +73,8 @@ rownames(spks) <- positives #fix rownames with actual cells numbers
 
 spks[is.na(spks)] <- 0 #NAs replaced with 0
 
-saveRDS(spks, file = "ID0032_spks.rds")
-write.csv(spks, "ID0032_spks.csv")
+saveRDS(spks, file = "ID0031_spks.rds")
+write.csv(spks, "ID0031_spks.csv")
 ```
 
 ```{r cutoff}
@@ -87,8 +87,8 @@ cutoff <- function(x) {
 }
 
 spksthresholded <- t(apply(spks, 1, cutoff))
-saveRDS(spksthresholded, file = "ID0032_spksthresholded.rds")
-write.csv(spksthresholded, "ID0032_spksthresholded.csv")
+saveRDS(spksthresholded, file = "ID0031_spksthresholded.rds")
+write.csv(spksthresholded, "ID0031_spksthresholded.csv")
 ```
 
 ```{r all active cells over time}
@@ -98,12 +98,12 @@ spksSUM <- colSums(spksthresholded)
 spksSUM <- as.data.frame(spksSUM)
 spksSUM$Time <- 0:(nrow(spksSUM)-1)
 spksSUM$Perc <- spksSUM$spksSUM/nrow(spksthresholded)*100
-saveRDS(spksSUM, file = "ID0032_spksSUM.rds")
-write.csv(spksSUM, file = "ID0032_spksSUM.csv")
-ID0032.spksSUM.plt <- ggplot(spksSUM, aes(Time, Perc))+
+saveRDS(spksSUM, file = "ID0031_spksSUM.rds")
+write.csv(spksSUM, file = "ID0031_spksSUM.csv")
+ID0031.spksSUM.plt <- ggplot(spksSUM, aes(Time, Perc))+
   geom_line()+ 
   theme_pubr()
-ID0032.spksSUM.plt
+ID0031.spksSUM.plt
 ```
 
 ```{r Plot total calcium activity/time}
@@ -112,21 +112,21 @@ spksSUM2 <- colSums(spks)
 spksSUM2 <- as.data.frame(spksSUM2)
 spksSUM2$Time <- 0:(nrow(spksSUM2)-1)
 spksSUM2$Mean <- spksSUM2$spksSUM2/nrow(spksSUM2)
-saveRDS(spksSUM2, file = "ID0032_spksSUM2.rds")
-write.csv(spksSUM2, file = "ID0032_spksSUM2.csv")
-ID0032.spksSUM2.plt <- ggplot(spksSUM2, aes(Time, Mean))+
+saveRDS(spksSUM2, file = "ID0031_spksSUM2.rds")
+write.csv(spksSUM2, file = "ID0031_spksSUM2.csv")
+ID0031.spksSUM2.plt <- ggplot(spksSUM2, aes(Time, Mean))+
   geom_line()+ 
   theme_pubr()+
   geom_smooth()+
   ylab("Ca2+")+
   ylim(0, NA)
-ID0032.spksSUM2.ylim <- layer_scales(ID0032.spksSUM2.plt)$y$get_limits()
-ID0032.spksSUM2.plt
+ID0031.spksSUM2.ylim <- layer_scales(ID0031.spksSUM2.plt)$y$get_limits()
+ID0031.spksSUM2.plt
 ```
 ```{r average activity/cell}
 # Average activity PER CELL (deconvolved peaks) ---------------------------
-ID0032.posXY$Mean <- rowMeans(spks)
-ID0032.posXY
+ID0031.posXY$Mean <- rowMeans(spks)
+ID0031.posXY
 ```
 
 ```{r raster+dendro all cells/time}
@@ -134,8 +134,8 @@ ID0032.posXY
 dfpeaks <- as.data.frame(t(spks))  # Doing this coercion will apply +1 to all cells numbers
 # colnames(dfpeaks) <- 1:ncol(dfpeaks)
 dfpeaks$time <- 0:(nrow(dfpeaks)-1)
-meltPeaks <- melt(dfpeaks, id = "time")
-colnames(meltPeaks) <- c('time','cell','Ca2+')
+ID0031.meltPeaks <- melt(dfpeaks, id = "time")
+colnames(ID0031.meltPeaks) <- c('time','cell','Ca2+')
 
 
 # Hierarchical clustering
@@ -156,15 +156,15 @@ peaks.order <- order.dendrogram(dhc)
 ## Order the levels according to their position in the cluster
 peaks.rows <- rownames(spks)
 peaks.rows <- as.data.frame(peaks.rows)
-meltPeaks$cell <- factor(x = meltPeaks$cell,
+ID0031.meltPeaks$cell <- factor(x = ID0031.meltPeaks$cell,
                          levels = peaks.rows$peaks.rows[peaks.order], 
                          ordered = TRUE)
 
 # Ggplot raster with dendro order
-ID0032.raster.hc <- ggplot(meltPeaks, aes(time, cell))+
+ID0031.raster.hc <- ggplot(ID0031.meltPeaks, aes(time, cell))+
   geom_raster(aes(fill = `Ca2+`))+
   # geom_line(aes(color = RFP), alpha = .2)+
-  # scale_y_discrete(breaks = levels(meltPeaks$RFP))+
+  # scale_y_discrete(breaks = levels(ID0031.meltPeaks$RFP))+
   scale_fill_gradientn(colours=c("white", "black"))+
   theme_pubr()+
   theme(legend.position = "none",
@@ -174,7 +174,7 @@ ID0032.raster.hc <- ggplot(meltPeaks, aes(time, cell))+
         axis.ticks.y = element_blank(),
         axis.text.y = element_blank(),
         plot.title = element_text(colour = "red", hjust = .5))+
-  ggtitle("ID0032 hclust")
+  ggtitle("ID0031 hclust")
 
 # GRID
 # grid.newpage()
@@ -182,9 +182,9 @@ ID0032.raster.hc <- ggplot(meltPeaks, aes(time, cell))+
 # print(peaks.dendro, vp = viewport(x = 0.90, y = 0.455, width = 0.2, height = 0.94))
 
 # GRID raster/sums
-plots <- align_plots(ID0032.raster.hc, ID0032.spksSUM.plt, align = 'v', axis = 'l')
-ID0032.grid <- plot_grid(plots[[1]], ID0032.spksSUM.plt, ncol = 1, rel_heights = c(4.5,1))
-ID0032.grid
+plots <- align_plots(ID0031.raster.hc, ID0031.spksSUM.plt, align = 'v', axis = 'l')
+ID0031.grid <- plot_grid(plots[[1]], ID0031.spksSUM.plt, ncol = 1, rel_heights = c(4.5,1))
+ID0031.grid
 ```
 
 
@@ -192,40 +192,40 @@ ID0032.grid
 
 ```{r HRAS/AKT1 cells}
 ########################################### RFP ####################################
-ID0032.RFPcells <- unique(scan("RFPcells.R", sep = ","))
+ID0031.RFPcells <- unique(scan("RFPcells.R", sep = ","))
 
 # Calculating percentage of active RFP cells over time (using deconvolved peaks)--------------------
-RFPt <- subset(spksthresholded, rownames(spksthresholded) %in% ID0032.RFPcells) #select only RFP cells
+RFPt <- subset(spksthresholded, rownames(spksthresholded) %in% ID0031.RFPcells) #select only RFP cells
 ##ggplot to show percentage of RPF+ cells over time
 RFPsum <- as.data.frame(colSums(RFPt))
 RFPsum$Time <- 0:(nrow(RFPsum)-1)
 RFPsum$Perc <- RFPsum$`colSums(RFPt)`/nrow(RFPt)*100
-saveRDS(RFPsum, file = "ID0032_RFPsum.rds")
-write.csv(RFPsum, file = "ID0032_RFPsum.csv")
+saveRDS(RFPsum, file = "ID0031_RFPsum.rds")
+write.csv(RFPsum, file = "ID0031_RFPsum.csv")
 
 # Plot
-ID0032.RFPsum.plt <- ggplot(RFPsum, aes(Time, Perc))+
+ID0031.RFPsum.plt <- ggplot(RFPsum, aes(Time, Perc))+
   geom_line()+
   theme_pubr()
-ID0032.RFPsum.plt
+ID0031.RFPsum.plt
 ```
 
 ```{r activity/time}
 # Sum of all activity over time RFP+ --------------------------------------
-RFP <- subset(spks, rownames(spks) %in% ID0032.RFPcells) #select only RFP cells
+RFP <- subset(spks, rownames(spks) %in% ID0031.RFPcells) #select only RFP cells
 RFPsum2 <- as.data.frame(colSums(RFP)/nrow(RFP)) #normalized by number of RFP cells
 RFPsum2$Time <- 0:(nrow(RFPsum2)-1)
-saveRDS(RFPsum2, file = "ID0032_RFPsum2.rds")
-write.csv(RFPsum2, file = "ID0032_RFPsum2.csv")
+saveRDS(RFPsum2, file = "ID0031_RFPsum2.rds")
+write.csv(RFPsum2, file = "ID0031_RFPsum2.csv")
 
-ID0032.RFPsum2.plt <- ggplot(RFPsum2, aes(Time, `colSums(RFP)/nrow(RFP)`))+
+ID0031.RFPsum2.plt <- ggplot(RFPsum2, aes(Time, `colSums(RFP)/nrow(RFP)`))+
   geom_line()+
   theme_pubr()+
   geom_smooth()+
   ylab("Deconvolved activity")+
   ylim(0, NA)
-ID0032.RFPsum2.plt.ylim <- layer_scales(ID0032.RFPsum2.plt)$y$get_limits()
-ID0032.RFPsum2.plt
+ID0031.RFPsum2.plt.ylim <- layer_scales(ID0031.RFPsum2.plt)$y$get_limits()
+ID0031.RFPsum2.plt
 ```
 
 ```{r hc->raster+dendro}
@@ -235,8 +235,8 @@ ID0032.RFPsum2.plt
 dfpeaks.RFP <- as.data.frame(t(RFP))
 # colnames(dfpeaks.RFP) <- 1:ncol(dfpeaks.RFP)
 dfpeaks.RFP$time <- 0:(nrow(dfpeaks.RFP)-1)
-meltPeaks.RFP <- melt(dfpeaks.RFP, id = "time")
-colnames(meltPeaks.RFP) <- c('time','cell','Ca2+')
+ID0031.meltPeaks.RFP <- melt(dfpeaks.RFP, id = "time")
+colnames(ID0031.meltPeaks.RFP) <- c('time','cell','Ca2+')
 
 # Hierarchical clustering
 hc.RFP <- hclust(dist(RFP, method = "euclidean"), method = "ward.D2")
@@ -256,12 +256,12 @@ RFP.order <- order.dendrogram(dhc.RFP)
 ## Order the levels according to their position in the cluster
 RFP.rows <- rownames(RFP)
 RFP.rows <- as.data.frame(RFP.rows)
-meltPeaks.RFP$cell <- factor(x = meltPeaks.RFP$cell,
+ID0031.meltPeaks.RFP$cell <- factor(x = ID0031.meltPeaks.RFP$cell,
                          levels = RFP.rows$RFP.rows[RFP.order], 
                          ordered = TRUE)
 
 # Ggplot rasterwith dendro order
-ID0032.RFP.raster <- ggplot(meltPeaks.RFP, aes(time, cell))+
+ID0031.RFP.raster <- ggplot(ID0031.meltPeaks.RFP, aes(time, cell))+
   geom_raster(aes(fill = `Ca2+`))+
   scale_fill_gradientn(colours=c("white", "grey20", "grey10", "black"))+
   theme_pubr()+
@@ -270,15 +270,28 @@ ID0032.RFP.raster <- ggplot(meltPeaks.RFP, aes(time, cell))+
         axis.ticks.x = element_blank(),
         axis.text.x = element_blank(),
         # axis.ticks.y = element_blank(),
-        # axis.text.y = element_text(face=ID0032.posXY.RFP$Cell[which(ID0032.posXY.RFP$Member=="TRUE"),], "bold"),
+        # axis.text.y = element_text(face=ID0031.posXY.RFP$Cell[which(ID0031.posXY.RFP$Member=="TRUE"),], "bold"),
         plot.title = element_text(colour = "red", hjust = .5))
-  # ggtitle("ID0032 RFP+")
+  # ggtitle("ID0031 RFP+")
 
 # GRID raster/sums
-plots <- align_plots(ID0032.RFP.raster, ID0032.RFPsum.plt, align = 'v', axis = 'l')
-ID0032.RFP.grid <- plot_grid(plots[[1]], ID0032.RFPsum.plt, ncol = 1, rel_heights = c(3.5,1))
-ID0032.RFP.grid
+plots <- align_plots(ID0031.RFP.raster, ID0031.RFPsum.plt, align = 'v', axis = 'l')
+ID0031.RFP.grid <- plot_grid(plots[[1]], ID0031.RFPsum.plt, ncol = 1, rel_heights = c(3.5,1))
+ID0031.RFP.grid
 ```
+
+```{r Isolate HRAS coordinates from posXY dataframe}
+# Isolate RFP+ XY from posXY dataframe ------------------------------------
+ID0031.posXY$RFP <- ID0031.posXY$Cell %in% ID0031.RFPcells
+
+ID0031.posXY.RFP <- ID0031.posXY[which(ID0031.posXY$RFP=="TRUE"),]
+
+saveRDS(ID0031.posXY.RFP, file = "ID0031.posXY.RFP.rds")
+write.csv(ID0031.posXY.RFP, file = "ID0031.posXY.RFP.csv")
+ID0031.posXY.RFP
+```
+
+
 
 
 ```{r dF.npy}
@@ -293,40 +306,34 @@ rownames(dFPOS) <- positives
 dFPOS
 ```
 
+
 ```{r average activity/HRAS cell}
 # Average activity per RFP+ cell (dF peaks) -------------------------------
-ID0032.posXY$Mean.dF <- rowMeans(dFPOS)
-ID0032.posXY$Mean.dF.N <- apply(as.matrix(ID0032.posXY$Mean.dF), 2,
+ID0031.posXY$Mean.dF <- rowMeans(dFPOS)
+ID0031.posXY$Mean.dF.N <- apply(as.matrix(ID0031.posXY$Mean.dF), 2,
                                 function(x) (x - min(x))/(max(x)-min(x)))
-ID0032.posXY
+ID0031.posXY
 ```
 
-```{r active cell/time using dF/F}
-# Calculating percentage of active RFP+ cells over time --------------------
-dF.RFP <- subset(spksthresholded, rownames(dFPOS) %in% ID0032.RFPcells) #select only RFP cells
-##ggplot to show percentage of RPF+ cells over time
-RFPsum <- as.data.frame(colSums(RFP))
-RFPsum$Time <- 0:(nrow(RFPsum)-1)
-RFPsum$Perc <- RFPsum$`colSums(RFP)`/nrow(RFP)*100
-ID0032.RFPsum.dF.plt <- ggplot(RFPsum, aes(Time, Perc))+
-  geom_line()+
-  theme_pubr()
-ID0032.RFPsum.dF.plt
-```
+# ```{r coactive cells percentage/time}
+# # Calculating percentage of active RFP+ cells over time --------------------
+# dF.RFP <- subset(spksthresholded, rownames(dFPOS) %in% ID0031.RFPcells) #select only RFP cells
+# ##ggplot to show percentage of RPF+ cells over time
+# RFPsum <- as.data.frame(colSums(RFP))
+# RFPsum$Time <- 0:(nrow(RFPsum)-1)
+# RFPsum$Perc <- RFPsum$`colSums(RFP)`/nrow(RFP)*100
+# ID0031.RFPsum.dF.plt <- ggplot(RFPsum, aes(Time, Perc))+
+#   geom_line()+
+#   theme_pubr()
+# ID0031.RFPsum.dF.plt
+# ```
 
-# Isolate RFP+ XY from posXY dataframe ------------------------------------
-ID0032.posXY$RFP <- ID0032.posXY$Cell %in% ID0032.RFPcells
-
-ID0032.posXY.RFP <- ID0032.posXY[which(ID0032.posXY$RFP=="TRUE"),]
-
-saveRDS(ID0032.posXY.RFP, file = "ID0032.posXY.RFP.rds")
-write.csv(ID0032.posXY.RFP, file = "ID0032.posXY.RFP.csv")
 
 #Averaging per timepoint (all cells)
 # dFx <- as.data.frame(colSums(dFPOS)/nrow(dFPOS))
 # dFx$Time <- 0:(nrow(dFx)-1)
 # #plot
-# ID0032.POS.aveF <- ggplot(dFx, aes(Time, `colSums(dFPOS)/nrow(dFPOS)`))+
+# ID0031.POS.aveF <- ggplot(dFx, aes(Time, `colSums(dFPOS)/nrow(dFPOS)`))+
 #   geom_line()+
 #   theme_pubr()+
 #   ylab("Average dF/F")+
@@ -341,24 +348,11 @@ write.csv(ID0032.posXY.RFP, file = "ID0032.posXY.RFP.csv")
 # FrawRFPx <- as.data.frame(colSums(FrawRFP)/nrow(FrawRFP))
 # FrawRFPx$Time <- 0:(nrow(FrawRFPx)-1)
 # #plot
-# ID0032.RFP.aveF <- ggplot(FrawRFPx, aes(Time, `colSums(FrawRFP)/nrow(FrawRFP)`))+
+# ID0031.RFP.aveF <- ggplot(FrawRFPx, aes(Time, `colSums(FrawRFP)/nrow(FrawRFP)`))+
 #                               geom_line()+
 #                               theme_pubr()+
 #                               ylab("Average Ca2+ (RFP+)")+
 #                               geom_smooth(method = "loess")
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -370,9 +364,9 @@ write.csv(ID0032.posXY.RFP, file = "ID0032.posXY.RFP.csv")
 # POSITION ANALYSIS
 # cut3 <- cutree(hc, k = 3)
 # 
-# ID0032.posXY$Cluster <- cut3
+# ID0031.posXY$Cluster <- cut3
 # 
-# ggplot(ID0032.posXY, aes(X, Y, color = as.factor(Cluster), shape = as.factor(Cluster)))+
+# ggplot(ID0031.posXY, aes(X, Y, color = as.factor(Cluster), shape = as.factor(Cluster)))+
 #   geom_point(size = 2)+
 #   # scale_color_manual(values=c('red','blue','green'))+
 #   theme_graph()+

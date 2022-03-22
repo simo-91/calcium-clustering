@@ -128,13 +128,13 @@ ID0031.posXY.RFP$Community <- ID0031.graph.clusters.RFP$membership
 # Make composite palette
 colorz = grDevices::colors()[grep('gr(a|e)y', grDevices::colors(), invert = T)]
 communities.palette.big <- colorz
-communities.palette <- c(brewer.pal(9,'Set1'),
-                         brewer.pal(8,'Set2'),
-                         brewer.pal(12,'Set3'),
-                         brewer.pal(8, 'Dark2'),
-                         brewer.pal(8, 'Accent'),
-                         brewer.pal(9,'Pastel1'),
-                         brewer)
+# communities.palette <- c(brewer.pal(9,'Set1'),
+#                          brewer.pal(8,'Set2'),
+#                          brewer.pal(12,'Set3'),
+#                          brewer.pal(8, 'Dark2'),
+#                          brewer.pal(8, 'Accent'),
+#                          brewer.pal(9,'Pastel1'),
+#                          brewer)
 communities.guide <- guide_legend(title = element_text("Communities"),
                                   label = FALSE,
                                   keywidth = 0.1)
