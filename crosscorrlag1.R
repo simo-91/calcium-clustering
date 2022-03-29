@@ -1,4 +1,4 @@
-# CROSS-COVARIANCE MATRIX CONSIDERING ±1 LAG AND TAKING ONLY THE HIGHEST VALUE
+```{r  CROSS-COVARIANCE MATRIX CONSIDERING ±1 LAG AND TAKING ONLY THE HIGHEST VALUE}
 # 
 # e.g. Autocorrelations of series ‘X’, by lag
 # 
@@ -41,23 +41,18 @@
 # 
 # 
 # 
-# # Display the resultant matrix
+```
+```{r Display the resultant heatmap matrix}
 library(gplots)
 heatmap.2(as.matrix(cmat.RFPt)), dendrogram = "none",
                                  trace = "none", density.info =  "none", keysize = 0.25,
           cexRow = 0.1, cexCol=0.1, labRow = "none", labCol = "none", main = NULL,
           xlab = NULL,
           ylab = NULL, na.rm = TRUE)
+```
 
 
-
-# RFP ---------------------------------------------------------------------
-# Create empty matrix that will host corr coefficents. 
-tRFP <- t(RFP)
-
-nc <- nrow(RFP)
-cmat.RFP <- matrix(NA,nc,nc)
-
+```{r max_CCF}
 # Function to find max CCF between a and b in ±1 lag range
 max_CCF<- function(a,b)
 {
@@ -65,6 +60,14 @@ max_CCF<- function(a,b)
   cor = d$acf[,,1]
   return(max(cor))
 } 
+```
+```{r RFP}
+# RFP ---------------------------------------------------------------------
+# Create empty matrix that will host corr coefficents. 
+tRFP <- t(RFP)
+
+nc <- nrow(RFP)
+cmat.RFP <- matrix(NA,nc,nc)
 
 
 # Actual crosscorrelation; loop for every combination of column pairs (one column - one curve)
@@ -73,8 +76,9 @@ for (i in 1:nc) {
     cmat.RFP[i,j] <- max_CCF(tRFP[,i],tRFP[,j])
   }
 }
+```
 
-
+```{r RFP Using thresholded matrix}
 # Using thresholded values ------------------------------------------------
 # # Function to find max CCF between a and b in ±1 lag range
 max_CCF<- function(a,b)
@@ -98,3 +102,4 @@ for (i in 1:nc) {
   }
 }
 close(pb)
+```
