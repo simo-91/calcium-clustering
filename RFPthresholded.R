@@ -30,7 +30,7 @@ meltPeaks.RFPt$cell <- factor(x = meltPeaks.RFPt$cell,
                              ordered = TRUE)
 
 # Ggplot rasterwith dendro order
-ID0031.RFPt.raster <- ggplot(meltPeaks.RFPt, aes(time, cell))+
+ID0040.RFPt.raster <- ggplot(meltPeaks.RFPt, aes(time, cell))+
   geom_raster(aes(fill = `Ca2+`))+
   scale_fill_gradientn(colours=c("white", "grey20", "grey10", "black"))+
   theme_pubr()+
@@ -39,12 +39,12 @@ ID0031.RFPt.raster <- ggplot(meltPeaks.RFPt, aes(time, cell))+
         axis.ticks.x = element_blank(),
         axis.text.x = element_blank(),
         # axis.ticks.y = element_blank(),
-        # axis.text.y = element_text(face=ID0031.posXY.RFP$Cell[which(ID0031.posXY.RFP$Member=="TRUE"),], "bold"),
+        # axis.text.y = element_text(face=ID0040.posXY.RFP$Cell[which(ID0040.posXY.RFP$Member=="TRUE"),], "bold"),
         plot.title = element_text(colour = "red", hjust = .5))
-# ggtitle("ID0031 RFP+")
+# ggtitle("ID0040 RFP+")
 
 # GRID raster/sums
-plots <- align_plots(ID0031.RFPt.raster, ID0031.RFPsum.plt, align = 'v', axis = 'l')
-ID0031.RFPt.grid <- plot_grid(plots[[1]], ID0031.RFPsum.plt, ncol = 1, rel_heights = c(3.5,1))
-ID0031.RFPt.grid
+plots <- align_plots(ID0040.RFPt.raster, ID0040.RFPsum.plt, align = 'v', axis = 'l')
+ID0040.RFPt.grid <- plot_grid(plots[[1]], ID0040.RFPsum.plt, ncol = 1, rel_heights = c(3.5,1))
+ID0040.RFPt.grid
 ```

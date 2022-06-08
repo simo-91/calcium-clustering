@@ -44,6 +44,7 @@ ID0040.posXY
 ```
 
 ```{r tag redcells using redcell.npy}
+redcell <- np$load("redcell.npy", allow_pickle = TRUE) #load redcell.npy
 ID0040.posXY$redcell <- redcell[,1]
 ```
 
@@ -129,6 +130,7 @@ ID0040.spksSUM2.plt <- ggplot(spksSUM2, aes(Time, Mean))+
 ID0040.spksSUM2.ylim <- layer_scales(ID0040.spksSUM2.plt)$y$get_limits()
 ID0040.spksSUM2.plt
 ```
+
 ```{r average activity/cell}
 # Average activity PER CELL (deconvolved peaks) ---------------------------
 ID0040.posXY$Mean <- rowMeans(spks)
@@ -202,8 +204,11 @@ ID0040.grid
 
 
 # Calculating percentage of active RFP cells over time (using deconvolved peaks)--------------------
+ID0040.RFPcells <- ID0040.posXY %>% 
+                      subset(redcell==1) %>%
+                        .$Cell
 RFPt <- subset(spksthresholded, rownames(spksthresholded) %in% ID0040.RFPcells) #select only RFP cells
-##ggplot to show percentage of RPF+ cells over time
+##ggplot to show percentage of coactive RPF+ cells over time
 RFPsum <- as.data.frame(colSums(RFPt))
 RFPsum$Time <- 0:(nrow(RFPsum)-1)
 RFPsum$Perc <- RFPsum$`colSums(RFPt)`/nrow(RFPt)*100
@@ -291,7 +296,8 @@ ID0040.RFP.grid
 # Isolate RFP+ XY from posXY dataframe ------------------------------------
 ID0040.posXY$RFP <- ID0040.posXY$Cell %in% ID0040.RFPcells
 
-ID0040.posXY.RFP <- ID0040.posXY[which(ID0040.posXY$RFP=="TRUE"),]
+ID0040.posXY.RFP <- ID0040.posXY %>%
+                      subset(redcell==1)
 
 saveRDS(ID0040.posXY.RFP, file = "ID0040.posXY.RFP.rds")
 write.csv(ID0040.posXY.RFP, file = "ID0040.posXY.RFP.csv")
