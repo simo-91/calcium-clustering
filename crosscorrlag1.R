@@ -99,7 +99,7 @@ cmat.allcellst <- matrix(NA,nc,nc)
 pb <- txtProgressBar(min = 0, max = nc, style = 3)
 for (i in 1:nc) {
   for (j in 1:nc) {
-    cmat.allcellsrenamet[i,j] <- max_CCF(T.allcellst[,i],T.allcellst[,j])
+    cmat.allcellst[i,j] <- max_CCF(T.allcellst[,i],T.allcellst[,j])
     setTxtProgressBar(pb, i)
   }
 }
