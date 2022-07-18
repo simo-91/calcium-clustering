@@ -171,13 +171,19 @@ peaks.rows <- as.data.frame(peaks.rows)
 ID0031.meltPeaks$cell <- factor(x = ID0031.meltPeaks$cell,
                          levels = peaks.rows$peaks.rows[peaks.order], 
                          ordered = TRUE)
+# Mark RFP+ cells
+ID0031.RFPcells <- ID0031.posXY %>% 
+                      subset(redcell==1) %>%
+                        .$Cell # extract redcell indexes
+ID0031.meltPeaks$RFP <- ID0031.meltPeaks$cell %in% ID0031.RFPcells
 
 # Ggplot raster with dendro order
 ID0031.raster.hc <- ggplot(ID0031.meltPeaks, aes(time, cell))+
   geom_raster(aes(fill = `Ca2+`))+
-  # geom_line(aes(color = RFP), alpha = .2)+
-  # scale_y_discrete(breaks = levels(ID0031.meltPeaks$RFP))+
+  geom_line(aes(color = RFP), alpha = .2)+
   scale_fill_gradientn(colours=c("white", "black"))+
+  scale_color_manual(values = c("TRUE" = "red",
+                                "FALSE" = "white"))+
   theme_pubr()+
   theme(legend.position = "none",
         axis.title.x = element_blank(),
@@ -211,9 +217,7 @@ ggsave(plot = ID0031.grid, file = "/Users/Simo/calcium-clustering/plots/ID0031.g
 
 
 # Calculating percentage of active RFP cells over time (using deconvolved peaks)--------------------
-ID0031.RFPcells <- ID0031.posXY %>% 
-                      subset(redcell==1) %>%
-                        .$Cell
+
 RFPt <- subset(spksthresholded, rownames(spksthresholded) %in% ID0031.RFPcells) #select only RFP cells
 ##ggplot to show percentage of coactive RPF+ cells over time
 RFPsum <- as.data.frame(colSums(RFPt))
