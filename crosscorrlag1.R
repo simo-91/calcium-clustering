@@ -13,13 +13,19 @@
 # nc <- nrow(spks)
 # cmat <- matrix(NA,nc,nc)
 # 
-# # Function to find max CCF between a and b in ±1 lag range
-# max_CCF<- function(a,b)
-#   {
-#   d <- ccf(a, b, plot = FALSE, lag.max = 1)
-#   cor = d$acf[,,1]
-#   return(max(cor))
-# } 
+```
+
+
+
+```{r max_CCF}
+# Function to find max CCF between a and b in ±1 lag range
+max_CCF<- function(a,b)
+{
+  d <- ccf(a, b, plot = FALSE, lag.max = 1)
+  cor = d$acf[,,1]
+  return(max(cor))
+} 
+
 # 
 # pb <- txtProgressBar(min = 0, max = nc, style = 3)
 # # Actual crosscorrelation; loop for every combination of column pairs (one column - one curve)
@@ -52,15 +58,8 @@ heatmap.2(as.matrix(cmat.RFPt)), dendrogram = "none",
 ```
 
 
-```{r max_CCF}
-# Function to find max CCF between a and b in ±1 lag range
-max_CCF<- function(a,b)
-{
-  d <- ccf(a, b, plot = FALSE, lag.max = 1)
-  cor = d$acf[,,1]
-  return(max(cor))
-} 
-```
+
+
 ```{r RFP}
 # RFP ---------------------------------------------------------------------
 # Create empty matrix that will host corr coefficents. 
@@ -77,6 +76,37 @@ for (i in 1:nc) {
   }
 }
 ```
+
+
+
+
+```{r allcells Using thresholded matrix}
+# Using thresholded values ------------------------------------------------
+# # Function to find max CCF between a and b in ±1 lag range
+max_CCF<- function(a,b)
+{
+  d <- ccf(a, b, plot = FALSE, lag.max = 1)
+  cor = d$acf[,,1]
+  return(max(cor))
+} 
+# Create empty matrix that will host corr coefficents. 
+T.allcellst <- t(spksthresholded)
+
+nc <- nrow(spksthresholded)
+cmat.allcellst <- matrix(NA,nc,nc)
+
+
+pb <- txtProgressBar(min = 0, max = nc, style = 3)
+for (i in 1:nc) {
+  for (j in 1:nc) {
+    cmat.allcellsrenamet[i,j] <- max_CCF(T.allcellst[,i],T.allcellst[,j])
+    setTxtProgressBar(pb, i)
+  }
+}
+close(pb)
+```
+
+
 
 ```{r RFP Using thresholded matrix}
 # Using thresholded values ------------------------------------------------
