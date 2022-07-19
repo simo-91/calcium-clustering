@@ -149,8 +149,9 @@ ID0031.degree.mean.RFP <- mean(degree(ID0031.graph.RFP))
 # libs --------------------------------------------------------------------
 library(factoextra)
 library(ggpubr)
+library(ggfortify)
 # PCA ---------------------------------------------------------------------
-pca.RFP <- prcomp(T.RFPt, center = TRUE, scale = FALSE) # change to scale = FALSE if not normalised data
+pca.RFP <- prcomp(RFPt, center = TRUE, scale = FALSE) # change to scale = FALSE if not normalised data
 ID0031.scree.RFP <- fviz_eig(pca.RFP, ncp = 100)
 ID0031.scree.RFP <- ggpar(ID0031.scree.RFP, title = element_blank())
 
@@ -335,13 +336,6 @@ ggsave(plot = ID0031.graph.btw.plt, file = "/Users/Simo/calcium-clustering/plots
 
 
 
-
-
-
-
-
-
-
 # ```{r palettes to ignore now}
 g.palette.Sync <- c("TRUE" = "green","FALSE" = "grey")
 g.sizes.Sync <- c("TRUE" = 2.5,"FALSE" = 1)
@@ -435,4 +429,13 @@ ID0031.graph.plt <- ggraph(ID0031.graph,
                              ggtitle("ID0031n")+ 
                              scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
                              
+```
+
+
+```{r PCA}
+# PCA
+pca <- prcomp(T.allcellst, center = TRUE, scale = FALSE) # change to scale = FALSE if not normalised data
+
+
+
 ```
