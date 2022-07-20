@@ -1,0 +1,775 @@
+################ CALCIUM ANALYSIS WITHOUT THRESHOLDING
+```{r echo=FALSE, setup, include=FALSE}
+knitr::opts_knit$set(root.dir = selectDirectory(caption = "Select suite2p/plane folder", 
+                           label = "Select"))
+```
+
+```{r script}
+getwd()
+# Libraries ---------------------------------------------------------------
+library(utils)
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(plotly)
+library(tidyr)
+library(reshape2)
+# library(heatmaply)
+library(factoextra)
+library(ggdendro)
+library(grid)
+library(RcppCNPy)
+library(cowplot)
+library(ggpubr)
+library(mmand)
+library(rstudioapi)
+# Load raw Suite2p npy arrays using reticulate
+library(reticulate)
+options(reticulate.conda_binary = "/Users/simo/miniforge3")
+np <-import("numpy")
+
+# all script from stat.npy
+# Stat.npy ----------------------------------------------------------------
+stat <- np$load("stat.npy", allow_pickle = TRUE) #stats containing ROIs XY
+# Loop over stat.npy to access "med" (ROIs coordinates) to create list of cells coordinates. ROIs from suite2p starts with index 0
+posXY <- data.frame()
+for (i in 1:length(stat)) {
+  posXY <- rbind(posXY, stat[[i]][["med"]])
+}
+
+posXY$Cell <- as.numeric(0:(nrow(posXY)-1))
+colnames(posXY) <- c('Y','X','Cell')
+
+
+redcell <- np$load("redcell.npy", allow_pickle = TRUE) #load redcell.npy
+posXY$redcell <- redcell[,1]
+
+
+
+# iscell.npy --------------------------------------------------------------
+#iscell.npy to select only ROIs that are recognized as cells
+iscell <- as.data.frame(np$load("iscell.npy", allow_pickle = TRUE))
+iscell$Cell <- as.numeric(0:(nrow(iscell)-1))
+posXY$Positive <- iscell$V1
+posXY <- subset(posXY, Positive == 1, select = c(Y,X,Cell,redcell))
+positives <- posXY$Cell
+positivesPLUSone <- positives+1 ##this is needed because suite2p starts counting ROIs with the number 0 (python..)
+
+
+
+# spks.npy ----------------------------------------------------------------
+# load suite2p numpy arrays outputs
+spks <- as.data.frame(np$load("spks.npy", allow_pickle = TRUE)) #deconvolved peaks
+spks[is.na(spks)] <- 0 #NAs replaced with 0
+
+#need to clean it from first 0 and select best window
+spks <- spks[,50:ncol(spks)]
+
+
+spks <- t(apply(spks, 1, function(x) (x - min(x))/(max(x)-min(x)))) # Normalize each cell
+spks <- spks[positivesPLUSone,] #select only positives (real cells)
+rownames(spks) <- positives #fix rownames with actual cells numbers
+
+spks[is.na(spks)] <- 0 #NAs replaced with 0
+
+saveRDS(spks, file = "~/calcium-clustering/data/ID0031_spks.rds")
+write.csv(spks, "~/calcium-clustering/data/ID0031_spks.csv")
+
+# Cutoff function <- anything below 2*(row sd/cell) is 0, anytlong above is 1
+cutoff <- function(x) {
+  th <- 2*sd(x)
+  x[x < th] <- 0
+  x[x > th] <- 1
+  return(x)
+}
+
+spksthresholded <- t(apply(spks, 1, cutoff))
+saveRDS(spksthresholded, file = "~/calcium-clustering/data/ID0031_spksthresholded.rds")
+write.csv(spksthresholded, "~/calcium-clustering/data/ID0031_spksthresholded.csv")
+
+
+
+## CALCULATE ALL ACTIVE CELLS OVER TIME
+# Calculating percentage of active cells over time -------------------------
+spksSUM <- colSums(spksthresholded)
+spksSUM <- as.data.frame(spksSUM)
+spksSUM$Time <- 0:(nrow(spksSUM)-1)
+spksSUM$Perc <- spksSUM$spksSUM/nrow(spksthresholded)*100
+saveRDS(spksSUM, file = "~/calcium-clustering/data/ID0031_spksSUM.rds")
+write.csv(spksSUM, file = "~/calcium-clustering/data/ID0031_spksSUM.csv")
+spksSUM.plt <- ggplot(spksSUM, aes(Time, Perc))+
+  geom_line()+ 
+  theme_pubr()
+
+
+# cell thresholded events divided by 60 sec
+posXY$frequency <- rowSums(spksthresholded)/60
+frequency <- mean(rowSums(spksthresholded)/60)
+
+
+# # Plot total calcium activity/time --------------------------------------
+spksSUM2 <- colSums(spks)
+spksSUM2 <- as.data.frame(spksSUM2)
+spksSUM2$Time <- 0:(nrow(spksSUM2)-1)
+spksSUM2$Mean <- spksSUM2$spksSUM2/nrow(spksSUM2)
+saveRDS(spksSUM2, file = "~/calcium-clustering/data/ID0031_spksSUM2.rds")
+write.csv(spksSUM2, file = "~/calcium-clustering/data/ID0031_spksSUM2.csv")
+spksSUM2.plt <- ggplot(spksSUM2, aes(Time, Mean))+
+  geom_line()+ 
+  theme_pubr()+
+  geom_smooth()+
+  ylab("Ca2+")+
+  ylim(0, NA)
+spksSUM2.ylim <- layer_scales(spksSUM2.plt)$y$get_limits()
+spksSUM2.plt
+
+
+
+# Average activity PER CELL (deconvolved peaks) ---------------------------
+posXY$Mean <- rowMeans(spks)
+
+
+# # Raster+dendro all cells/time ggplot ------------------------------------------
+dfpeaks <- as.data.frame(t(spks))  # Doing this coercion will apply +1 to all cells numbers
+# colnames(dfpeaks) <- 1:ncol(dfpeaks)
+dfpeaks$time <- 0:(nrow(dfpeaks)-1)
+meltPeaks <- melt(dfpeaks, id = "time")
+colnames(meltPeaks) <- c('time','cell','Ca2+')
+
+
+# Hierarchical clustering
+hc <- hclust(dist(spks, method = "euclidean"), method = "ward.D2")
+dhc <- as.dendrogram(hc)
+
+# Dendrogram
+peaks.dendro <- ggdendrogram(dhc, rotate = TRUE, labels = FALSE)+
+                  theme(panel.grid = element_blank(),
+                        axis.title.y = element_blank(),
+                        axis.text.x = element_blank(),
+                        axis.text.y = element_blank(),
+                        axis.ticks = element_blank())
+
+# GRID to put together dendrograms and rasters
+peaks.order <- order.dendrogram(dhc)
+
+## Order the levels according to their position in the cluster
+peaks.rows <- rownames(spks)
+peaks.rows <- as.data.frame(peaks.rows)
+meltPeaks$cell <- factor(x = meltPeaks$cell,
+                         levels = peaks.rows$peaks.rows[peaks.order], 
+                         ordered = TRUE)
+# Mark RFP+ cells
+RFPcells <- posXY %>% 
+                      subset(redcell==1) %>%
+                        .$Cell # extract redcell indexes
+meltPeaks$RFP <- meltPeaks$cell %in% RFPcells
+
+# Ggplot raster with dendro order
+raster.hc <- ggplot(meltPeaks, aes(time, cell))+
+  geom_raster(aes(fill = `Ca2+`))+
+  geom_line(aes(color = RFP), alpha = .2)+
+  scale_fill_gradientn(colours=c("white", "black"))+
+  scale_color_manual(values = c("TRUE" = "red",
+                                "FALSE" = "white"))+
+  theme_pubr()+
+  theme(legend.position = "none",
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.text.y = element_blank(),
+        plot.title = element_text(colour = "red", hjust = .5))+
+  ggtitle("ID0031 hclust")
+
+# GRID raster/sums
+plots <- align_plots(raster.hc, spksSUM.plt, align = 'v', axis = 'l')
+grid <- plot_grid(plots[[1]], spksSUM.plt, ncol = 1, rel_heights = c(4.5,1))
+
+########################################### RFP ####################################
+# RFPcells <- unique(scan("RFPcells.R", sep = ","))
+
+
+# Calculating percentage of active RFP cells over time (using deconvolved peaks)--------------------
+
+RFPt <- subset(spksthresholded, rownames(spksthresholded) %in% RFPcells) #select only RFP cells
+##ggplot to show percentage of coactive RPF+ cells over time
+RFPsum <- as.data.frame(colSums(RFPt))
+RFPsum$Time <- 0:(nrow(RFPsum)-1)
+RFPsum$Perc <- RFPsum$`colSums(RFPt)`/nrow(RFPt)*100
+saveRDS(RFPsum, file = "~/calcium-clustering/data/ID0031_RFPsum.rds")
+write.csv(RFPsum, file = "~/calcium-clustering/data/ID0031_RFPsum.csv")
+
+# Plot
+RFPsum.plt <- ggplot(RFPsum, aes(Time, Perc))+
+  geom_line()+
+  theme_pubr()
+
+
+
+# Sum of all activity over time RFP+ --------------------------------------
+RFP <- subset(spks, rownames(spks) %in% RFPcells) #select only RFP cells
+RFPsum2 <- as.data.frame(colSums(RFP)/nrow(RFP)) #normalized by number of RFP cells
+RFPsum2$Time <- 0:(nrow(RFPsum2)-1)
+saveRDS(RFPsum2, file = "~/calcium-clustering/data/ID0031_RFPsum2.rds")
+write.csv(RFPsum2, file = "~/calcium-clustering/data/ID0031_RFPsum2.csv")
+
+RFPsum2.plt <- ggplot(RFPsum2, aes(Time, `colSums(RFP)/nrow(RFP)`))+
+  geom_line()+
+  theme_pubr()+
+  geom_smooth()+
+  ylab("Deconvolved activity")+
+  ylim(0, NA)
+RFPsum2.plt.ylim <- layer_scales(RFPsum2.plt)$y$get_limits()
+
+
+
+# RFPcells for activity/hc/raster/dendrogram.  -------------------------------
+## Take care of using already normalized spks array
+# Raster ggplot
+dfpeaks.RFP <- as.data.frame(t(RFP))
+# colnames(dfpeaks.RFP) <- 1:ncol(dfpeaks.RFP)
+dfpeaks.RFP$time <- 0:(nrow(dfpeaks.RFP)-1)
+meltPeaks.RFP <- melt(dfpeaks.RFP, id = "time")
+colnames(meltPeaks.RFP) <- c('time','cell','Ca2+')
+
+# Hierarchical clustering
+hc.RFP <- hclust(dist(RFP, method = "euclidean"), method = "ward.D2")
+dhc.RFP <- as.dendrogram(hc.RFP)
+
+# Dendrogram
+RFP.dendro <- ggdendrogram(dhc.RFP, rotate = TRUE, labels = FALSE)+
+  theme(panel.grid = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())
+
+# GRID to put together dendrograms and rasters
+RFP.order <- order.dendrogram(dhc.RFP)
+
+## Order the levels according to their position in the cluster
+RFP.rows <- rownames(RFP)
+RFP.rows <- as.data.frame(RFP.rows)
+meltPeaks.RFP$cell <- factor(x = meltPeaks.RFP$cell,
+                         levels = RFP.rows$RFP.rows[RFP.order], 
+                         ordered = TRUE)
+
+# Ggplot raster with dendro order
+RFP.raster <- ggplot(meltPeaks.RFP, aes(time, cell))+
+  geom_raster(aes(fill = `Ca2+`))+
+  scale_fill_gradientn(colours=c("white", "grey20", "grey10", "black"))+
+  theme_pubr()+
+  theme(legend.position = "none",
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.x = element_blank(),
+        # axis.ticks.y = element_blank(),
+        # axis.text.y = element_text(face=posXY.RFP$Cell[which(posXY.RFP$Member=="TRUE"),], "bold"),
+        plot.title = element_text(colour = "red", hjust = .5))
+  # ggtitle("ID0031 RFP+")
+
+# GRID raster/sums
+plots <- align_plots(RFP.raster, RFPsum.plt, align = 'v', axis = 'l')
+RFP.grid <- plot_grid(plots[[1]], RFPsum.plt, ncol = 1, rel_heights = c(3.5,1))
+
+
+# RFPcells for activity/hc/raster/dendrogram using thresholded data  -------------------------------
+# Raster ggplot
+dfpeaks.RFPt <- as.data.frame(t(RFPt))
+# colnames(dfpeaks.RFP) <- 1:ncol(dfpeaks.RFP)
+dfpeaks.RFPt$time <- 0:(nrow(dfpeaks.RFPt)-1)
+meltPeaks.RFPt <- melt(dfpeaks.RFPt, id = "time")
+colnames(meltPeaks.RFPt) <- c('time','cell','Ca2+')
+
+# Hierarchical clustering
+hc.RFPt <- hclust(dist(RFPt, method = "euclidean"), method = "ward.D2")
+dhc.RFPt <- as.dendrogram(hc.RFPt)
+
+# Dendrogram
+RFPt.dendro <- ggdendrogram(dhc.RFPt, rotate = TRUE, labels = FALSE)+
+  theme(panel.grid = element_blank(),
+        axis.title.y = element_blank(),
+        axis.text.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks = element_blank())
+
+# GRID to put together dendrograms and rasters
+RFPt.order <- order.dendrogram(dhc.RFPt)
+
+## Order the levels according to their position in the cluster
+RFPt.rows <- rownames(RFPt)
+RFPt.rows <- as.data.frame(RFPt.rows)
+meltPeaks.RFPt$cell <- factor(x = meltPeaks.RFPt$cell,
+                             levels = RFPt.rows$RFPt.rows[RFPt.order], 
+                             ordered = TRUE)
+
+# Ggplot rasterwith dendro order
+RFPt.raster <- ggplot(meltPeaks.RFPt, aes(time, cell))+
+  geom_raster(aes(fill = `Ca2+`))+
+  scale_fill_gradientn(colours=c("white", "grey20", "grey10", "black"))+
+  theme_pubr()+
+  theme(legend.position = "none",
+        axis.title.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.x = element_blank(),
+        # axis.ticks.y = element_blank(),
+        # axis.text.y = element_text(face=posXY.RFP$Cell[which(posXY.RFP$Member=="TRUE"),], "bold"),
+        plot.title = element_text(colour = "red", hjust = .5))
+# ggtitle("ID0031 RFP+")
+
+# GRID raster/sums
+plots <- align_plots(RFPt.raster, RFPsum.plt, align = 'v', axis = 'l')
+RFPt.grid <- plot_grid(plots[[1]], RFPsum.plt, ncol = 1, rel_heights = c(3.5,1))
+
+
+# max_CCF()
+# Using thresholded values ------------------------------------------------
+# # Function to find max CCF between a and b in ±1 lag range
+max_CCF<- function(a,b)
+{
+  d <- ccf(a, b, plot = FALSE, lag.max = 1)
+  cor = d$acf[,,1]
+  return(max(cor))
+} 
+# Create empty matrix that will host corr coefficents. 
+T.allcellst <- t(spksthresholded)
+
+nc <- nrow(spksthresholded)
+cmat.allcellst <- matrix(NA,nc,nc)
+
+
+pb <- txtProgressBar(min = 0, max = nc, style = 3)
+for (i in 1:nc) {
+  for (j in 1:nc) {
+    cmat.allcellst[i,j] <- max_CCF(T.allcellst[,i],T.allcellst[,j])
+    setTxtProgressBar(pb, i)
+  }
+}
+close(pb)
+
+
+# Create empty matrix that will host corr coefficents. 
+T.RFPt <- t(RFPt)
+
+nc <- nrow(RFPt)
+cmat.RFPt <- matrix(NA,nc,nc)
+
+
+pb <- txtProgressBar(min = 0, max = nc, style = 3)
+for (i in 1:nc) {
+  for (j in 1:nc) {
+    cmat.RFPt[i,j] <- max_CCF(T.RFPt[,i],T.RFPt[,j])
+    setTxtProgressBar(pb, i)
+  }
+}
+close(pb)
+
+# Graph
+library(ggplot2)
+library(igraph)
+library(ggraph)
+library(visNetwork) 
+library(tidyverse)
+library(tidygraph)
+library(ggiraph)
+library(ggnewscale)
+library(grid)
+library(gridExtra)
+library(RColorBrewer)
+library(pals)
+
+# AKT1/HRAS cells graph
+
+graph.RFP <- graph.adjacency(as.matrix(cmat.RFPt), mode = "undirected", weighted = TRUE, diag = FALSE) # using thresholded values
+
+# Threshold correlation degree. An interval is chosen because the Pearson correlation coeff goes -1 to 1, BUT -1 means anti-correlation.. so one neuron is active when the other isn't)
+# Set weight threshold (set to 0.30 as per literature: Avitan et al., 2017 http://dx.doi.org/10.1016/j.cub.2017.06.056)
+graph.RFP <- delete.edges(graph.RFP, which(E(graph.RFP)$weight <0.30))
+
+# Robustness
+cohesion <- cohesion(graph.RFP)
+
+# Isolate RFP+ XY from posXY dataframe ------------------------------------
+posXY$RFP <- posXY$Cell %in% RFPcells
+
+posXY.RFP <- posXY %>%
+                      subset(redcell==1)
+
+saveRDS(posXY.RFP, file = "~/calcium-clustering/dataposXY.RFP.rds")
+write.csv(posXY.RFP, file = "~/calcium-clustering/dataposXY.RFP.csv")
+
+
+# Communities detection ---------------------------------------------------
+# greedy method (hierarchical, fast method)
+graph.clusters.RFP = cluster_leading_eigen(graph.RFP)
+posXY.RFP$Community <- graph.clusters.RFP$membership
+
+
+# Network plot ------------------------------------------------------------
+# Make composite palette
+colorz = grDevices::colors()[grep('gr(a|e)y', grDevices::colors(), invert = T)]
+communities.guide <- guide_legend(title = element_text("Communities"),
+                                  label = FALSE,
+                                  keywidth = 0.1)
+
+graph.RFP.plt <- ggraph(graph.RFP, 
+                                          layout = as.matrix(posXY.RFP)[, c("X", "Y")]) +
+                                          geom_edge_link(aes(colour = weight, alpha = weight))+
+                                          scale_edge_alpha_continuous(range = c(0.1, 1), guide = "none")+
+                                          scale_edge_color_viridis(name = "F. Corr",
+                                                                   alpha = 1,
+                                                                   begin = 0.3,
+                                                                   end = 1,
+                                                                   discrete = FALSE,
+                                                                   option = "inferno",
+                                                                   direction = 1
+                                          )+
+                                          # Calcium levels and degrees
+                                          geom_node_point(aes(fill = ordered(cluster_leading_eigen(graph.RFP)$membership),
+                                                              size = degree(graph.RFP)),
+                                                          shape = 21)+
+                                          # geom_node_text(aes(label = posXY.RFP$Cell), 
+                                          #                colour = "red",
+                                          #                 repel = TRUE,
+                                          #                size = 2.5)+
+                                          geom_node_text(aes(label = ordered(cluster_leading_eigen(graph.RFP)$membership)),
+                                                         colour = "black",
+                                                         fontface = 1,
+                                                         size = 3)+
+                                          scale_fill_manual(values = colorz,
+                                                            guide = "none")+
+                                          scale_size_continuous(range = c(5, 12),
+                                                            guide = "none")+
+                                          # scale_shape_manual(values = c("TRUE" = 25, "FALSE" = 21))+
+                                          # scale_colour_manual(values = c("TRUE" = "#fc9272", "FALSE" = "black"))+
+                                          # labs(fill = "Ca")+
+                                          # Hubs
+                                          # annotate("text", x=45, y=20, 
+                                          #           label = "W. thresh. = 0.50")+
+                                          # annotate("text", x=40, y=35,
+                                          #          label = "Cohesion = ")+
+                                          # annotate("text", x=70, y=35,
+                                          #          label = cohesion)+
+                                          # geom_node_point(aes(fill = as.factor(posXY$synchron),
+                                          #                     size = as.factor(posXY$synchron),
+                                          #                     shape = as.factor(posXY$synchron)))+
+                                          # scale_size_manual(values = g.sizes.Sync, name = "Synchronous")+
+                                          # scale_fill_manual(values = g.palette.Sync, name = "Synchronous")+
+                                          # scale_shape_manual(values = g.shapes.Sync, name = "Synchronous")+
+                                          # geom_node_label(aes(label = posXY$Cell), repel = TRUE)+
+                                          
+                                          theme_graph(background = "white",
+                                                      plot_margin = margin(5, 5, 5, 5))+
+                                          theme(legend.position = "right",
+                                                legend.margin	= margin(1,1,1,1),
+                                                legend.key.size = unit(0.5, 'cm'), #change legend key size
+                                                # legend.key.height = unit(1, 'pt'), #change legend key height
+                                                # legend.key.width = unit(1, 'pt'), #change legend key width
+                                                # legend.title = element_text(size=5), #change legend title font size
+                                                # legend.text = element_text(size=4),
+                                                # legend.text.align = 0
+                                          )+
+                                          ggtitle("ID0031 RFP+")+
+                                          scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
+
+
+
+# Histogram count of degrees ----------------------------------------------
+posXY.RFP$Degree <- degree(graph.RFP)
+max.y.degree <- length(RFPcells)
+
+degree.RFP.hist <- gghistogram(posXY.RFP, x = "Degree", y = "..count..",
+                                      binwidth = 1)
+
+
+# Mean degree
+degree.mean.RFP <- mean(degree(graph.RFP))
+
+
+# libs for PCA --------------------------------------------------------------------
+library(factoextra)
+library(ggpubr)
+library(ggfortify)
+# PCA ---------------------------------------------------------------------
+pca.RFP <- prcomp(RFPt, center = TRUE, scale = FALSE) # change to scale = FALSE if not normalised data
+scree.RFP <- fviz_eig(pca.RFP, ncp = 100)
+scree.RFP <- ggpar(scree.RFP, title = element_blank())
+
+pca.viz <- fviz_pca_ind(pca.RFP, col.ind = RFP.rows$RFP.rows[RFP.order])
+
+
+
+# Viz ---------------------------------------------------------------------
+gs = c(graph.RFP.plt, degree.RFP.hist,
+      RFP.grid, RFPsum2.plt, scree.RFP)
+
+lay <- rbind(c(1,1,3,3),
+             c(1,1,3,3),
+             c(2,5,4,4))
+arranged <- grid.arrange(graph.RFP.plt, degree.RFP.hist,
+                     RFP.grid, RFPsum2.plt, scree.RFP,
+                     layout_matrix = lay)
+
+
+#Save whole graph + raster + activity plot + coactive cells/time
+ggsave(plot = arranged, file = "/Users/Simo/calcium-clustering/plots/ID0031.whole.RFP.png", 
+       device = "png",  bg = "white",
+       width = 20, height = 15, units = "cm", dpi = 320,
+       scale = 2)
+
+
+# General graph2
+
+graph <- graph.adjacency(as.matrix(cmat.allcellst), mode = "undirected", weighted = TRUE, diag = FALSE) # using thresholded values
+
+# Threshold correlation degree. An interval is chosen because the Pearson correlation coeff goes -1 to 1, BUT -1 means anti-correlation.. so one neuron is active when the other isn't)
+# Set weight threshold (set to 0.30 as per literature: Avitan et al., 2017 http://dx.doi.org/10.1016/j.cub.2017.06.056)
+graph <- delete.edges(graph, which(E(graph)$weight <0.30))
+
+# Robustness
+cohesion <- cohesion(graph)
+
+# Communities detection ---------------------------------------------------
+# greedy method (hierarchical, fast method)
+graph.clusters = leading.eigenvector.community(graph, options = list(maxiter = 1000000))
+posXY$Community <- graph.clusters$membership
+
+# posXY.RFP$Member <- duplicated(posXY.RFP$Community) to be fixed
+# posXY.RFP$degree <- ordered(degree(graph.RFP))
+
+
+
+# Network plot ------------------------------------------------------------
+# Make composite palette
+colorz = grDevices::colors()[grep('gr(a|e)y', grDevices::colors(), invert = T)]
+colorz.invert = rev(colorz)
+communities.palette.big <- c(colorz, brewer.pal(9,'Set1'),
+                         brewer.pal(8,'Set2'),
+                         brewer.pal(12,'Set3'),
+                         brewer.pal(8, 'Dark2'),
+                         brewer.pal(8, 'Accent'),
+                         brewer.pal(9,'Pastel1'),
+                         colorz.invert)
+
+communities.guide <- guide_legend(title = element_text("Communities"),
+                                  label = FALSE,
+                                  keywidth = 0.1)
+
+graph.plt <- ggraph(graph, 
+                                          layout = as.matrix(posXY)[, c("X", "Y")]) +
+                                          geom_edge_link(aes(colour = weight, alpha = weight))+
+                                          scale_edge_alpha_continuous(range = c(0.1, 1), guide = "none")+
+                                          scale_edge_color_viridis(name = "F. Corr",
+                                                                   alpha = 1,
+                                                                   begin = 0.3,
+                                                                   end = 1,
+                                                                   discrete = FALSE,
+                                                                   option = "inferno",
+                                                                   direction = 1
+                                          )+
+                                          # Calcium levels and degrees
+                                          geom_node_point(aes(fill = ordered(leading.eigenvector.community(graph, options = list(maxiter = 1000000))$membership),
+                                                              size = degree(graph)),
+                                                          shape = 21)+
+                                          # geom_node_text(aes(label = posXY$Cell), 
+                                          #                colour = "red",
+                                          #                 repel = TRUE,
+                                          #                size = 2.5)+
+                                          geom_node_text(aes(label = ordered(leading.eigenvector.community(graph, options = list(maxiter = 1000000))$membership)),
+                                                         colour = "black",
+                                                         fontface = 1,
+                                                         size = 3)+
+                                          scale_fill_manual(values = communities.palette.big,
+                                                            guide = "none")+
+                                          scale_size_continuous(range = c(5, 12),
+                                                            guide = "none")+
+                                          # scale_shape_manual(values = c("TRUE" = 25, "FALSE" = 21))+
+                                          # scale_colour_manual(values = c("TRUE" = "#fc9272", "FALSE" = "black"))+
+                                          # labs(fill = "Ca")+
+                                          # Hubs
+                                          # annotate("text", x=45, y=20, 
+                                          #           label = "W. thresh. = 0.50")+
+                                          # annotate("text", x=40, y=35,
+                                          #          label = "Cohesion = ")+
+                                          # annotate("text", x=70, y=35,
+                                          #          label = cohesion)+
+                                          # geom_node_point(aes(fill = as.factor(posXY$synchron),
+                                          #                     size = as.factor(posXY$synchron),
+                                          #                     shape = as.factor(posXY$synchron)))+
+                                          # scale_size_manual(values = g.sizes.Sync, name = "Synchronous")+
+                                          # scale_fill_manual(values = g.palette.Sync, name = "Synchronous")+
+                                          # scale_shape_manual(values = g.shapes.Sync, name = "Synchronous")+
+                                          # geom_node_label(aes(label = posXY$Cell), repel = TRUE)+
+                                          
+                                          theme_graph(background = "white",
+                                                      plot_margin = margin(5, 5, 5, 5))+
+                                          theme(legend.position = "right",
+                                                legend.margin	= margin(1,1,1,1),
+                                                legend.key.size = unit(0.5, 'cm'), #change legend key size
+                                                # legend.key.height = unit(1, 'pt'), #change legend key height
+                                                # legend.key.width = unit(1, 'pt'), #change legend key width
+                                                # legend.title = element_text(size=5), #change legend title font size
+                                                # legend.text = element_text(size=4),
+                                                # legend.text.align = 0
+                                          )+
+                                          ggtitle("ID0031")+
+                                          scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
+
+# Save graph
+ggsave(plot = graph.plt, file = "/Users/Simo/calcium-clustering/plots/ID0031.graph.png", 
+       device = "png",  bg = "white",
+       width = 20, height = 15, units = "cm", dpi = 320,
+       scale = 2)
+
+# Connections between normal and RFP+ cells
+graph.btw.plt <- ggraph(graph, 
+                                          layout = as.matrix(posXY)[, c("X", "Y")]) +
+                                          geom_edge_link(aes(colour = weight, alpha = weight))+
+                                          scale_edge_alpha_continuous(range = c(0.1, 1), guide = "none")+
+                                          scale_edge_color_viridis(name = "F. Corr",
+                                                                   alpha = 1,
+                                                                   begin = 0.3,
+                                                                   end = 1,
+                                                                   discrete = FALSE,
+                                                                   option = "inferno",
+                                                                   direction = 1
+                                          )+
+                                          # Calcium levels and degrees
+                                          geom_node_point(aes(fill = as.factor(posXY$redcell),
+                                                              size = as.factor(posXY$redcell)),
+                                                          shape = 21)+
+                                          # geom_node_text(aes(label = posXY$Cell), 
+                                          #                colour = "blue",
+                                          #                 repel = TRUE,
+                                          #                size = 2.5)+
+                                         scale_fill_manual(values = c("0" = "grey",
+                                                                      "1" = "red"),
+                                                            guide = "none")+
+                                         scale_size_manual(values = c("0" = 5,
+                                                                      "1" = 8),
+                                                           guide = "none")+
+                                          theme_graph(background = "white",
+                                                      plot_margin = margin(5, 5, 5, 5))+
+                                          theme(legend.position = "right",
+                                                legend.margin	= margin(1,1,1,1),
+                                                legend.key.size = unit(0.5, 'cm'), #change legend key size
+                                                # legend.key.height = unit(1, 'pt'), #change legend key height
+                                                # legend.key.width = unit(1, 'pt'), #change legend key width
+                                                # legend.title = element_text(size=5), #change legend title font size
+                                                # legend.text = element_text(size=4),
+                                                # legend.text.align = 0
+                                          )+
+                                          ggtitle("ID0031 RFP+ highlighted")+
+                                          scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
+
+# Save graph
+ggsave(plot = graph.btw.plt, file = "/Users/Simo/calcium-clustering/plots/ID0031.graph.btw.plt.png", 
+       device = "png",  bg = "white",
+       width = 20, height = 15, units = "cm", dpi = 320,
+       scale = 2)
+
+
+
+# PCA
+pca <- prcomp(T.allcellst, center = TRUE, scale = FALSE) # change to scale = FALSE if not normalised data
+
+
+
+```
+```
+
+
+
+
+
+
+
+
+
+
+```{r dF.npy}
+######################################### dF/F #########################################
+# Average calcium levels over time ----------------------------------------
+## Here by using dF traces after executing "get_dF.py" to extract them
+dF <- as.data.frame(np$load("dF.npy", allow_pickle = TRUE)) #delta F calcium levels of all cells
+dF <- dF[,50:ncol(dF)] #select window
+# dF <- t(apply(dF, 1, function(x) (x - min(x))/(max(x)-min(x)))) # Normalize?
+dFPOS <- dF[positivesPLUSone,]
+rownames(dFPOS) <- positives
+dFPOS
+```
+
+
+```{r average activity/HRAS cell}
+# Average activity per RFP+ cell (dF peaks) -------------------------------
+posXY$Mean.dF <- rowMeans(dFPOS)
+posXY$Mean.dF.N <- apply(as.matrix(posXY$Mean.dF), 2,
+                                function(x) (x - min(x))/(max(x)-min(x)))
+posXY
+```
+
+# ```{r coactive cells percentage/time}
+# # Calculating percentage of active RFP+ cells over time --------------------
+# dF.RFP <- subset(spksthresholded, rownames(dFPOS) %in% RFPcells) #select only RFP cells
+# ##ggplot to show percentage of RPF+ cells over time
+# RFPsum <- as.data.frame(colSums(RFP))
+# RFPsum$Time <- 0:(nrow(RFPsum)-1)
+# RFPsum$Perc <- RFPsum$`colSums(RFP)`/nrow(RFP)*100
+# RFPsum.dF.plt <- ggplot(RFPsum, aes(Time, Perc))+
+#   geom_line()+
+#   theme_pubr()
+# RFPsum.dF.plt
+# ```
+
+
+#Averaging per timepoint (all cells)
+# dFx <- as.data.frame(colSums(dFPOS)/nrow(dFPOS))
+# dFx$Time <- 0:(nrow(dFx)-1)
+# #plot
+# POS.aveF <- ggplot(dFx, aes(Time, `colSums(dFPOS)/nrow(dFPOS)`))+
+#   geom_line()+
+#   theme_pubr()+
+#   ylab("Average dF/F")+
+#   geom_smooth(method = "loess")
+# 
+# 
+# 
+
+
+
+# Averaging per timepoint (RFP only)
+# FrawRFPx <- as.data.frame(colSums(FrawRFP)/nrow(FrawRFP))
+# FrawRFPx$Time <- 0:(nrow(FrawRFPx)-1)
+# #plot
+# RFP.aveF <- ggplot(FrawRFPx, aes(Time, `colSums(FrawRFP)/nrow(FrawRFP)`))+
+#                               geom_line()+
+#                               theme_pubr()+
+#                               ylab("Average Ca2+ (RFP+)")+
+#                               geom_smooth(method = "loess")
+
+
+
+
+
+
+# Plot RFP deconvolved curves all together
+
+# POSITION ANALYSIS
+# cut3 <- cutree(hc, k = 3)
+# 
+# posXY$Cluster <- cut3
+# 
+# ggplot(posXY, aes(X, Y, color = as.factor(Cluster), shape = as.factor(Cluster)))+
+#   geom_point(size = 2)+
+#   # scale_color_manual(values=c('red','blue','green'))+
+#   theme_graph()+
+#   scale_y_reverse()
+
+
+
+
+
+
+
+# Color clusters
+# put on graph
