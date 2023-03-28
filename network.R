@@ -146,7 +146,7 @@ ID0031.degree.RFP.hist <- gghistogram(ID0042.posXY.RFP, x = "Degree", y = "..cou
 ID0031.degree.mean.RFP <- mean(degree(ID0031.graph.RFP))
 
 
-# libs --------------------------------------------------------------------
+# libs for PCA --------------------------------------------------------------------
 library(factoextra)
 library(ggpubr)
 library(ggfortify)
@@ -154,6 +154,9 @@ library(ggfortify)
 pca.RFP <- prcomp(RFPt, center = TRUE, scale = FALSE) # change to scale = FALSE if not normalised data
 ID0031.scree.RFP <- fviz_eig(pca.RFP, ncp = 100)
 ID0031.scree.RFP <- ggpar(ID0031.scree.RFP, title = element_blank())
+
+pca.viz <- fviz_pca_ind(pca.RFP, col.ind = RFP.rows$RFP.rows[RFP.order])
+
 
 
 # Viz ---------------------------------------------------------------------
@@ -331,7 +334,19 @@ ggsave(plot = ID0031.graph.btw.plt, file = "/Users/Simo/calcium-clustering/plots
        device = "png",  bg = "white",
        width = 20, height = 15, units = "cm", dpi = 320,
        scale = 2)
+
+
+
+# PCA
+pca <- prcomp(T.allcellst, center = TRUE, scale = FALSE) # change to scale = FALSE if not normalised data
+
+
+
 ```
+```
+
+
+
 
 
 
@@ -357,6 +372,14 @@ g.shapes.RFP <- c("TRUE" = 25)
 # ID0031.posXY.RFP$`Hub score` <- round(ID0031.hub.score.RFP$vector, digits = 2)
 # ID0031.posXY.RFP$HScore <- (ID0031.posXY.RFP$`Hub score`)*100
 ```
+
+
+
+
+
+
+
+
 
 
 # ```{r general graph}
@@ -432,10 +455,3 @@ ID0031.graph.plt <- ggraph(ID0031.graph,
 ```
 
 
-```{r PCA}
-# PCA
-pca <- prcomp(T.allcellst, center = TRUE, scale = FALSE) # change to scale = FALSE if not normalised data
-
-
-
-```

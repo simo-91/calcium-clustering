@@ -1,7 +1,13 @@
-# Clustering coefficient comparison
-Localclusteringcoefficient $C_{v} = \frac{number\ of\ closed\ triplets}{number\ of\ all\ triplets}$
-Global clustering coefficient (aka mean local clustering coeff): $C_{G} = \frac{1}{N} \sum_{v \in V} C_v$
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 
+# Clustering coefficient comparison
+
+Local clustering coefficient $C_{v} = \frac{number\ of\ closed\ triplets}{number\ of\ all\ triplets}$ 
+Global clustering coefficient (aka mean local clustering coeff): $C_{G} = \frac{1}{N} \sum_{v \in V} C_v$
 
 ```{r}
 # in RFP cells
