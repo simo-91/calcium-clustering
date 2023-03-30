@@ -60,8 +60,8 @@ rownames(spks) <- positives #fix rownames with actual cells numbers
 
 spks[is.na(spks)] <- 0 #NAs replaced with 0
 
-saveRDS(spks, file = "~/calcium-clustering/data/ID0133_spks.rds")
-write.csv(spks, "~/calcium-clustering/data/ID0133_spks.csv")
+saveRDS(spks, file = "~/calcium-clustering/data/ID0119_spks.rds")
+write.csv(spks, "~/calcium-clustering/data/ID0119_spks.csv")
 
 # Cutoff function <- anything below 2*(row sd/cell) is 0, anytlong above is 1
 cutoff <- function(x) {
@@ -72,8 +72,8 @@ cutoff <- function(x) {
 }
 
 spksthresholded <- t(apply(spks, 1, cutoff))
-saveRDS(spksthresholded, file = "~/calcium-clustering/data/ID0133_spksthresholded.rds")
-write.csv(spksthresholded, "~/calcium-clustering/data/ID0133_spksthresholded.csv")
+saveRDS(spksthresholded, file = "~/calcium-clustering/data/ID0119_spksthresholded.rds")
+write.csv(spksthresholded, "~/calcium-clustering/data/ID0119_spksthresholded.csv")
 
 
 
@@ -83,8 +83,8 @@ spksSUM <- colSums(spksthresholded)
 spksSUM <- as.data.frame(spksSUM)
 spksSUM$Time <- 0:(nrow(spksSUM)-1)
 spksSUM$Perc <- spksSUM$spksSUM/nrow(spksthresholded)*100
-saveRDS(spksSUM, file = "~/calcium-clustering/data/ID0133_spksSUM.rds")
-write.csv(spksSUM, file = "~/calcium-clustering/data/ID0133_spksSUM.csv")
+saveRDS(spksSUM, file = "~/calcium-clustering/data/ID0119_spksSUM.rds")
+write.csv(spksSUM, file = "~/calcium-clustering/data/ID0119_spksSUM.csv")
 spksSUM.plt <- ggplot(spksSUM, aes(Time, Perc))+
   geom_line()+ 
   theme_pubr()
@@ -94,8 +94,8 @@ spksSUM.plt <- ggplot(spksSUM, aes(Time, Perc))+
 posXY$frequency <- rowSums(spksthresholded)/60 #events per minute
 frequency <- mean(rowSums(spksthresholded)/60)
 
-saveRDS(frequency, file = "~/calcium-clustering/data/ID0133_mean_frequency.rds")
-write.csv(frequency, file = "~/calcium-clustering/data/ID0133_mean_frequency.csv")
+saveRDS(frequency, file = "~/calcium-clustering/data/ID0119_mean_frequency.rds")
+write.csv(frequency, file = "~/calcium-clustering/data/ID0119_mean_frequency.csv")
 # Compare number of events/min across samples?
 
 
@@ -112,8 +112,8 @@ spksSUM2 <- colSums(spks)
 spksSUM2 <- as.data.frame(spksSUM2)
 spksSUM2$Time <- 0:(nrow(spksSUM2)-1)
 spksSUM2$Mean <- spksSUM2$spksSUM2/nrow(spksSUM2)
-saveRDS(spksSUM2, file = "~/calcium-clustering/data/ID0133_spksSUM2.rds")
-write.csv(spksSUM2, file = "~/calcium-clustering/data/ID0133_spksSUM2.csv")
+saveRDS(spksSUM2, file = "~/calcium-clustering/data/ID0119_spksSUM2.rds")
+write.csv(spksSUM2, file = "~/calcium-clustering/data/ID0119_spksSUM2.csv")
 spksSUM2.plt <- ggplot(spksSUM2, aes(Time, Mean))+
   geom_line()+ 
   theme_pubr()+
@@ -180,19 +180,19 @@ raster.hc <- ggplot(meltPeaks, aes(time, cell))+
         axis.text.y = element_blank(),
         axis.text.x = element_blank(),
         plot.title = element_text(colour = "red", hjust = .5))
-  # ggtitle("ID0133 hclust", subtitle = sprintf("Mean frequency is: %s events/min", round(frequency, digits = 3)))
+  # ggtitle("ID0119 hclust", subtitle = sprintf("Mean frequency is: %s events/min", round(frequency, digits = 3)))
 
 # GRID raster/sums
 plots <- align_plots(raster.hc, spksSUM.plt, align = 'v', axis = 'l')
 grid <- plot_grid(plots[[1]], spksSUM.plt, ncol = 1, rel_heights = c(4.5,1))
 
 # Save data
-ggsave(plot = grid, file = "~/calcium-clustering/plots/ID0133.grid-allcells.png", 
+ggsave(plot = grid, file = "~/calcium-clustering/plots/ID0119.grid-allcells.png", 
        device = "png",  bg = "white",
        width = 20, height = 15, units = "cm", dpi = 320,
        scale = 2)
-saveRDS(posXY, file = "~/calcium-clustering/data/ID0133_posXY.rds")
-write.csv(posXY, file = "~/calcium-clustering/data/ID0133_posXY.csv")
+saveRDS(posXY, file = "~/calcium-clustering/data/ID0119_posXY.rds")
+write.csv(posXY, file = "~/calcium-clustering/data/ID0119_posXY.csv")
 
 ########################################### RFP ####################################
 # RFPcells <- unique(scan("RFPcells.R", sep = ","))
@@ -219,8 +219,8 @@ write.csv(posXY.RFP, file = "~/calcium-clustering/dataposXY.RFP.csv")
 RFPsum <- as.data.frame(colSums(RFPt))
 RFPsum$Time <- 0:(nrow(RFPsum)-1)
 RFPsum$Perc <- RFPsum$`colSums(RFPt)`/nrow(RFPt)*100
-saveRDS(RFPsum, file = "~/calcium-clustering/data/ID0133_RFPsum.rds")
-write.csv(RFPsum, file = "~/calcium-clustering/data/ID0133_RFPsum.csv")
+saveRDS(RFPsum, file = "~/calcium-clustering/data/ID0119_RFPsum.rds")
+write.csv(RFPsum, file = "~/calcium-clustering/data/ID0119_RFPsum.csv")
 
 # Plot
 RFPsum.plt <- ggplot(RFPsum, aes(Time, Perc))+
@@ -233,8 +233,8 @@ RFPsum.plt <- ggplot(RFPsum, aes(Time, Perc))+
 RFP <- subset(spks, rownames(spks) %in% RFPcells) #select only RFP cells
 RFPsum2 <- as.data.frame(colSums(RFP)/nrow(RFP)) #normalized by number of RFP cells
 RFPsum2$Time <- 0:(nrow(RFPsum2)-1)
-saveRDS(RFPsum2, file = "~/calcium-clustering/data/ID0133_RFPsum2.rds")
-write.csv(RFPsum2, file = "~/calcium-clustering/data/ID0133_RFPsum2.csv")
+saveRDS(RFPsum2, file = "~/calcium-clustering/data/ID0119_RFPsum2.rds")
+write.csv(RFPsum2, file = "~/calcium-clustering/data/ID0119_RFPsum2.csv")
 
 RFPsum2.plt <- ggplot(RFPsum2, aes(Time, `colSums(RFP)/nrow(RFP)`))+
   geom_line()+
@@ -288,7 +288,7 @@ RFP.raster <- ggplot(meltPeaks.RFP, aes(time, cell))+
         # axis.ticks.y = element_blank(),
         # axis.text.y = element_text(face=posXY.RFP$Cell[which(posXY.RFP$Member=="TRUE"),], "bold"),
         plot.title = element_text(colour = "red", hjust = .5))+
-  ggtitle("ID0133 RFP+", subtitle = sprintf("Mean frequency is: %s events/min", round(frequency.RFP, digits = 3)))
+  ggtitle("ID0119 RFP+", subtitle = sprintf("Mean frequency is: %s events/min", round(frequency.RFP, digits = 3)))
 
 # GRID raster/sums
 plots <- align_plots(RFP.raster, RFPsum.plt, align = 'v', axis = 'l')
@@ -338,7 +338,7 @@ RFPt.raster <- ggplot(meltPeaks.RFPt, aes(time, cell))+
         # axis.ticks.y = element_blank(),
         # axis.text.y = element_text(face=posXY.RFP$Cell[which(posXY.RFP$Member=="TRUE"),], "bold"),
         plot.title = element_text(colour = "red", hjust = .5))+
-  ggtitle("ID0133 RFP+", subtitle = sprintf("Mean frequency is: %s events/min", round(frequency.RFP, digits = 3)))
+  ggtitle("ID0119 RFP+", subtitle = sprintf("Mean frequency is: %s events/min", round(frequency.RFP, digits = 3)))
 
 # GRID raster/sums
 plots <- align_plots(RFPt.raster, RFPsum.plt, align = 'v', axis = 'l')
@@ -392,9 +392,9 @@ for (i in 1:nc) {
 }
 close(pb)
 
-# Graph
+# Graph USE ggraph version 2.0.6 (https://cran.r-project.org/src/contrib/Archive/ggraph/ggraph_2.0.6.tar.gz)
 p_load(igraph, ggraph, visNetwork, tidygraph, ggiraph, ggnewscale, grid,
-       gridExtra, RColorBrewer, pals)
+       gridExtra, RColorBrewer, pals) 
 
 # AKT1/HRAS cells graph
 
@@ -420,10 +420,10 @@ posXY.RFP$Community <- graph.clusters.RFP$membership
 #     summarise(Degree = sum(Degree))
 
 # Clustering coefficient RFP
-ID0133.clustcoeff.RFP <- transitivity(graph.RFP)
+ID0119.clustcoeff.RFP <- transitivity(graph.RFP)
 
 # Global efficiency RFP (NaN if there are no connected triples in the graph)
-ID0133.globaleff.RFP <- global_efficiency(graph.RFP)
+ID0119.globaleff.RFP <- global_efficiency(graph.RFP)
 
 
 
@@ -435,7 +435,7 @@ communities.guide <- guide_legend(title = element_text("Communities"),
                                   keywidth = 0.1)
 
 graph.RFP.plt <- ggraph(graph.RFP, 
-                                          layout = as.matrix(posXY.RFP)[, c("X", "Y")]) +
+                                          layout = as.matrix(posXY.RFP)[, c("X", "Y")])+
                                           geom_edge_link(aes(colour = weight, alpha = weight))+
                                           scale_edge_alpha_continuous(range = c(0.1, 1), guide = "none")+
                                           scale_edge_color_viridis(name = "F. Corr",
@@ -490,7 +490,7 @@ graph.RFP.plt <- ggraph(graph.RFP,
                                                 # legend.text = element_text(size=4),
                                                 # legend.text.align = 0
                                           )+
-                                          ggtitle("ID0133 RFP+")+
+                                          ggtitle("ID0119 RFP+")+
                                           scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
 
 
@@ -516,13 +516,13 @@ degree.mean.RFP <- mean(degree(graph.RFP))
 pca <- prcomp(spksthresholded, center = TRUE, scale = FALSE) # change to scale = FALSE if not normalised data
 scree <- fviz_eig(pca, ncp = 100)
 scree <- ggpar(scree, title = element_blank())
-ID0133.pca.eigenvalues <- get_eigenvalue(pca)
+ID0119.pca.eigenvalues <- get_eigenvalue(pca)
 
 # for RFP
 pca.RFP <- prcomp(RFPt, center = TRUE, scale = FALSE, rank. = 10) # change to scale = FALSE if not normalised data
 scree.RFP <- fviz_eig(pca.RFP, ncp = 50)
 scree.RFP <- ggpar(scree.RFP, title = element_blank())
-ID0133.pca.RFP.eigenvalues <- get_eigenvalue(pca.RFP)
+ID0119.pca.RFP.eigenvalues <- get_eigenvalue(pca.RFP)
 
 
 # Viz ---------------------------------------------------------------------
@@ -538,7 +538,7 @@ arranged <- grid.arrange(graph.RFP.plt, degree.RFP.hist,
                      layout_matrix = lay)
 
 #Save whole graph + raster + activity plot + coactive cells/time
-ggsave(plot = arranged, file = "~/calcium-clustering/plots/ID0133.whole.RFP.png", 
+ggsave(plot = arranged, file = "~/calcium-clustering/plots/ID0119.whole.RFP.png", 
        device = "png",  bg = "white",
        width = 20, height = 15, units = "cm", dpi = 320,
        scale = 2)
@@ -563,10 +563,10 @@ posXY$Community <- graph.clusters$membership
 
 
 # Clustering coefficient RFP
-ID0133.clustcoeff <- transitivity(graph)
+ID0119.clustcoeff <- transitivity(graph)
 
 # Global efficiency RFP
-ID0133.globaleff <- global_efficiency(graph)
+ID0119.globaleff <- global_efficiency(graph)
 
 
 # Network plot ------------------------------------------------------------
@@ -642,11 +642,11 @@ graph.plt <- ggraph(graph,
                                                 # legend.text = element_text(size=4),
                                                 # legend.text.align = 0
                                           )+
-                                          ggtitle("ID0133")+
+                                          ggtitle("ID0119")+
                                           scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
 
 # Save graph
-ggsave(plot = graph.plt, file = "~/calcium-clustering/plots/ID0133.graph.png", 
+ggsave(plot = graph.plt, file = "~/calcium-clustering/plots/ID0119.graph.png", 
        device = "png",  bg = "white",
        width = 20, height = 15, units = "cm", dpi = 320,
        scale = 2)
@@ -689,11 +689,11 @@ graph.btw.plt <- ggraph(graph,
                                                 # legend.text = element_text(size=4),
                                                 # legend.text.align = 0
                                           )+
-                                          ggtitle("ID0133 RFP+ highlighted")+
+                                          ggtitle("ID0119 RFP+ highlighted")+
                                           scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
 
 # Save graph
-ggsave(plot = graph.btw.plt, file = "~/calcium-clustering/plots/ID0133.graph.btw.plt.png", 
+ggsave(plot = graph.btw.plt, file = "~/calcium-clustering/plots/ID0119.graph.btw.plt.png", 
        device = "png",  bg = "white",
        width = 20, height = 15, units = "cm", dpi = 320,
        scale = 2)
