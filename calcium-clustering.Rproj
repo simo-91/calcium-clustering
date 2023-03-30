@@ -13,5 +13,5 @@ RnwWeave: Sweave
 LaTeX: pdfLaTeX
 
 PythonType: conda
-PythonVersion: 3.9.10
-PythonPath: ~/miniforge3/bin/python3.9
+PythonVersion: 3.8.16
+PythonPath: ~/anaconda3/envs/suite2p/bin/python3.8
