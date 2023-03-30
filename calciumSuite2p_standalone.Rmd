@@ -1,25 +1,10 @@
 ################ CALCIUM ANALYSIS WITHOUT THRESHOLDING
 ```{r libraries, include=FALSE}
 # Libraries ---------------------------------------------------------------
-library(utils)
-library(dplyr)
-library(tidyverse)
-library(ggplot2)
-library(plotly)
-library(tidyr)
-library(reshape2)
-# library(heatmaply)
-library(factoextra)
-library(ggdendro)
-library(grid)
-library(RcppCNPy)
-library(cowplot)
-library(ggpubr)
-library(mmand)
-library(rstudioapi)
-# Load raw Suite2p npy arrays using reticulate
-library(reticulate)
-# options(reticulate.conda_binary = "/Users/simo/miniforge3")
+library(pacman)
+p_load(utils, dplyr, tidyverse, ggplot2, plotly, tidyr, reshape2, factoextra,
+       ggdendro, grid, RcppCNPy, cowplot, ggpubr, mmand, rstudioapi, reticulate)
+
 ```
 
 ```{r echo=FALSE, setup, include=FALSE}
@@ -408,18 +393,8 @@ for (i in 1:nc) {
 close(pb)
 
 # Graph
-library(ggplot2)
-library(igraph)
-library(ggraph)
-library(visNetwork) 
-library(tidyverse)
-library(tidygraph)
-library(ggiraph)
-library(ggnewscale)
-library(grid)
-library(gridExtra)
-library(RColorBrewer)
-library(pals)
+p_load(igraph, ggraph, visNetwork, tidygraph, ggiraph, ggnewscale, grid,
+       gridExtra, RColorBrewer, pals)
 
 # AKT1/HRAS cells graph
 
@@ -504,12 +479,11 @@ graph.RFP.plt <- ggraph(graph.RFP,
                                           # scale_fill_manual(values = g.palette.Sync, name = "Synchronous")+
                                           # scale_shape_manual(values = g.shapes.Sync, name = "Synchronous")+
                                           # geom_node_label(aes(label = posXY$Cell), repel = TRUE)+
-                                          
                                           theme_graph(background = "white",
                                                       plot_margin = margin(5, 5, 5, 5))+
                                           theme(legend.position = "right",
                                                 legend.margin	= margin(1,1,1,1),
-                                                legend.key.size = unit(0.5, 'cm'), #change legend key size
+                                                legend.key.size = unit(0.5, 'cm') #change legend key size
                                                 # legend.key.height = unit(1, 'pt'), #change legend key height
                                                 # legend.key.width = unit(1, 'pt'), #change legend key width
                                                 # legend.title = element_text(size=5), #change legend title font size
