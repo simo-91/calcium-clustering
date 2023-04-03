@@ -2,9 +2,8 @@
 ```{r libraries, include=FALSE}
 # Libraries ---------------------------------------------------------------
 library(pacman)
-p_load(utils, dplyr, tidyverse, ggplot2, plotly, tidyr, reshape2, factoextra,
-       ggdendro, grid, RcppCNPy, cowplot, ggpubr, mmand, rstudioapi, reticulate)
-
+p_load(utils, dplyr, tidyverse, ggplot2, plotly, tidyr, reshape2, factoextra, ggdendro,
+       grid, RcppCNPy, cowplot, ggpubr, mmand, rstudioapi, reticulate)
 ```
 
 ```{r echo=FALSE, setup, include=FALSE}
@@ -49,7 +48,6 @@ positivesPLUSone <- positives+1 ##this is needed because suite2p starts counting
 # load suite2p numpy arrays outputs
 spks <- as.data.frame(np$load("spks.npy", allow_pickle = TRUE)) #deconvolved peaks
 spks[is.na(spks)] <- 0 #NAs replaced with 0
-
 #need to clean it from first 0 and select best window
 spks <- spks[,50:ncol(spks)]
 
@@ -391,12 +389,15 @@ for (i in 1:nc) {
   }
 }
 close(pb)
+```
 
-# Graph USE ggraph version 2.0.6 (https://cran.r-project.org/src/contrib/Archive/ggraph/ggraph_2.0.6.tar.gz)
-p_load(igraph, ggraph, visNetwork, tidygraph, ggiraph, ggnewscale, grid,
-       gridExtra, RColorBrewer, pals) 
-
+```{r graphs}
 # AKT1/HRAS cells graph
+# Graph
+p_load("ggplot2", "igraph", "ggraph", "visNetwork", "tidyverse", "tidygraph",
+          "ggiraph", "ggnewscale", "grid", "gridExtra", "RColorBrewer", "pals")
+
+
 
 graph.RFP <- graph.adjacency(as.matrix(cmat.RFPt), mode = "undirected", weighted = TRUE, diag = FALSE) # using thresholded values
 
@@ -435,7 +436,7 @@ communities.guide <- guide_legend(title = element_text("Communities"),
                                   keywidth = 0.1)
 
 graph.RFP.plt <- ggraph(graph.RFP, 
-                                          layout = as.matrix(posXY.RFP)[, c("X", "Y")])+
+                                          layout = as.matrix(posXY.RFP)[, c("X", "Y")]) +
                                           geom_edge_link(aes(colour = weight, alpha = weight))+
                                           scale_edge_alpha_continuous(range = c(0.1, 1), guide = "none")+
                                           scale_edge_color_viridis(name = "F. Corr",
@@ -444,7 +445,8 @@ graph.RFP.plt <- ggraph(graph.RFP,
                                                                    end = 1,
                                                                    discrete = FALSE,
                                                                    option = "inferno",
-                                                                   direction = 1
+                                                                   direction = 1,
+                                                                   guide = guide_colourbar(available_aes = "edge_colour")
                                           )+
                                           # Calcium levels and degrees
                                           geom_node_point(aes(fill = ordered(cluster_leading_eigen(graph.RFP)$membership),
@@ -479,11 +481,12 @@ graph.RFP.plt <- ggraph(graph.RFP,
                                           # scale_fill_manual(values = g.palette.Sync, name = "Synchronous")+
                                           # scale_shape_manual(values = g.shapes.Sync, name = "Synchronous")+
                                           # geom_node_label(aes(label = posXY$Cell), repel = TRUE)+
+                                          
                                           theme_graph(background = "white",
                                                       plot_margin = margin(5, 5, 5, 5))+
                                           theme(legend.position = "right",
                                                 legend.margin	= margin(1,1,1,1),
-                                                legend.key.size = unit(0.5, 'cm') #change legend key size
+                                                legend.key.size = unit(0.5, 'cm'), #change legend key size
                                                 # legend.key.height = unit(1, 'pt'), #change legend key height
                                                 # legend.key.width = unit(1, 'pt'), #change legend key width
                                                 # legend.title = element_text(size=5), #change legend title font size
@@ -595,7 +598,8 @@ graph.plt <- ggraph(graph,
                                                                    end = 1,
                                                                    discrete = FALSE,
                                                                    option = "inferno",
-                                                                   direction = 1
+                                                                   direction = 1,
+                                                                   guide = guide_colourbar(available_aes = "edge_colour")
                                           )+
                                           # Calcium levels and degrees
                                           geom_node_point(aes(fill = ordered(leading.eigenvector.community(graph, options = list(maxiter = 1000000))$membership),
@@ -645,7 +649,7 @@ graph.plt <- ggraph(graph,
                                           ggtitle("ID0133")+
                                           scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
 
-# Save graphgraph.btw.plt
+# Save graph
 ggsave(plot = graph.plt, file = "~/calcium-clustering/plots/ID0133.graph.png", 
        device = "png",  bg = "white",
        width = 20, height = 15, units = "cm", dpi = 320,
@@ -662,7 +666,8 @@ graph.btw.plt <- ggraph(graph,
                                                                    end = 1,
                                                                    discrete = FALSE,
                                                                    option = "inferno",
-                                                                   direction = 1
+                                                                   direction = 1,
+                                                                   guide = guide_colourbar(available_aes = "edge_colour")
                                           )+
                                           # Calcium levels and degrees
                                           geom_node_point(aes(fill = as.factor(posXY$redcell),
