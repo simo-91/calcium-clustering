@@ -11,13 +11,12 @@ freq <- seq(0, nyquist, length.out=nrow(psd)) # calculate frequency range
 psd.melt <- as.data.frame(psd)
 psd.melt$frequency <- freq
 psd.melt <- melt(psd.melt, id.vars = "frequency", variable.name = "cell", value.name = "PSD")
+
+ID0149.psd.mean <- summarise(psd.melt, ID0149.mean = mean(PSD), .by = "frequency")
 ```
 
-ID0147.psd.mean <- summarise(psd.melt, ID0147.mean = mean(PSD), .by = "frequency")
-
-
 # Plot
-ggplot(ID0147.psd.mean, aes(x = frequency, y = `ID0147.mean`))+
+ggplot(ID0149.psd.mean, aes(x = frequency, y = `ID0149.mean`))+
   geom_line()
 
 
@@ -35,5 +34,9 @@ freq <- seq(0, nyquist, length.out=nrow(psd.RFP)) # calculate frequency range
 psd.RFP.melt <- as.data.frame(psd.RFP)
 psd.RFP.melt$frequency <- freq
 psd.RFP.melt <- melt(psd.RFP.melt, id.vars = "frequency", variable.name = "cell", value.name = "PSD")
+
+ID0149.psd.RFP.mean <- summarise(psd.RFP.melt, ID0149.RFP.mean = mean(PSD), .by = "frequency")
 ```
+
+
 
