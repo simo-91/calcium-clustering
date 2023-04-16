@@ -5,3 +5,4 @@ for (i in 1:(ncol(spks)/2)) {
 }
 
 rownames(regr_spks) <- rownames(spks)
+spks <- regr_spks
