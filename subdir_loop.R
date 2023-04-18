@@ -57,8 +57,8 @@ for (subdir in subdirs_stat) {
   spks <- spks[positivesPLUSone,]  #select only positives (real cells)
   rownames(spks) <- positives #fix rownames with actual cells numbers
   spks[is.na(spks)] <- 0 #NAs replaced with 0
-  saveRDS(spks, file = paste0(id_str, "_spks.rds"))
-  write.csv(spks, file = paste0(id_str, "_spks.csv"))
+  saveRDS(spks, file = paste0("~/calcium-clustering/data/", id_str, "_spks.rds"))
+  write.csv(spks, file = paste0("~/calcium-clustering/data/", id_str, "_spks.csv"))
   
   ## Cutoff function <- anything below 2*(row sd/cell) is 0, anytlong above is 1
   cutoff <- function(x) {
@@ -69,16 +69,16 @@ for (subdir in subdirs_stat) {
   }
   
   spksthresholded <- t(apply(spks, 1, cutoff))
-  saveRDS(spksthresholded, file = paste0(id_str, "_spksthresholded.rds"))
-  write.csv(spksthresholded, file = paste0(id_str, "_spksthresholded.csv"))
+  saveRDS(spksthresholded, file = paste0("~/calcium-clustering/data/", id_str, "_spksthresholded.rds"))
+  write.csv(spksthresholded, file = paste0("~/calcium-clustering/data/", id_str, "_spksthresholded.csv"))
   
   ## Calculating percentage of active cells over time -------------------------
   spksSUM <- colSums(spksthresholded)
   spksSUM <- as.data.frame(spksSUM)
   spksSUM$Time <- 0:(nrow(spksSUM)-1)
   spksSUM$Perc <- spksSUM$spksSUM/nrow(spksthresholded)*100
-  saveRDS(spksSUM, file = paste0(id_str, "_percentage_of_coactive_cells.rds"))
-  write.csv(spksSUM, file = paste0(id_str, "_percentage_of_coactive_cells.csv"))
+  saveRDS(spksSUM, file = paste0("~/calcium-clustering/data/", id_str, "_percentage_of_coactive_cells.rds"))
+  write.csv(spksSUM, file = paste0("~/calcium-clustering/data/", id_str, "_percentage_of_coactive_cells.csv"))
   spksSUM.plt <- ggplot(spksSUM, aes(Time, Perc))+
     geom_line()+ 
     theme_pubr()
@@ -88,8 +88,8 @@ for (subdir in subdirs_stat) {
   posXY$frequency <- rowSums(spksthresholded)/60 #events per minute
   frequency <- mean(rowSums(spksthresholded)/60)
   
-  saveRDS(frequency, file = paste0(id_str, "_mean_frequency.rds"))
-  write.csv(frequency, file = paste0(id_str, "_mean_frequency.csv"))
+  saveRDS(frequency, file = paste0("~/calcium-clustering/data/", id_str, "_mean_frequency.rds"))
+  write.csv(frequency, file = paste0("~/calcium-clustering/data/", id_str, "_mean_frequency.csv"))
   ### Compare number of events/min across samples?
   
   ## Plot total calcium activity/time --------------------------------------
@@ -97,8 +97,8 @@ for (subdir in subdirs_stat) {
   spksSUM2 <- as.data.frame(spksSUM2)
   spksSUM2$Time <- 0:(nrow(spksSUM2)-1)
   spksSUM2$Mean <- spksSUM2$spksSUM2/nrow(spksSUM2)
-  saveRDS(spksSUM2, file = paste0(id_str, "_total_activity.rds"))
-  write.csv(spksSUM2, file = paste0(id_str, "_total_activity.csv"))
+  saveRDS(spksSUM2, file = paste0("~/calcium-clustering/data/", id_str, "_total_activity.rds"))
+  write.csv(spksSUM2, file = paste0("~/calcium-clustering/data/", id_str, "_total_activity.csv"))
   spksSUM2.plt <- ggplot(spksSUM2, aes(Time, Mean))+
     geom_line()+ 
     theme_pubr()+
@@ -106,7 +106,7 @@ for (subdir in subdirs_stat) {
     ylab("Ca2+")+
     ylim(0, NA)
   spksSUM2.ylim <- layer_scales(spksSUM2.plt)$y$get_limits()
-  ggsave(plot = spksSUM2.plt, file = paste0(id_str, "_total_activity.png"), 
+  ggsave(plot = spksSUM2.plt, file = paste0("~/calcium-clustering/plots/", id_str, "_total_activity.png"), 
          device = "png",  bg = "white",
          width = 20, height = 15, units = "cm", dpi = 320,
          scale = 2)
@@ -172,12 +172,12 @@ for (subdir in subdirs_stat) {
   grid <- plot_grid(plots[[1]], spksSUM.plt, ncol = 1, rel_heights = c(4.5,1))
   
   ## Save data
-  ggsave(plot = grid, file = paste0(id_str, "_grid-allcells.png"), 
+  ggsave(plot = grid, file = paste0("~/calcium-clustering/plots/", id_str, "_grid-allcells.png"), 
          device = "png",  bg = "white",
          width = 20, height = 15, units = "cm", dpi = 320,
          scale = 2)
-  saveRDS(posXY, file = paste0(id_str, "_posXY.rds"))
-  write.csv(posXY, file = paste0(id_str, "_posXY.csv"))
+  saveRDS(posXY, file = paste0("~/calcium-clustering/data/", id_str, "_posXY.rds"))
+  write.csv(posXY, file = paste0("~/calcium-clustering/data/", id_str, "_posXY.csv"))
   
   # RFP redcells only ------------------------------------------------
   # Calculating percentage of active RFP cells over time (using deconvolved peaks)--------------------
@@ -194,20 +194,20 @@ for (subdir in subdirs_stat) {
   posXY.RFP$frequency <- rowSums(RFPt)/60 #events per minute
   frequency.RFP <- mean(rowSums(RFPt)/60)
   
-  saveRDS(posXY.RFP, file = paste0(id_str, "_dataposXY.RFP.rds"))
-  write.csv(posXY.RFP, file = paste0(id_str, "_dataposXY.RFP.csv"))
+  saveRDS(posXY.RFP, file = paste0("~/calcium-clustering/data/", id_str, "_dataposXY.RFP.rds"))
+  write.csv(posXY.RFP, file = paste0("~/calcium-clustering/data/", id_str, "_dataposXY.RFP.csv"))
   
   ##ggplot to show percentage of coactive RPF+ cells over time
   RFPsum <- as.data.frame(colSums(RFPt))
   RFPsum$Time <- 0:(nrow(RFPsum)-1)
   RFPsum$Perc <- RFPsum$`colSums(RFPt)`/nrow(RFPt)*100
-  saveRDS(RFPsum, file = paste0(id_str, "_percentage_of_coactive_cells-RFP.rds"))
-  write.csv(RFPsum, file = paste0(id_str, "_percentage_of_coactive_cells-RFP.csv"))
+  saveRDS(RFPsum, file = paste0("~/calcium-clustering/data/", id_str, "_percentage_of_coactive_cells-RFP.rds"))
+  write.csv(RFPsum, file = paste0("~/calcium-clustering/data/", id_str, "_percentage_of_coactive_cells-RFP.csv"))
   
   RFPsum.plt <- ggplot(RFPsum, aes(Time, Perc))+
     geom_line()+
     theme_pubr()
-  ggsave(plot = RFPsum.plt, file = paste0(id_str, "_percentage_of_coactive_cells-RFP.png"), 
+  ggsave(plot = RFPsum.plt, file = paste0("~/calcium-clustering/data/", id_str, "_percentage_of_coactive_cells-RFP.png"), 
          device = "png",  bg = "white",
          width = 20, height = 15, units = "cm", dpi = 320,
          scale = 2)
@@ -216,8 +216,8 @@ for (subdir in subdirs_stat) {
   RFP <- subset(spks, rownames(spks) %in% RFPcells) #select only RFP cells
   RFPsum2 <- as.data.frame(colSums(RFP)/nrow(RFP)) #normalized by number of RFP cells
   RFPsum2$Time <- 0:(nrow(RFPsum2)-1)
-  saveRDS(RFPsum2, file = paste0(id_str, "_total_activity_RFP.rds"))
-  write.csv(RFPsum2, file = paste0(id_str, "_total_activity_RFPsum2.csv"))
+  saveRDS(RFPsum2, file = paste0("~/calcium-clustering/data/", id_str, "_total_activity_RFP.rds"))
+  write.csv(RFPsum2, file = paste0("~/calcium-clustering/data/", id_str, "_total_activity_RFPsum2.csv"))
   
   RFPsum2.plt <- ggplot(RFPsum2, aes(Time, `colSums(RFP)/nrow(RFP)`))+
     geom_line()+
@@ -226,7 +226,7 @@ for (subdir in subdirs_stat) {
     ylab("Deconvolved activity")+
     ylim(0, NA)
   RFPsum2.plt.ylim <- layer_scales(RFPsum2.plt)$y$get_limits()
-  ggsave(plot = RFPsum2.plt, file = paste0(id_str, "_percentage_of_coactive_cells-RFP.png"), 
+  ggsave(plot = RFPsum2.plt, file = paste0("~/calcium-clustering/plots/", id_str, "_percentage_of_coactive_cells-RFP.png"), 
          device = "png",  bg = "white",
          width = 20, height = 15, units = "cm", dpi = 320,
          scale = 2)
@@ -278,7 +278,7 @@ for (subdir in subdirs_stat) {
   ## GRID raster/sums
   plots <- align_plots(RFP.raster, RFPsum.plt, align = 'v', axis = 'l')
   RFP.grid <- plot_grid(plots[[1]], RFPsum.plt, ncol = 1, rel_heights = c(3.5,1))
-  ggsave(plot = RFP.grid, file = paste0(id_str, "_grid-allcells.png"), 
+  ggsave(plot = RFP.grid, file = paste0("~/calcium-clustering/plots/", id_str, "_grid-allcells.png"), 
          device = "png",  bg = "white",
          width = 20, height = 15, units = "cm", dpi = 320,
          scale = 2)
@@ -331,7 +331,7 @@ for (subdir in subdirs_stat) {
   ## GRID raster/sums
   plots <- align_plots(RFPt.raster, RFPsum.plt, align = 'v', axis = 'l')
   RFPt.grid <- plot_grid(plots[[1]], RFPsum.plt, ncol = 1, rel_heights = c(3.5,1))
-  ggsave(plot = RFPt.grid, file = paste0(id_str, "_binarized_grid-allcells.png"), 
+  ggsave(plot = RFPt.grid, file = paste0("~/calcium-clustering/plots/", id_str, "_binarized_grid-allcells.png"), 
          device = "png",  bg = "white",
          width = 20, height = 15, units = "cm", dpi = 320,
          scale = 2)
@@ -538,7 +538,7 @@ for (subdir in subdirs_stat) {
                            layout_matrix = lay)
   
   #Save whole graph + raster + activity plot + coactive cells/time
-  ggsave(plot = arranged, file = paste0(id_str, "_whole.RFP.png"), 
+  ggsave(plot = arranged, file = paste0("~/calcium-clustering/plots/", id_str, "_whole.RFP.png"), 
          device = "png",  bg = "white",
          width = 20, height = 15, units = "cm", dpi = 320,
          scale = 2)
@@ -557,8 +557,6 @@ for (subdir in subdirs_stat) {
   # greedy method (hierarchical, fast method)
   graph.clusters = leading.eigenvector.community(graph, options = list(maxiter = 1000000))
   posXY$Community <- graph.clusters$membership
-  
-  
   
   # Clustering coefficient RFP
   clustcoeff <- transitivity(graph)
@@ -647,7 +645,7 @@ for (subdir in subdirs_stat) {
     scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
   
   # Save graph
-  ggsave(plot = graph.plt, file = paste0(id_str, "_graph.png"), 
+  ggsave(plot = graph.plt, file = paste0("~/calcium-clustering/plots/", id_str, "_graph.png"), 
          device = "png",  bg = "white",
          width = 20, height = 15, units = "cm", dpi = 320,
          scale = 2)
@@ -695,7 +693,7 @@ for (subdir in subdirs_stat) {
     scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
   
   # Save graph
-  ggsave(plot = graph.btw.plt, file = paste0(id_str, "_graph.btw.plt.png"), 
+  ggsave(plot = graph.btw.plt, file = paste0("~/calcium-clustering/plots/", id_str, "_graph.btw.plt.png"), 
          device = "png",  bg = "white",
          width = 20, height = 15, units = "cm", dpi = 320,
          scale = 2)
