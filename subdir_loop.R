@@ -1,4 +1,7 @@
-library(tcltk)
+library(pacman)
+p_load(utils, dplyr, tidyverse, ggplot2, plotly, tidyr, reshape2, factoextra, ggdendro,
+       grid, RcppCNPy, cowplot, ggpubr, mmand, rstudioapi, reticulate, tcltk, ggfortify,
+       ggpubr, factoextra, parallel)
 
 # Function to choose a directory with platform-independent GUI
 choose_directory = function(caption = 'Select data directory') {
@@ -15,7 +18,10 @@ main.dir <- choose_directory()
 subdirs <- list.files(path = main.dir, recursive = TRUE, full.names = TRUE, include.dirs = TRUE)
 subdirs_stat <- subdirs[grep("stat.npy", subdirs)]
 
-id_num <- 1000 #starting ID number
+id_num <- 0031 #starting ID number
+
+pb_general <- txtProgressBar(min = 0, max = length(subdirs_stat), style = 3)
+
 for (subdir in subdirs_stat) {
   id_num <- id_num + 1
   id_str <- sprintf("ID%04d", id_num)
@@ -338,6 +344,8 @@ for (subdir in subdirs_stat) {
   
   # Graph analysis -------------------------------------------------------
   ## Using thresholded values
+  # Create empty matrix that will host corr coefficents. 
+  T.allcellst <- t(spksthresholded)
   ## Function to find max CCF between a and b in ±1 lag range
   max_CCF<- function(a,b)
   {
@@ -734,4 +742,7 @@ for (subdir in subdirs_stat) {
   psd.RFP.mean <- summarise(psd.RFP.melt, "PSD mean" = mean(PSD), .by = "frequency")
   assign(paste0(id_str, ".psd.RFP.mean"), psd.RFP.mean)
   
+  
+  setTxtProgressBar(pb_general, subdir)
 }
+close(pb_general)
