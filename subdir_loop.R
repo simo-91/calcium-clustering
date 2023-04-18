@@ -701,4 +701,39 @@ for (subdir in subdirs_stat) {
          scale = 2)
   
   
+  # PSD analysis -----------------------------------------------------
+  fft <- apply(spks, 1, fft)
+  
+  # Calculate power spectrum for each time series
+  psd <- abs(fft)^2/ncol(spks) # normalized by length of acquisition
+  fs = 0.5 #sampling freq in Hertz; we take a sample every two seconds (1 sample/2 seconds = 0.5)
+  nyquist <- fs/2
+  
+  psd <- round(psd, digits = 1)
+  freq <- seq(0, nyquist, length.out=nrow(psd)) # calculate frequency range
+  psd.melt <- as.data.frame(psd)
+  psd.melt$frequency <- freq
+  psd.melt <- melt(psd.melt, id.vars = "frequency", variable.name = "cell", value.name = "PSD")
+  
+  psd_mean_colname <- paste0(id_str, " PSD mean")
+  psd.mean <- summarise(psd.melt, "PSD mean" = mean(PSD), .by = "frequency")
+  assign(paste0(id_str, ".psd.mean"), psd.mean)
+  
+  # RFP only
+  fft.RFP <- apply(RFP, 1, fft)
+  
+  # Calculate power spectrum for each time series
+  psd.RFP <- abs(fft.RFP)^2/ncol(RFP) # normalized by length of acquisition
+  fs = 0.5 #sampling freq in Hertz; we take a sample every two seconds (1 sample/2 seconds = 0.5)
+  nyquist <- fs/2
+  
+  psd.RFP <- round(psd.RFP, digits = 1)
+  freq <- seq(0, nyquist, length.out=nrow(psd.RFP)) # calculate frequency range
+  psd.RFP.melt <- as.data.frame(psd.RFP)
+  psd.RFP.melt$frequency <- freq
+  psd.RFP.melt <- melt(psd.RFP.melt, id.vars = "frequency", variable.name = "cell", value.name = "PSD")
+  
+  psd.RFP.mean <- summarise(psd.RFP.melt, "PSD mean" = mean(PSD), .by = "frequency")
+  assign(paste0(id_str, ".psd.RFP.mean"), psd.RFP.mean)
+  
 }
