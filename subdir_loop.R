@@ -18,7 +18,7 @@ main.dir <- choose_directory()
 subdirs <- list.files(path = main.dir, recursive = TRUE, full.names = TRUE, include.dirs = TRUE)
 subdirs_stat <- subdirs[grep("stat.npy", subdirs)]
 
-id_num <- 0031 #starting ID number
+id_num <- 0039 #starting ID number
 
 pb_general <- txtProgressBar(min = 0, max = length(subdirs_stat), style = 3)
 
@@ -229,10 +229,10 @@ for (subdir in subdirs_stat) {
     geom_line()+
     theme_pubr()+
     geom_smooth()+
-    ylab("Deconvolved activity")+
+    ylab("Ca2+")+
     ylim(0, NA)
   RFPsum2.plt.ylim <- layer_scales(RFPsum2.plt)$y$get_limits()
-  ggsave(plot = RFPsum2.plt, file = paste0("~/calcium-clustering/plots/", id_str, "_percentage_of_coactive_cells-RFP.png"), 
+  ggsave(plot = RFPsum2.plt, file = paste0("~/calcium-clustering/plots/", id_str, "_total_activity-RFP.png"), 
          device = "png",  bg = "white",
          width = 20, height = 15, units = "cm", dpi = 320,
          scale = 2)
@@ -284,7 +284,7 @@ for (subdir in subdirs_stat) {
   ## GRID raster/sums
   plots <- align_plots(RFP.raster, RFPsum.plt, align = 'v', axis = 'l')
   RFP.grid <- plot_grid(plots[[1]], RFPsum.plt, ncol = 1, rel_heights = c(3.5,1))
-  ggsave(plot = RFP.grid, file = paste0("~/calcium-clustering/plots/", id_str, "_grid-allcells.png"), 
+  ggsave(plot = RFP.grid, file = paste0("~/calcium-clustering/plots/", id_str, "_grid-RFP.png"), 
          device = "png",  bg = "white",
          width = 20, height = 15, units = "cm", dpi = 320,
          scale = 2)
@@ -337,7 +337,7 @@ for (subdir in subdirs_stat) {
   ## GRID raster/sums
   plots <- align_plots(RFPt.raster, RFPsum.plt, align = 'v', axis = 'l')
   RFPt.grid <- plot_grid(plots[[1]], RFPsum.plt, ncol = 1, rel_heights = c(3.5,1))
-  ggsave(plot = RFPt.grid, file = paste0("~/calcium-clustering/plots/", id_str, "_binarized_grid-allcells.png"), 
+  ggsave(plot = RFPt.grid, file = paste0("~/calcium-clustering/plots/", id_str, "_binarized_grid-RFP.png"), 
          device = "png",  bg = "white",
          width = 20, height = 15, units = "cm", dpi = 320,
          scale = 2)
@@ -392,7 +392,7 @@ for (subdir in subdirs_stat) {
   close(pb)
   
   
-  ## RFP-redcells only
+  ## RFP-redcells only --------------------
   T.RFPt <- t(RFPt)
   nc <- nrow(RFPt)
   cmat.RFPt <- matrix(NA,nc,nc)
@@ -551,7 +551,7 @@ for (subdir in subdirs_stat) {
          width = 20, height = 15, units = "cm", dpi = 320,
          scale = 2)
   
-  # General graph
+  # General graph ----------------------------
   graph <- graph.adjacency(as.matrix(cmat.allcellst), mode = "undirected", weighted = TRUE, diag = FALSE) # using thresholded values
   
   # Threshold correlation degree. An interval is chosen because the Pearson correlation coeff goes -1 to 1, BUT -1 means anti-correlation.. so one neuron is active when the other isn't)
@@ -702,6 +702,35 @@ for (subdir in subdirs_stat) {
   
   # Save graph
   ggsave(plot = graph.btw.plt, file = paste0("~/calcium-clustering/plots/", id_str, "_graph.btw.plt.png"), 
+         device = "png",  bg = "white",
+         width = 20, height = 15, units = "cm", dpi = 320,
+         scale = 2)
+  
+  
+  ## Histogram count of degrees
+  posXY$Degree <- degree(graph)
+  max.y.degree <- length(nrow(spks))
+  
+  degree.hist <- gghistogram(posXY, x = "Degree", y = "..count..",
+                                 binwidth = 1)
+  ## Mean degree
+  degree.mean <- mean(degree(graph))
+  assign(paste0(id_str, ".degree.mean"), degree.mean)
+  
+  # Viz
+  gs = c(graph.plt, degree.hist,
+         grid, spksSUM2.plt)
+  
+  lay <- rbind(c(1,1,3,3),
+               c(1,1,3,3),
+               c(2,5,4,4))
+  
+  arranged <- grid.arrange(graph.plt, degree.hist,
+                           grid, spksSUM2.plt, scree,
+                           layout_matrix = lay)
+  
+  #Save whole graph + raster + activity plot + coactive cells/time
+  ggsave(plot = arranged, file = paste0("~/calcium-clustering/plots/", id_str, "_whole.png"), 
          device = "png",  bg = "white",
          width = 20, height = 15, units = "cm", dpi = 320,
          scale = 2)
