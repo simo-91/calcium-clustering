@@ -18,7 +18,7 @@ main.dir <- choose_directory()
 subdirs <- list.files(path = main.dir, recursive = TRUE, full.names = TRUE, include.dirs = TRUE)
 subdirs_stat <- subdirs[grep("stat.npy", subdirs)]
 
-id_num <- 0039 #starting ID number
+id_num <- 0093 #starting ID number
 
 for (subdir in subdirs_stat) {
   id_num <- id_num + 1
@@ -46,14 +46,14 @@ for (subdir in subdirs_stat) {
   positives <- posXY$Cell
   positivesPLUSone <- positives+1
   
-  ## Regression from 1sec/vol to 2sec/vol time resolution
+  ## Regression from 1sec/vol to 2sec/vol time resolution -----
   regr_spks <- matrix(0, nrow = nrow(spks), ncol = ncol(spks)/2)
   for (i in 1:(ncol(spks)/2)) {
     regr_spks[, i] <- rowMeans(spks[, (2*i - 1):(2*i)])
   }
   rownames(regr_spks) <- rownames(spks)
   spks <- regr_spks
-  # 
+  # -----
   
   spks[is.na(spks)] <- 0
   spks <- spks[,50:ncol(spks)] #need to clean it from first 0 and select best window
@@ -118,7 +118,8 @@ for (subdir in subdirs_stat) {
   
   ## Average activity PER CELL (deconvolved peaks) ---------------------------
   posXY$Mean <- rowMeans(spks)
-  
+  mean_Ca <- rowMeans(spks)
+  assign(paste0(id_str, "_mean_Ca"), mean_Ca)
   
   
   ## Raster+dendro all cells/time ggplot ------------------------------------------
@@ -172,7 +173,7 @@ for (subdir in subdirs_stat) {
           axis.text.y = element_blank(),
           axis.text.x = element_blank(),
           plot.title = element_text(colour = "red", hjust = .5))+
-  ggtitle(paste0(id_str, " hclust"), subtitle = sprintf("Mean frequency is: %s events/min", round(frequency, digits = 3)))
+  ggtitle(paste0(id_str, " hclust", subdir), subtitle = sprintf("Mean frequency is: %s events/min", round(frequency, digits = 3)))
   
   ## GRID raster/sums
   plots <- align_plots(raster.hc, spksSUM.plt, align = 'v', axis = 'l')
@@ -280,7 +281,7 @@ for (subdir in subdirs_stat) {
           # axis.ticks.y = element_blank(),
           # axis.text.y = element_text(face=posXY.RFP$Cell[which(posXY.RFP$Member=="TRUE"),], "bold"),
           plot.title = element_text(colour = "red", hjust = .5))+
-    ggtitle(paste0(id_str, " hclust RFP+"), subtitle = sprintf("Mean frequency is: %s events/min", round(frequency.RFP, digits = 3)))
+    ggtitle(paste0(id_str, " hclust RFP+", subdir), subtitle = sprintf("Mean frequency is: %s events/min", round(frequency.RFP, digits = 3)))
   
   ## GRID raster/sums
   plots <- align_plots(RFP.raster, RFPsum.plt, align = 'v', axis = 'l')
@@ -506,7 +507,7 @@ for (subdir in subdirs_stat) {
           # legend.text = element_text(size=4),
           # legend.text.align = 0
     )+
-    ggtitle(paste0(id_str, " RFP+"))+
+    ggtitle(paste0(id_str, " RFP+", subdir))+
     scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
   
   ## Histogram count of degrees
@@ -650,7 +651,7 @@ for (subdir in subdirs_stat) {
           # legend.text = element_text(size=4),
           # legend.text.align = 0
     )+
-    ggtitle(paste0(id_str))+
+    ggtitle(paste0(id_str, "-", subdir))+
     scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
   
   # Save graph
@@ -698,7 +699,7 @@ for (subdir in subdirs_stat) {
           # legend.text = element_text(size=4),
           # legend.text.align = 0
     )+
-    ggtitle(paste0(id_str, " RFP+ highlighted"))+
+    ggtitle(paste0(id_str, " RFP+ highlighted", subdir))+
     scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
   
   # Save graph
