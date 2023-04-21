@@ -20,8 +20,6 @@ subdirs_stat <- subdirs[grep("stat.npy", subdirs)]
 
 id_num <- 0039 #starting ID number
 
-pb_general <- txtProgressBar(min = 0, max = length(subdirs_stat), style = 3)
-
 for (subdir in subdirs_stat) {
   id_num <- id_num + 1
   id_str <- sprintf("ID%04d", id_num)
@@ -93,9 +91,10 @@ for (subdir in subdirs_stat) {
   ## Frequency -cell thresholded events divided by 60 sec -----
   posXY$frequency <- rowSums(spksthresholded)/60 #events per minute
   frequency <- mean(rowSums(spksthresholded)/60)
-  
   saveRDS(frequency, file = paste0("~/calcium-clustering/data/", id_str, "_mean_frequency.rds"))
   write.csv(frequency, file = paste0("~/calcium-clustering/data/", id_str, "_mean_frequency.csv"))
+  
+  assign(paste0(id_str, "_frequency"), frequency)
   ### Compare number of events/min across samples?
   
   ## Plot total calcium activity/time --------------------------------------
@@ -119,6 +118,8 @@ for (subdir in subdirs_stat) {
   
   ## Average activity PER CELL (deconvolved peaks) ---------------------------
   posXY$Mean <- rowMeans(spks)
+  
+  
   
   ## Raster+dendro all cells/time ggplot ------------------------------------------
   dfpeaks <- as.data.frame(t(spks))  # Doing this coercion will apply +1 to all cells numbers
@@ -187,7 +188,6 @@ for (subdir in subdirs_stat) {
   
   # RFP redcells only ------------------------------------------------
   # Calculating percentage of active RFP cells over time (using deconvolved peaks)--------------------
-  
   RFPt <- subset(spksthresholded, rownames(spksthresholded) %in% RFPcells) #select only RFP cells
   
   # Isolate RFP+ XY from posXY dataframe ------------------------------------
@@ -199,11 +199,12 @@ for (subdir in subdirs_stat) {
   # Frequency -cell thresholded events divided by 60 sec -----
   posXY.RFP$frequency <- rowSums(RFPt)/60 #events per minute
   frequency.RFP <- mean(rowSums(RFPt)/60)
-  
   saveRDS(posXY.RFP, file = paste0("~/calcium-clustering/data/", id_str, "_dataposXY.RFP.rds"))
   write.csv(posXY.RFP, file = paste0("~/calcium-clustering/data/", id_str, "_dataposXY.RFP.csv"))
   
-  ##ggplot to show percentage of coactive RPF+ cells over time
+  assign(paste0(id_str, "_frequency-RFP"), frequency.RFP)
+  
+  ## ggplot to show percentage of coactive RPF+ cells over time -----
   RFPsum <- as.data.frame(colSums(RFPt))
   RFPsum$Time <- 0:(nrow(RFPsum)-1)
   RFPsum$Perc <- RFPsum$`colSums(RFPt)`/nrow(RFPt)*100
@@ -518,7 +519,7 @@ for (subdir in subdirs_stat) {
   degree.mean.RFP <- mean(degree(graph.RFP))
   assign(paste0(id_str, ".degree.mean.RFP"), degree.mean.RFP)
   
-  # PCA 
+  # PCA  ----
   ## General population
   pca <- prcomp(spksthresholded, center = TRUE, scale = FALSE) # change to scale = FALSE if not normalised data
   scree <- fviz_eig(pca, ncp = 100)
@@ -533,7 +534,7 @@ for (subdir in subdirs_stat) {
   pca.RFP.eigenvalues <- get_eigenvalue(pca.RFP)
   assign(paste0(id_str, ".pca.RFP.eigenvalues"), pca.RFP.eigenvalues)
   
-  # Viz
+  # Viz ---------
   gs = c(graph.RFP.plt, degree.RFP.hist,
          RFP.grid, RFPsum2.plt)
   
