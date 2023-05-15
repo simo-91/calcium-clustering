@@ -11,6 +11,7 @@ choose_directory = function(caption = 'Select data directory') {
     tk_choose.dir(caption = caption)
   }
 }
+
 # Select the main directory containing the subdirectories
 main.dir <- choose_directory()
 
@@ -18,7 +19,9 @@ main.dir <- choose_directory()
 subdirs <- list.files(path = main.dir, recursive = TRUE, full.names = TRUE, include.dirs = TRUE)
 subdirs_stat <- subdirs[grep("stat.npy", subdirs)]
 
-id_num <- 0093 #starting ID number
+
+
+id_num <- 0115 #starting ID number
 
 for (subdir in subdirs_stat) {
   id_num <- id_num + 1
@@ -26,6 +29,7 @@ for (subdir in subdirs_stat) {
   
   ## Navigate to the subdirectory and load the necessary files
   setwd((dirname(subdir)))
+  final_subdir <- basename(dirname(dirname(dirname(dirname(subdir)))))
   np <- import("numpy")
   stat <- np$load("stat.npy", allow_pickle = TRUE)
   redcell <- np$load("redcell.npy", allow_pickle = TRUE)
@@ -46,7 +50,7 @@ for (subdir in subdirs_stat) {
   positives <- posXY$Cell
   positivesPLUSone <- positives+1
   
-  ## Regression from 1sec/vol to 2sec/vol time resolution -----
+  # Regression from 1sec/vol to 2sec/vol time resolution -----
   regr_spks <- matrix(0, nrow = nrow(spks), ncol = ncol(spks)/2)
   for (i in 1:(ncol(spks)/2)) {
     regr_spks[, i] <- rowMeans(spks[, (2*i - 1):(2*i)])
@@ -173,7 +177,7 @@ for (subdir in subdirs_stat) {
           axis.text.y = element_blank(),
           axis.text.x = element_blank(),
           plot.title = element_text(colour = "red", hjust = .5))+
-  ggtitle(paste0(id_str, " hclust", subdir), subtitle = sprintf("Mean frequency is: %s events/min", round(frequency, digits = 3)))
+  ggtitle(paste0(id_str, " hclust", final_subdir), subtitle = sprintf("Mean frequency is: %s events/min", round(frequency, digits = 3)))
   
   ## GRID raster/sums
   plots <- align_plots(raster.hc, spksSUM.plt, align = 'v', axis = 'l')
@@ -281,7 +285,7 @@ for (subdir in subdirs_stat) {
           # axis.ticks.y = element_blank(),
           # axis.text.y = element_text(face=posXY.RFP$Cell[which(posXY.RFP$Member=="TRUE"),], "bold"),
           plot.title = element_text(colour = "red", hjust = .5))+
-    ggtitle(paste0(id_str, " hclust RFP+", subdir), subtitle = sprintf("Mean frequency is: %s events/min", round(frequency.RFP, digits = 3)))
+    ggtitle(paste0(id_str, " hclust RFP+", final_subdir), subtitle = sprintf("Mean frequency is: %s events/min", round(frequency.RFP, digits = 3)))
   
   ## GRID raster/sums
   plots <- align_plots(RFP.raster, RFPsum.plt, align = 'v', axis = 'l')
@@ -507,7 +511,7 @@ for (subdir in subdirs_stat) {
           # legend.text = element_text(size=4),
           # legend.text.align = 0
     )+
-    ggtitle(paste0(id_str, " RFP+", subdir))+
+    ggtitle(paste0(id_str, " RFP+", final_subdir))+
     scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
   
   ## Histogram count of degrees
@@ -565,7 +569,7 @@ for (subdir in subdirs_stat) {
   
   ## Communities detection ---------------------------------------------------
   # greedy method (hierarchical, fast method)
-  graph.clusters = leading.eigenvector.community(graph, options = list(maxiter = 1000000))
+  graph.clusters = leading.eigenvector.community(graph, options = list(maxiter = 10000000))
   posXY$Community <- graph.clusters$membership
   
   # Clustering coefficient RFP
@@ -607,14 +611,14 @@ for (subdir in subdirs_stat) {
                              guide = guide_colourbar(available_aes = "edge_colour")
     )+
     # Calcium levels and degrees
-    geom_node_point(aes(fill = ordered(leading.eigenvector.community(graph, options = list(maxiter = 1000000))$membership),
+    geom_node_point(aes(fill = ordered(leading.eigenvector.community(graph, options = list(maxiter = 10000000))$membership),
                         size = degree(graph)),
                     shape = 21)+
     # geom_node_text(aes(label = posXY$Cell), 
     #                colour = "red",
     #                 repel = TRUE,
     #                size = 2.5)+
-    geom_node_text(aes(label = ordered(leading.eigenvector.community(graph, options = list(maxiter = 1000000))$membership)),
+    geom_node_text(aes(label = ordered(leading.eigenvector.community(graph, options = list(maxiter = 10000000))$membership)),
                    colour = "black",
                    fontface = 1,
                    size = 3)+
@@ -651,7 +655,7 @@ for (subdir in subdirs_stat) {
           # legend.text = element_text(size=4),
           # legend.text.align = 0
     )+
-    ggtitle(paste0(id_str, "-", subdir))+
+    ggtitle(paste0(id_str, "-", final_subdir))+
     scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
   
   # Save graph
@@ -699,7 +703,7 @@ for (subdir in subdirs_stat) {
           # legend.text = element_text(size=4),
           # legend.text.align = 0
     )+
-    ggtitle(paste0(id_str, " RFP+ highlighted", subdir))+
+    ggtitle(paste0(id_str, " RFP+ highlighted", final_subdir))+
     scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
   
   # Save graph
