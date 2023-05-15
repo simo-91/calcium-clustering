@@ -56,3 +56,70 @@ my_comparisons <- list( c("CTRLs_4dpf__freq", "HRASV12_4dpf__freq"),
 ggplot(frequency_df, aes(Genotype, `Events/minute`))+
   geom_boxplot(aes(colour = Genotype))+
   stat_compare_means(comparisons = my_comparisons) # Add pairwise comparisons p-value
+
+
+
+
+
+
+
+
+
+# List the variable names and their corresponding column names
+variable_names <- c(
+  CTRLs_4dpf__freq = "CTRLs_4dpf",
+  CTRL_4dpf.RFP__freq = "CTRL_4dpf_RFP",
+  CTRL_5dpf__freq = "CTRL_5dpf",
+  CTRL_5dpf.RFP__freq = "CTRL_5dpf_RFP",
+  HRASV12_4dpf__freq = "HRASV12_4dpf",
+  HRASV12_4dpf.RFP__freq = "HRASV12_4dpf_RFP",
+  HRASV12_5dpf__freq = "HRASV12_5dpf",
+  HRASV12_5dpf.RFP__freq = "HRASV12_5dpf_RFP",
+  AKT1_4dpf__freq = "AKT1_4dpf",
+  AKT1_4dpf.RFP__freq = "AKT1_4dpf_RFP",
+  AKT1_5dpf__freq = "AKT1_5dpf",
+  AKT1_5dpf.RFP__freq = "AKT1_5dpf_RFP"
+)
+
+# Determine the maximum length among the vectors
+max_length <- max(lengths(list(CTRLs_4dpf__freq, CTRL_4dpf.RFP__freq, CTRL_5dpf__freq, CTRL_5dpf.RFP__freq,
+                               HRASV12_4dpf__freq, HRASV12_4dpf.RFP__freq, HRASV12_5dpf__freq, HRASV12_5dpf.RFP__freq,
+                               AKT1_4dpf__freq, AKT1_4dpf.RFP__freq, AKT1_5dpf__freq, AKT1_5dpf.RFP__freq)))
+
+# Create a data frame with NA values
+frequency_df <- data.frame(matrix(NA, nrow = max_length, ncol = length(variable_names)))
+colnames(frequency_df) <- names(variable_names)
+
+# Assign vectors to the data frame columns
+for (variable in names(variable_names)) {
+  variable_vector <- eval(parse(text = variable))
+  frequency_df[1:length(variable_vector), variable] <- variable_vector
+}
+
+
+
+
+frequency_df <- melt(frequency_df, variable.name = "Genotype", value.name = "events/min")
+
+
+
+
+# Perform pairwise comparisons with Games-Howell test
+pairwise_results <- pairwise.welch.test(frequency_df$`events/min`, frequency_df$Genotype, p.adjust.method = "holm")
+
+# Create boxplot with significance comparisons
+p <- ggplot(frequency_df, aes(x = variable, y = `events/min`)) +
+  geom_boxplot() +
+  labs(x = "Group", y = "Frequency") +
+  theme_minimal()
+
+# Extract significant comparisons
+significant_comparisons <- pairwise_results$p.`events/min` < 0.05
+significant_indices <- which(significant_comparisons, arr.ind = TRUE)
+
+# Add significance comparisons to the plot
+p <- p + geom_text(aes(x = significant_indices[, 1], y = max(frequency_df$`events/min`), label = "*"), size = 6)
+
+# Display the plot
+print(p)
+
