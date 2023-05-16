@@ -150,7 +150,6 @@ frequency_df$Condition <- factor(frequency_df$Condition, levels = c("CTRLs_4dpf"
                                                                     "AKT1_4dpf", "AKT1_4dpf.RFP", "AKT1_5dpf", "AKT1_5dpf.RFP"))
 frequency_df$Genotype <- factor(frequency_df$Genotype, levels = c("CTRL", "HRASV12", "AKT1"))
 frequency_df$Age <- factor(frequency_df$Age, levels = c("4dpf", "5dpf"))
-RFP_colors <- c("RFP" = "red", "total" = "blue")
 
 
 
@@ -165,11 +164,16 @@ ggplot(frequency_df, aes(x = Condition, y = `events/min`, fill = Genotype, shape
   geom_boxplot_pattern(aes(pattern = RFP),
                        pattern_colour = "red",
                        pattern_density = 0.05,
-                       pattern_spacing = 0.01) +
-  scale_pattern_manual(values = c(total='none', RFP = "stripe")) +
-  geom_point(aes(shape = Genotype))+
+                       pattern_spacing = 0.025) +
+  scale_pattern_manual(values = c(total='none', 
+                                  RFP = "stripe"),
+                       guide = guide_legend(title = element_blank())) +
+  # geom_point(aes(shape = Genotype))+
   labs(x = "Genotype", y = "events/min") +
   scale_shape_manual(values = c(16, 17, 15)) +
-  scale_fill_manual(values = c("#FF0000", "#00FF00", "#0000FF")) +  # Adjust colors as needed
+  scale_fill_manual(values = c("#8dd3c7", "#ffffb3", "#bebada")) +  # Adjust colors as needed
   theme_minimal() +
-  guides(fill = guide_legend(override.aes = list(pattern = c("stripe"))), shape = FALSE)  # Add pattern for stripes
+  guides(fill = guide_legend(override.aes = list(pattern = "none")), shape = FALSE)+
+ 
+  # NEED TO CHANGE KEY LABELS ("RFP" SHOULD BE "PRENEOPLASTIC" MAYBE)
+  
