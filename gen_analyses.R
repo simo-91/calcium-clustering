@@ -46,22 +46,8 @@ frequency_df[1:length(CTRLs_4dpf__freq), "CTRLs_4dpf__freq"] <- CTRLs_4dpf__freq
 frequency_df[1:length(HRASV12_4dpf__freq), "HRASV12_4dpf__freq"] <- HRASV12_4dpf__freq
 frequency_df[1:length(AKT1_4dpf__freq), "AKT1_4dpf__freq"] <- AKT1_4dpf__freq
 
-frequency_df <- melt(frequency_df, variable.name = "Genotype", value.name = "Events/minute")
+frequency_df <- melt(frequency_df, variable.name = "Genotype", value.name = "events/min")
 frequency_df <- na.omit(frequency_df)
-
-my_comparisons <- list( c("CTRLs_4dpf__freq", "HRASV12_4dpf__freq"),
-                        c("CTRLs_4dpf__freq", "AKT1_4dpf__freq"),
-                        c("HRASV12_4dpf__freq", "AKT1_4dpf__freq"))
-
-ggplot(frequency_df, aes(Genotype, `Events/minute`))+
-  geom_boxplot(aes(colour = Genotype))+
-  stat_compare_means(comparisons = my_comparisons) # Add pairwise comparisons p-value
-
-
-
-
-
-
 
 
 
@@ -99,13 +85,20 @@ for (variable in names(variable_names)) {
 
 
 
-frequency_df <- melt(frequency_df, variable.name = "Genotype", value.name = "events/min")
+frequency_df <- melt(frequency_df, variable.name = "Condition", value.name = "events/min")
+frequency_df <- na.omit(frequency_df)
 
 
+# Remove "__freq" from "Genotype" column
+frequency_df$Condition <- gsub("__freq", "", frequency_df$Condition)
 
 
-# Perform pairwise comparisons with Games-Howell test
-pairwise_results <- pairwise.welch.test(frequency_df$`events/min`, frequency_df$Genotype, p.adjust.method = "holm")
+# Perform oneway Welch's test (cause they are parametric but unequal variances)
+oneway.frequency.test <- oneway.test(`events/min` ~ Genotype, data = frequency_df, var.equal = FALSE)
+# Perform pairwise t.test for unequal variances to compare between groups
+pairwise.frequency.test <- pairwise.t.test(frequency_df$`events/min`, frequency_df$Genotype, p.adjust.method = "bonferroni", pool.sd = FALSE)
+
+
 
 # Create boxplot with significance comparisons
 p <- ggplot(frequency_df, aes(x = variable, y = `events/min`)) +
@@ -113,7 +106,7 @@ p <- ggplot(frequency_df, aes(x = variable, y = `events/min`)) +
   labs(x = "Group", y = "Frequency") +
   theme_minimal()
 
-# Extract significant comparisons
+# Extract significant comparisonscalled Genotype
 significant_comparisons <- pairwise_results$p.`events/min` < 0.05
 significant_indices <- which(significant_comparisons, arr.ind = TRUE)
 
@@ -123,3 +116,47 @@ p <- p + geom_text(aes(x = significant_indices[, 1], y = max(frequency_df$`event
 # Display the plot
 print(p)
 
+
+
+
+# 
+# comparisons <- data.frame(pairwise.frequency.test$p.value)
+# comparisons$Genotype1 <- rownames(comparisons)
+# comparisons <- subset(comparisons, p.value <= 0.05) # Filter for significant comparisons
+
+# Plot -----
+shape_mapping <- data.frame(Genotype = unique(frequency_df$Genotype))
+shape_mapping$shape <- ifelse(grepl("^CTRL", shape_mapping$Genotype), 21,
+                              ifelse(grepl("^HRASV12", shape_mapping$Genotype), 22,
+                                     ifelse(grepl("^AKT1", shape_mapping$Genotype), 23, NA)))
+
+
+# Create the ggplot
+ggplot(frequency_df, aes(x = Genotype, y = `events/min`, fill = Genotype)) +
+  geom_boxplot() +
+  geom_jitter(data = frequency_df, aes(shape = factor(shape_mapping$shape[match(Genotype, shape_mapping$Genotype)])),
+              geom_point(aes(shape = Genotype), position = position_jitterdodge(jitter.width = 0.2, dodge.width = 0.75)))+
+  labs(x = "Genotype", y = "events/min") +
+  guides(fill = "none", shape = "none") +
+  theme_minimal()
+
+
+
+
+
+# Change the order of levels in "Genotype" column
+frequency_df$Genotype <- factor(frequency_df$Genotype, levels = c("CTRLs_4dpf", "CTRL_4dpf.RFP", "CTRL_5dpf", "CTRL_5dpf.RFP",
+                                                                  "HRASV12_4dpf", "HRASV12_4dpf.RFP","HRASV12_5dpf", "HRASV12_5dpf.RFP",
+                                                                  "AKT1_4dpf", "AKT1_4dpf.RFP", "AKT1_5dpf", "AKT1_5dpf.RFP"))
+
+# Plot the data with organized jitter
+ggplot(frequency_df, aes(x = reorder(Genotype, as.numeric(sub("^CTRL", "", Genotype))), y = `events/min`, fill = Genotype)) +
+  geom_boxplot() +
+  geom_point(aes(shape = Genotype), position = position_jitterdodge(jitter.width = 0.2, dodge.width = 0.75)) +
+  labs(x = "Genotype", y = "Frequency") +
+  scale_shape_manual(values = c(16, 17, 15)) +
+  theme_minimal() +
+  guides(shape = FALSE)
+
+
+frequency_df$Condition <- cbind(str_split(frequency_df$Condition, "_"))
