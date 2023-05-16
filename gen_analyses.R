@@ -145,18 +145,31 @@ ggplot(frequency_df, aes(x = Genotype, y = `events/min`, fill = Genotype)) +
 
 
 # Change the order of levels in "Genotype" column
-frequency_df$Genotype <- factor(frequency_df$Genotype, levels = c("CTRLs_4dpf", "CTRL_4dpf.RFP", "CTRL_5dpf", "CTRL_5dpf.RFP",
-                                                                  "HRASV12_4dpf", "HRASV12_4dpf.RFP","HRASV12_5dpf", "HRASV12_5dpf.RFP",
-                                                                  "AKT1_4dpf", "AKT1_4dpf.RFP", "AKT1_5dpf", "AKT1_5dpf.RFP"))
+frequency_df$Condition <- factor(frequency_df$Condition, levels = c("CTRLs_4dpf", "CTRL_4dpf.RFP", "CTRL_5dpf", "CTRL_5dpf.RFP",
+                                                                    "HRASV12_4dpf", "HRASV12_4dpf.RFP", "HRASV12_5dpf", "HRASV12_5dpf.RFP",
+                                                                    "AKT1_4dpf", "AKT1_4dpf.RFP", "AKT1_5dpf", "AKT1_5dpf.RFP"))
+frequency_df$Genotype <- factor(frequency_df$Genotype, levels = c("CTRL", "HRASV12", "AKT1"))
+frequency_df$Age <- factor(frequency_df$Age, levels = c("4dpf", "5dpf"))
+RFP_colors <- c("RFP" = "red", "total" = "blue")
 
-# Plot the data with organized jitter
-ggplot(frequency_df, aes(x = reorder(Genotype, as.numeric(sub("^CTRL", "", Genotype))), y = `events/min`, fill = Genotype)) +
-  geom_boxplot() +
-  geom_point(aes(shape = Genotype), position = position_jitterdodge(jitter.width = 0.2, dodge.width = 0.75)) +
-  labs(x = "Genotype", y = "Frequency") +
+
+
+library(ggplot2)
+library(ggpattern)
+
+# Create a new variable for specifying the stripe pattern
+frequency_df$stripe <- factor(frequency_df$Genotype)
+
+# Update the plot code
+ggplot(frequency_df, aes(x = Condition, y = `events/min`, fill = Genotype, shape = Genotype)) +
+  geom_boxplot_pattern(aes(pattern = RFP),
+                       pattern_colour = "red",
+                       pattern_density = 0.05,
+                       pattern_spacing = 0.01) +
+  scale_pattern_manual(values = c(total='none', RFP = "stripe")) +
+  geom_point(aes(shape = Genotype))+
+  labs(x = "Genotype", y = "events/min") +
   scale_shape_manual(values = c(16, 17, 15)) +
+  scale_fill_manual(values = c("#FF0000", "#00FF00", "#0000FF")) +  # Adjust colors as needed
   theme_minimal() +
-  guides(shape = FALSE)
-
-
-frequency_df$Condition <- cbind(str_split(frequency_df$Condition, "_"))
+  guides(fill = guide_legend(override.aes = list(pattern = c("stripe"))), shape = FALSE)  # Add pattern for stripes
