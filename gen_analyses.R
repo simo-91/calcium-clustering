@@ -161,19 +161,42 @@ frequency_df$stripe <- factor(frequency_df$Genotype)
 
 # Update the plot code
 ggplot(frequency_df, aes(x = Condition, y = `events/min`, fill = Genotype, shape = Genotype)) +
-  geom_boxplot_pattern(aes(pattern = RFP),
+  geom_violin_pattern(aes(pattern = RFP),
                        pattern_colour = "red",
                        pattern_density = 0.05,
-                       pattern_spacing = 0.025) +
-  scale_pattern_manual(values = c(total='none', 
+                       pattern_spacing = 0.025,
+                      trim = FALSE) +
+  scale_pattern_manual(values = c(total="none", 
                                   RFP = "stripe"),
                        guide = guide_legend(title = element_blank())) +
-  # geom_point(aes(shape = Genotype))+
-  labs(x = "Genotype", y = "events/min") +
+  geom_point(aes(shape = Genotype), alpha = 0.5)+
+  labs(title = "Events/min across genotypes",
+       x = "Genotype", y = "events/min") +
   scale_shape_manual(values = c(16, 17, 15)) +
   scale_fill_manual(values = c("#8dd3c7", "#ffffb3", "#bebada")) +  # Adjust colors as needed
   theme_minimal() +
-  guides(fill = guide_legend(override.aes = list(pattern = "none")), shape = FALSE)+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.title.x = element_blank())+
+  guides(fill = guide_legend(override.aes = list(pattern = "none")), shape = FALSE)
  
   # NEED TO CHANGE KEY LABELS ("RFP" SHOULD BE "PRENEOPLASTIC" MAYBE)
   
+
+
+
+
+
+# Assuming you have your data in a data frame called 'data'
+# 'Condition' is the categorical variable and 'events/min' is the continuous variable
+
+# Perform Welch's ANOVA
+welch_anova <- oneway.test(`events/min` ~ Condition, data=frequency_df, var.equal=FALSE)
+
+# Perform post-hoc tests (Tukey's HSD) if the ANOVA result is significant
+if (welch_anova$p.value < 0.05) {
+  posthoc <- TukeyHSD(aov(`events/min` ~ Condition, data=frequency_df))
+  print(posthoc)
+}
+
+# Print the ANOVA results
+print(welch_anova)
