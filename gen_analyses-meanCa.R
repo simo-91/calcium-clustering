@@ -1,3 +1,4 @@
+
 # Create an empty dataframe
 mean_Ca <- data.frame(ID = character(), Mean_Ca = numeric(), stringsAsFactors = FALSE)
 
@@ -80,5 +81,69 @@ mean_Ca_df[1:length(CTRL_5dpf.RFP__mean_Ca), "CTRL_5dpf.RFP__mean_Ca"] <- CTRL_5
 mean_Ca_df[1:length(HRASV12_5dpf.RFP__mean_Ca), "HRASV12_5dpf.RFP__mean_Ca"] <- HRASV12_5dpf.RFP__mean_Ca
 mean_Ca_df[1:length(AKT1_5dpf.RFP__mean_Ca), "AKT1_5dpf.RFP__mean_Ca"] <- AKT1_5dpf.RFP__mean_Ca
 
-mean_Ca_df <- melt(mean_Ca_df, variable.name = "Genotype", value.name = "events/min")
+mean_Ca_df <- melt(mean_Ca_df, variable.name = "Condition", value.name = "mean Ca")
 mean_Ca_df <- na.omit(mean_Ca_df)
+
+
+mean_Ca_df$Condition <- gsub("__mean_Ca", "", mean_Ca_df$Condition)
+
+# Plots
+pairwise_t <- pairwise.t.test(mean_Ca_df$`mean Ca`, mean_Ca_df$Condition, data = mean_Ca_df, p.adjust.method = "bonferroni", pool.sd = FALSE)
+
+
+ggplot(mean_Ca_df, aes(x = Condition, y = `mean Ca`, fill = Genotype, shape = Genotype)) +
+  geom_violin_pattern(aes(pattern = RFP),
+                      pattern_colour = "red",
+                      pattern_density = 0.05,
+                      pattern_spacing = 0.025,
+                      trim = FALSE) +
+  scale_pattern_manual(values = c(total="none", 
+                                  RFP = "stripe"),
+                       guide = guide_legend(title = element_blank())) +
+  geom_point(aes(shape = Genotype), alpha = 0.5)+
+  labs(title = expression("Mean Ca"^"2+"~" levels across genotypes"), 
+       x = "Genotype", y = expression("Ca"^"2+"))+
+  scale_shape_manual(values = c(16, 17, 15)) +
+  scale_fill_manual(values = c("#8dd3c7", "#ffffb3", "#bebada")) +  # Adjust colors as needed
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.title.x = element_blank())+
+  guides(fill = guide_legend(override.aes = list(pattern = "none")), shape = FALSE)
+
+
+ggplot(mean_Ca_df, aes(x = Condition, y = `mean Ca`, fill = Genotype, shape = Genotype)) +
+  geom_boxplot_pattern(aes(pattern = RFP),
+                       pattern_colour = "red",
+                       pattern_density = 0.05,
+                       pattern_spacing = 0.025) +
+  scale_pattern_manual(values = c(total="none", 
+                                  RFP = "stripe"),
+                       guide = guide_legend(title = element_blank())) +
+  geom_point(aes(shape = Genotype), alpha = 0.5)+
+  labs(title = expression("Mean Ca"^"2+"~" levels across genotypes"), 
+       x = "Genotype", y = expression("Ca"^"2+"))+
+  scale_shape_manual(values = c(16, 17, 15)) +
+  scale_fill_manual(values = c("#8dd3c7", "#ffffb3", "#bebada")) +  # Adjust colors as needed
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.title.x = element_blank())+
+  guides(fill = guide_legend(override.aes = list(pattern = "none")), shape = FALSE)
+
+
+ggsave(mean_Ca_across_genos.violinplt,
+       filename = paste0("mean_Ca_across_genos.violinplt",
+                         ".png"),
+       path = paste0("~/calcium-clustering/plots/"), 
+       device = "png",  bg = "white",
+       width = 20, height = 15, units = "cm", dpi = 320,
+       scale = 2)
+
+ggsave(mean_Ca_across_genos.boxplot,
+       filename = paste0(format(Sys.time(), "mean_Ca_across_genos.boxplot"),
+                         ".png"),
+       path = paste0("~/calcium-clustering/plots/"), 
+       device = "png",  bg = "white",
+       width = 20, height = 15, units = "cm", dpi = 320,
+       scale = 2)
+
+

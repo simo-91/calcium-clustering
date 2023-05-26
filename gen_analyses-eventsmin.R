@@ -223,7 +223,7 @@ ggsave(events_per_min_across_genos.violinplt,
        scale = 2)
 
 ggsave(events_per_min_across_genos.boxplt,
-       filename = paste0(format(Sys.time(), "events_per_min_across_genos.boxplt_%D-%M-%Y"),
+       filename = paste0(format(Sys.time(), "events_per_min_across_genos.boxplt"),
                          ".png"),
        path = paste0("~/calcium-clustering/plots/"), 
        device = "png",  bg = "white",
