@@ -60,7 +60,7 @@ library(ggplot2)
 library(ggpattern)
 
 # Make the plot
-ggplot(all_hind_mean_Ca.df, aes(x = Condition, y = mean_Ca, fill = Genotype, shape = Genotype)) +
+mean_Ca_across_genos.boxplt <- ggplot(all_hind_mean_Ca.df, aes(x = Condition, y = mean_Ca, fill = Genotype, shape = Genotype)) +
   geom_boxplot_pattern(aes(pattern = Type),
                        pattern_colour = "red",
                        pattern_density = 0.05,
@@ -79,3 +79,10 @@ ggplot(all_hind_mean_Ca.df, aes(x = Condition, y = mean_Ca, fill = Genotype, sha
         axis.title.x = element_blank())+
   guides(fill = guide_legend(override.aes = list(pattern = "none")), shape = FALSE)
 
+ggsave(mean_Ca_across_genos.boxplt,
+       filename = paste0(format(Sys.time(), "mean_Ca_across_genos.boxplt"),
+                         ".png"),
+       path = paste0("~/calcium-clustering/plots/"), 
+       device = "png",  bg = "white",
+       width = 20, height = 15, units = "cm", dpi = 320,
+       scale = 2)
