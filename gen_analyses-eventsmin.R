@@ -246,5 +246,5 @@ if (welch_anova$p.value < 0.05) {
 # Print the ANOVA results
 print(welch_anova)
 
-
+# Hind VS Hind
 
