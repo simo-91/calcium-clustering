@@ -60,7 +60,7 @@ library(ggplot2)
 library(ggpattern)
 
 # Make the plot
-mean_Ca_across_genos.boxplt <- ggplot(all_hind_mean_Ca.df, aes(x = Condition, y = mean_Ca, fill = Genotype, shape = Genotype)) +
+mean_Ca_across_genos.hind.boxplt <- ggplot(all_hind_mean_Ca.df, aes(x = Condition, y = mean_Ca, fill = Genotype, shape = Genotype)) +
   geom_boxplot_pattern(aes(pattern = Type),
                        pattern_colour = "red",
                        pattern_density = 0.05,
@@ -70,7 +70,7 @@ mean_Ca_across_genos.boxplt <- ggplot(all_hind_mean_Ca.df, aes(x = Condition, y 
                                   RFP = "stripe"),
                        guide = guide_legend(title = element_blank())) +
   geom_point(aes(shape = Genotype), alpha = 0.5)+
-  labs(title = "Mean Ca concentration across genotypes",
+  labs(title = "Mean Ca concentration across genotypes (hindbrain only)",
        x = "Condition", y = "mean_Ca") +
   scale_shape_manual(values = c(16, 17, 15)) +
   scale_fill_manual(values = c("#8dd3c7", "#ffffb3", "#bebada")) +
@@ -79,7 +79,28 @@ mean_Ca_across_genos.boxplt <- ggplot(all_hind_mean_Ca.df, aes(x = Condition, y 
         axis.title.x = element_blank())+
   guides(fill = guide_legend(override.aes = list(pattern = "none")), shape = FALSE)
 
-ggsave(mean_Ca_across_genos.boxplt,
+
+ggplot(all_hind_mean_Ca.df, aes(x = Condition, y = mean_Ca, fill = Genotype, shape = Genotype)) +
+  geom_violin_pattern(aes(pattern = Type),
+                      pattern_colour = "red",
+                      pattern_density = 0.05,
+                      pattern_spacing = 0.025,
+                      trim = FALSE) +
+  scale_pattern_manual(values = c(total="none", 
+                                  RFP = "stripe"),
+                       guide = guide_legend(title = element_blank())) +
+  geom_point(aes(shape = Genotype), alpha = 0.5)+
+  labs(title = "Mean Ca concentration across genotypes (hindbrain only)",
+       x = "Condition", y = "mean_Ca") +
+  scale_shape_manual(values = c(16, 17, 15)) +
+  scale_fill_manual(values = c("#8dd3c7", "#ffffb3", "#bebada")) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        axis.title.x = element_blank())+
+  guides(fill = guide_legend(override.aes = list(pattern = "none")), shape = FALSE)
+
+
+ggsave(mean_Ca_across_genos.hind.boxplt,
        filename = paste0(format(Sys.time(), "mean_Ca_across_genos.boxplt"),
                          ".png"),
        path = paste0("~/calcium-clustering/plots/"), 

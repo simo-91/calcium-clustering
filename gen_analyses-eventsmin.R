@@ -163,10 +163,11 @@ ggplot(frequency_df, aes(x = Genotype, y = `events/min`, fill = Genotype)) +
 
 
 # Change the order of levels in "Genotype" column
-frequency_df$Condition <- factor(frequency_df$Condition, levels = c("CTRL_4dpf", "CTRL_4dpf.RFP", "CTRL_5dpf", "CTRL_5dpf.RFP",
+frequency_df$Condition <- factor(frequency_df$Condition, levels = c("AKT1_4dpf", "AKT1_4dpf.RFP", "AKT1_5dpf", "AKT1_5dpf.RFP",
                                                                     "HRASV12_4dpf", "HRASV12_4dpf.RFP", "HRASV12_5dpf", "HRASV12_5dpf.RFP",
-                                                                    "AKT1_4dpf", "AKT1_4dpf.RFP", "AKT1_5dpf", "AKT1_5dpf.RFP"))
-frequency_df$Genotype <- factor(frequency_df$Genotype, levels = c("CTRL", "HRASV12", "AKT1"))
+                                                                    "CTRL_4dpf", "CTRL_4dpf.RFP", "CTRL_5dpf", "CTRL_5dpf.RFP"
+))
+frequency_df$Genotype <- factor(frequency_df$Genotype, levels = c("AKT1", "CTRL","HRASV12"))
 frequency_df$Age <- factor(frequency_df$Age, levels = c("4dpf", "5dpf"))
 
 
@@ -192,7 +193,8 @@ events_per_min_across_genos.violinplt <- ggplot(frequency_df, aes(x = Condition,
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         axis.title.x = element_blank())+
-  guides(fill = guide_legend(override.aes = list(pattern = "none")), shape = FALSE)
+  guides(fill = guide_legend(override.aes = list(pattern = "none")), shape = FALSE)+
+  geom_signif(comparisons = Condition)
 
 
 events_per_min_across_genos.boxplt <- ggplot(frequency_df, aes(x = Condition, y = `events/min`, fill = Genotype, shape = Genotype)) +

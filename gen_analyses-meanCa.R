@@ -91,7 +91,9 @@ mean_Ca_df$Condition <- gsub("__mean_Ca", "", mean_Ca_df$Condition)
 pairwise_t <- pairwise.t.test(mean_Ca_df$`mean Ca`, mean_Ca_df$Condition, data = mean_Ca_df, p.adjust.method = "bonferroni", pool.sd = FALSE)
 
 
-ggplot(mean_Ca_df, aes(x = Condition, y = `mean Ca`, fill = Genotype, shape = Genotype)) +
+mean_Ca_df2$Genotype <- factor(mean_Ca_df2$Genotype, levels = c("AKT1", "CTRL","HRASV12"))
+
+ggplot(mean_Ca_df2, aes(x = Condition, y = `mean Ca`, fill = Genotype, shape = Genotype)) +
   geom_violin_pattern(aes(pattern = RFP),
                       pattern_colour = "red",
                       pattern_density = 0.05,
@@ -108,7 +110,8 @@ ggplot(mean_Ca_df, aes(x = Condition, y = `mean Ca`, fill = Genotype, shape = Ge
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         axis.title.x = element_blank())+
-  guides(fill = guide_legend(override.aes = list(pattern = "none")), shape = FALSE)
+  guides(fill = guide_legend(override.aes = list(pattern = "none")), shape = FALSE)+
+  geom_signif(comparisons = comparisons)
 
 
 ggplot(mean_Ca_df, aes(x = Condition, y = `mean Ca`, fill = Genotype, shape = Genotype)) +

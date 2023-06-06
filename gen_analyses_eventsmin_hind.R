@@ -92,7 +92,7 @@ ggplot(all_freq_arrays.hind.df, aes(x = Condition, y = events_per_min, fill = Ge
                                   RFP = "stripe"),
                        guide = guide_legend(title = element_blank())) +
   geom_point(aes(shape = Genotype), alpha = 0.5)+
-  labs(title = "Events/min across genotypes",
+  labs(title = "Events/min across genotypes (hindbrain only)",
        x = "Genotype", y = "events/min") +
   scale_shape_manual(values = c(16, 17, 15)) +
   scale_fill_manual(values = c("#8dd3c7", "#ffffb3", "#bebada")) +
@@ -100,3 +100,5 @@ ggplot(all_freq_arrays.hind.df, aes(x = Condition, y = events_per_min, fill = Ge
   theme(axis.text.x = element_text(angle = 45, hjust = 1),
         axis.title.x = element_blank())+
   guides(fill = guide_legend(override.aes = list(pattern = "none")), shape = FALSE)
+
+
