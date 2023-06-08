@@ -1,3 +1,10 @@
+# Notes:
+# Using Fast Fourier Analysis
+# Plotting Power Density Spectrum (PSD) in function of frequency (max f = Nyquist frequency = fs/2)
+# Acquiring at 0.5Hz; so fs = 0.5Hz so Nyquist frequency = 0.25
+# Lower frequency is 1/T where T = span of the whole timeseries considered (371 seconds in our case)
+# Range to plot on is 0.0027 - 0.25 Hz
+
 # HRASV12 4dpf
 
 # Initialize an empty data frame
@@ -230,7 +237,7 @@ AKT1_5dpf_PSD_df <- data.frame("Frequency_Hz" = frequencies_x)
 
 # List of additional IDs for 4dpf and 5dpf
 additional_IDs_4dpf <- c("ID0119", "ID0120", "ID0121", "ID0122", "ID0123", "ID0124", "ID0125", "ID0126", "ID0127", "ID0128", "ID0129", "ID0133", "ID0134", "ID0136", "ID0137", "ID0138")
-additional_IDs_5dpf <- c("ID0130", "ID0131", "ID0132", "ID0139", "ID0140", "ID0141", "ID0142", "ID0143")
+additional_IDs_5dpf <- c("ID0130", "ID0131", "ID0132", "ID0140", "ID0141", "ID0142", "ID0143")
 
 # Loop through each condition and ID for 4dpf
 for (area in areas) {
@@ -302,3 +309,60 @@ for (i in 1:length(temp2)) {
 
 AKT1_5dpf_PSD_long.df <- cbind(AKT1_5dpf_PSD_long.df, result)
 names(AKT1_5dpf_PSD_long.df) <- c("Frequency_Hz", "Condition", "PSD", "Genotype", "Age", "Area", "ID", "Type")
+
+
+
+# Relative PSDs
+df_list <- list(HRASV12_4dpf_PSD_long.df, 
+                HRASV12_5dpf_PSD_long.df, 
+                CTRL_4dpf_PSD_long.df, 
+                CTRL_5dpf_PSD_long.df, 
+                AKT1_4dpf_PSD_long.df, 
+                AKT1_5dpf_PSD_long.df)
+
+# Loop over the list
+for (i in seq_along(df_list)) {
+  df_list[[i]] <- df_list[[i]] %>%
+    group_by(ID, Type) %>%
+    mutate(Sum_PSD = sum(PSD)) %>%
+    mutate(Relative_PSD = PSD / Sum_PSD) %>%
+    ungroup()
+}
+names(df_list) <- c("HRASV12_4dpf_PSD_long.df", 
+                    "HRASV12_5dpf_PSD_long.df", 
+                    "CTRL_4dpf_PSD_long.df", 
+                    "CTRL_5dpf_PSD_long.df", 
+                    "AKT1_4dpf_PSD_long.df", 
+                    "AKT1_5dpf_PSD_long.df")
+
+list2env(df_list, envir = .GlobalEnv)
+
+# GGplot
+
+ggplot(HRASV12_4dpf_PSD_long.df, aes(x = Frequency_Hz, y = PSD, color = Type)) +
+  geom_line() +
+  theme_minimal() +
+  labs(title = "PSD vs Frequency_Hz",
+       x = "Frequency_Hz",
+       y = "PSD",
+       color = "Type") +
+  theme(legend.position = "bottom")
+
+
+
+# all conditions
+all_conds_PSD_long.df <- bind_rows(HRASV12_4dpf_PSD_long.df, 
+                                   HRASV12_5dpf_PSD_long.df, 
+                                   CTRL_4dpf_PSD_long.df, 
+                                   CTRL_5dpf_PSD_long.df, 
+                                   AKT1_4dpf_PSD_long.df, 
+                                   AKT1_5dpf_PSD_long.df)
+
+ggplot(all_conds_PSD_long.df, aes(x = Frequency_Hz, y = PSD, color = Genotype)) +
+  geom_line() +
+  theme_minimal() +
+  labs(title = "PSD vs Frequency_Hz",
+       x = "Frequency_Hz",
+       y = "PSD",
+       color = "Type") +
+  theme(legend.position = "bottom")

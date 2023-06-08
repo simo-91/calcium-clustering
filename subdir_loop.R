@@ -787,7 +787,8 @@ for (subdir in subdirs_stat) {
   nyquist <- fs/2
 
   psd <- round(psd, digits = 1)
-  freq <- seq(0, nyquist, length.out=nrow(psd)) # calculate frequency range
+  lowest_freq <- 1/371
+  freq <- seq(lowest_freq, nyquist, length.out=nrow(psd)) # calculate frequency range
   psd.melt <- as.data.frame(psd)
   psd.melt$frequency <- freq
   psd.melt <- melt(psd.melt, id.vars = "frequency", variable.name = "cell", value.name = "PSD")
@@ -801,11 +802,8 @@ for (subdir in subdirs_stat) {
 
   # Calculate power spectrum for each time series
   psd.RFP <- abs(fft.RFP)^2/ncol(RFP) # normalized by length of acquisition
-  fs = 0.5 #sampling freq in Hertz; we take a sample every two seconds (1 sample/2 seconds = 0.5)
-  nyquist <- fs/2
 
   psd.RFP <- round(psd.RFP, digits = 1)
-  freq <- seq(0, nyquist, length.out=nrow(psd.RFP)) # calculate frequency range
   psd.RFP.melt <- as.data.frame(psd.RFP)
   psd.RFP.melt$frequency <- freq
   psd.RFP.melt <- melt(psd.RFP.melt, id.vars = "frequency", variable.name = "cell", value.name = "PSD")
