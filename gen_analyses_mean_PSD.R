@@ -60,6 +60,7 @@ IDs <- c("ID0031", "ID0032", "ID0033", "ID0034", "ID0035",
 areas <- c("hind", "mid")
 
 # Initialize an empty dataframe
+frequencies_x <- freq
 HRASV12_4dpf_PSD_df <- data.frame("Frequency_Hz" = frequencies_x)
 
 # Loop through each condition and ID
@@ -358,11 +359,63 @@ all_conds_PSD_long.df <- bind_rows(HRASV12_4dpf_PSD_long.df,
                                    AKT1_4dpf_PSD_long.df, 
                                    AKT1_5dpf_PSD_long.df)
 
-ggplot(all_conds_PSD_long.df, aes(x = Frequency_Hz, y = PSD, color = Genotype)) +
-  geom_line() +
+
+RFP_only_PSD_long.df <- all_conds_PSD_long.df %>%
+  filter(Type == "RFP")
+total_only_PSD_long.df <- all_conds_PSD_long.df %>%
+  filter(Type == "total")
+
+
+ggplot(total_only_PSD_long.df, aes(x = Frequency_Hz, y = Relative_PSD, color = Genotype)) +
+  geom_area(aes(fill = Genotype), 
+            alpha = 0.4) +
+  # ylim(0, 0.060)+
   theme_minimal() +
   labs(title = "PSD vs Frequency_Hz",
        x = "Frequency_Hz",
        y = "PSD",
        color = "Type") +
-  theme(legend.position = "bottom")
+  
+  theme(legend.position = "bottom")+
+  ggtitle("Power spectrum considering all cells")
+
+ggplot(RFP_only_PSD_long.df, aes(x = Frequency_Hz, y = Relative_PSD, color = Genotype)) +
+  geom_area(aes(fill = Genotype), 
+            alpha = 0.4) +
+  # ylim(0, 0.060)+
+  theme_minimal() +
+  labs(title = "PSD vs Frequency_Hz",
+       x = "Frequency_Hz",
+       y = "PSD",
+       color = "Type") +
+  theme(legend.position = "bottom")+
+  ggtitle("Power spectrum considering RFP cells only")
+
+
+library(gridExtra)
+
+p1 <- ggplot(total_only_PSD_long.df, aes(x = Frequency_Hz, y = Relative_PSD, color = Genotype)) +
+  geom_area(aes(fill = Genotype), 
+            alpha = 0.4) +
+  theme_minimal() +
+  labs(title = "PSD vs Frequency_Hz",
+       x = "Frequency_Hz",
+       y = "PSD",
+       color = "Type") +
+  theme(legend.position = "bottom") +
+  ggtitle("Power spectrum considering all cells")
+
+p2 <- ggplot(RFP_only_PSD_long.df, aes(x = Frequency_Hz, y = Relative_PSD, color = Genotype)) +
+  geom_area(aes(fill = Genotype), 
+            alpha = 0.4) +
+  theme_minimal() +
+  labs(title = "PSD vs Frequency_Hz",
+       x = "Frequency_Hz",
+       y = "PSD",
+       color = "Type") +
+  theme(legend.position = "bottom") +
+  ggtitle("Power spectrum considering RFP cells only")
+
+# Arrange the plots in one page
+grid.arrange(p1, p2, ncol = 1)
+
