@@ -338,19 +338,6 @@ names(df_list) <- c("HRASV12_4dpf_PSD_long.df",
 
 list2env(df_list, envir = .GlobalEnv)
 
-# GGplot
-
-ggplot(HRASV12_4dpf_PSD_long.df, aes(x = Frequency_Hz, y = PSD, color = Type)) +
-  geom_line() +
-  theme_minimal() +
-  labs(title = "PSD vs Frequency_Hz",
-       x = "Frequency_Hz",
-       y = "PSD",
-       color = "Type") +
-  theme(legend.position = "bottom")
-
-
-
 # all conditions
 all_conds_PSD_long.df <- bind_rows(HRASV12_4dpf_PSD_long.df, 
                                    HRASV12_5dpf_PSD_long.df, 
