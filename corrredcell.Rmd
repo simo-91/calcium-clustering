@@ -1,9 +1,9 @@
 # Correlation between redcell:total cells ratio VS total events/min
 
-**Aim:** To see if the low number of redcells in some samples is influencing graph features These ratios are stored in "AKT1.redcell.ratio" "CTRL.redcell.ratio" "HRASV12.redcell.ratio" But I also need the events/min vars..
-Need to see if there is correlation for ALL conditions, including AGE
+**Aim:** To see if the low number of redcells in some samples is influencing graph features These ratios are stored in "AKT1.redcell.ratio" "CTRL.redcell.ratio" "HRASV12.redcell.ratio" But I also need the events/min vars.. Need to see if there is correlation for ALL conditions, including AGE
 
 example code to collect the vars:
+
 ```{r example code}
 # Create a vector of variable names from different ranges
 var_names <- c(
@@ -33,20 +33,44 @@ all_AKT1_5dpf_freq <- all_AKT1_5dpf_freq[order(names(all_AKT1_5dpf_freq))]
 
 ```
 
-Correlation analysis:
-```{r}
-correlation_result_CTRL_4dpf <- cor.test(as.numeric(CTRL_4dpf.redcell.ratio), as.numeric(all_CTRL_4dpf_freq))
-correlation_result_CTRL_5dpf <- cor.test(as.numeric(CTRL_5dpf.redcell.ratio), as.numeric(all_CTRL_5dpf_freq))
+Correlation analysis VS events/min (frequency):
+
+```{r frequency}
+correlation_result_CTRL_4dpf.freq <- cor.test(as.numeric(CTRL_4dpf.redcell.ratio), as.numeric(all_CTRL_4dpf_freq))
+correlation_result_CTRL_5dpf.freq <- cor.test(as.numeric(CTRL_5dpf.redcell.ratio), as.numeric(all_CTRL_5dpf_freq))
 
 
-correlation_result_HRASV12_4dpf <- cor.test(as.numeric(HRASV12_4dpf.redcell.ratio), as.numeric(all_HRASV12_4dpf_freq))
-correlation_result_HRASV12_5dpf <- cor.test(as.numeric(HRASV12_5dpf.redcell.ratio), as.numeric(all_HRASV12_5dpf_freq))
+correlation_result_HRASV12_4dpf.freq <- cor.test(as.numeric(HRASV12_4dpf.redcell.ratio), as.numeric(all_HRASV12_4dpf_freq))
+correlation_result_HRASV12_5dpf.freq <- cor.test(as.numeric(HRASV12_5dpf.redcell.ratio), as.numeric(all_HRASV12_5dpf_freq))
 
-correlation_result_AKT1_4dpf <- cor.test(as.numeric(AKT1_4dpf.redcell.ratio), as.numeric(all_AKT1_4dpf_freq))
-correlation_result_AKT1_5dpf <- cor.test(as.numeric(AKT1_5dpf.redcell.ratio), as.numeric(all_AKT1_5dpf_freq))
+correlation_result_AKT1_4dpf.freq <- cor.test(as.numeric(AKT1_4dpf.redcell.ratio), as.numeric(all_AKT1_4dpf_freq))
+correlation_result_AKT1_5dpf.freq <- cor.test(as.numeric(AKT1_5dpf.redcell.ratio), as.numeric(all_AKT1_5dpf_freq))
 
 # Print the correlation coefficient and p-value
-print(correlation_result$estimate)
-print(correlation_result$p.value)
+print(paste0("CTRL 4dpf ", correlation_result_CTRL_4dpf.freq$p.value))
+print(paste0("CTRL 5dpf ", correlation_result_CTRL_5dpf.freq$p.value))
+print(paste0("HRASV12 4dpf ", correlation_result_HRASV12_4dpf.freq$p.value))
+print(paste0("HRASV12 5dpf ", correlation_result_HRASV12_5dpf.freq$p.value))
+print(paste0("AKT1 4dpf ", correlation_result_AKT1_4dpf.freq$p.value))
+print(paste0("AKT1 4dpf ", correlation_result_AKT1_5dpf.freq$p.value))
+```
 
+Correlation analysis VS mean (deconvoluted) Calcium levels
+
+```{r mean_Ca}
+correlation_result_CTRL_4dpf.ca <- cor.test(as.numeric(CTRL_4dpf.redcell.ratio), as.numeric(CTRL_4dpf__mean_Ca))
+correlation_result_CTRL_5dpf.ca <- cor.test(as.numeric(CTRL_5dpf.redcell.ratio), as.numeric(CTRL_5dpf__mean_Ca))
+
+correlation_result_HRASV12_4dpf.ca <- cor.test(as.numeric(HRASV12_4dpf.redcell.ratio), as.numeric(HRASV12_4dpf__mean_Ca))
+correlation_result_HRASV12_5dpf.ca <- cor.test(as.numeric(HRASV12_5dpf.redcell.ratio), as.numeric(HRASV12_5dpf__mean_Ca))
+
+correlation_result_AKT1_4dpf.ca <- cor.test(as.numeric(AKT1_4dpf.redcell.ratio), as.numeric(AKT1_4dpf__mean_Ca))
+correlation_result_AKT1_5dpf.ca <- cor.test(as.numeric(AKT1_5dpf.redcell.ratio), as.numeric(AKT1_5dpf__mean_Ca))
+
+print(paste0("CTRL 4dpf ", correlation_result_CTRL_4dpf.ca$p.value))
+print(paste0("CTRL 5dpf ", correlation_result_CTRL_5dpf.ca$p.value))
+print(paste0("HRASV12 4dpf ", correlation_result_HRASV12_4dpf.ca$p.value))
+print(paste0("HRASV12 5dpf ", correlation_result_HRASV12_5dpf.ca$p.value))
+print(paste0("AKT1 4dpf ", correlation_result_AKT1_4dpf.ca$p.value))
+print(paste0("AKT1 4dpf ", correlation_result_AKT1_5dpf.ca$p.value))
 ```
