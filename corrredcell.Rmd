@@ -1,0 +1,52 @@
+# Correlation between redcell:total cells ratio VS total events/min
+
+**Aim:** To see if the low number of redcells in some samples is influencing graph features These ratios are stored in "AKT1.redcell.ratio" "CTRL.redcell.ratio" "HRASV12.redcell.ratio" But I also need the events/min vars..
+Need to see if there is correlation for ALL conditions, including AGE
+
+example code to collect the vars:
+```{r example code}
+# Create a vector of variable names from different ranges
+var_names <- c(
+  paste0("ID0", 130:132, "redcell.ratio"),
+  paste0("ID0", 139:143, "redcell.ratio")
+)
+
+# Use mget to retrieve values of these variables from the environment
+values <- mget(var_names)
+
+# Combine all values into HRASV12_5dpf.redcell.ratio
+AKT1_5dpf.redcell.ratio <- unlist(values)
+AKT1_5dpf.redcell.ratio
+
+# For the frequency values:
+all_AKT1_5dpf_freq <- c(
+    all_lists[["AKT1_5dpf_hind"]][grepl(pattern, names(all_lists[["AKT1_5dpf_hind"]]), perl = TRUE)], 
+    all_lists[["AKT1_5dpf_mid"]][grepl(pattern, names(all_lists[["AKT1_5dpf_mid"]]), perl = TRUE)]
+)
+
+# order them so they parallel each other
+# Sort AKT1_5dpf.redcell.ratio by the names
+AKT1_5dpf.redcell.ratio <- AKT1_5dpf.redcell.ratio[order(names(AKT1_5dpf.redcell.ratio))]
+
+# Sort all_AKT1_5dpf_freq by the names
+all_AKT1_5dpf_freq <- all_AKT1_5dpf_freq[order(names(all_AKT1_5dpf_freq))]
+
+```
+
+Correlation analysis:
+```{r}
+correlation_result_CTRL_4dpf <- cor.test(as.numeric(CTRL_4dpf.redcell.ratio), as.numeric(all_CTRL_4dpf_freq))
+correlation_result_CTRL_5dpf <- cor.test(as.numeric(CTRL_5dpf.redcell.ratio), as.numeric(all_CTRL_5dpf_freq))
+
+
+correlation_result_HRASV12_4dpf <- cor.test(as.numeric(HRASV12_4dpf.redcell.ratio), as.numeric(all_HRASV12_4dpf_freq))
+correlation_result_HRASV12_5dpf <- cor.test(as.numeric(HRASV12_5dpf.redcell.ratio), as.numeric(all_HRASV12_5dpf_freq))
+
+correlation_result_AKT1_4dpf <- cor.test(as.numeric(AKT1_4dpf.redcell.ratio), as.numeric(all_AKT1_4dpf_freq))
+correlation_result_AKT1_5dpf <- cor.test(as.numeric(AKT1_5dpf.redcell.ratio), as.numeric(all_AKT1_5dpf_freq))
+
+# Print the correlation coefficient and p-value
+print(correlation_result$estimate)
+print(correlation_result$p.value)
+
+```
