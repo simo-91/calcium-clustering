@@ -36,7 +36,7 @@ all_AKT1_5dpf_freq <- all_AKT1_5dpf_freq[order(names(all_AKT1_5dpf_freq))]
 Correlation analysis VS events/min (frequency):
 
 ```{r frequency}
-correlation_result_CTRL_4dpf.freq <- cor.test(as.numeric(CTRL_4dpf.redcell.ratio), as.numeric(all_CTRL_4dpf_freq))
+correlation_result_CTRL_5dpf.freq <- cor.test(as.numeric(CTRL_4dpf.redcell.ratio), as.numeric(all_CTRL_4dpf_freq))
 correlation_result_CTRL_5dpf.freq <- cor.test(as.numeric(CTRL_5dpf.redcell.ratio), as.numeric(all_CTRL_5dpf_freq))
 
 
@@ -73,4 +73,69 @@ print(paste0("HRASV12 4dpf ", correlation_result_HRASV12_4dpf.ca$p.value))
 print(paste0("HRASV12 5dpf ", correlation_result_HRASV12_5dpf.ca$p.value))
 print(paste0("AKT1 4dpf ", correlation_result_AKT1_4dpf.ca$p.value))
 print(paste0("AKT1 4dpf ", correlation_result_AKT1_5dpf.ca$p.value))
+```
+
+VS Global efficiency
+
+```{r retrieving data}
+# Updated pattern to exclude '.RFP' and capture only those with '_globalcoeff'
+pattern <- "^(?!.*\\.RFP).*\\.globalcoeff$"
+
+all_AKT1_4dpf_globaleff <- c(
+    all_lists[["AKT1_4dpf_hind"]][grepl(pattern, names(all_lists[["AKT1_4dpf_hind"]]), perl = TRUE)], 
+    all_lists[["AKT1_4dpf_mid"]][grepl(pattern, names(all_lists[["AKT1_4dpf_mid"]]), perl = TRUE)]
+)
+
+# Order!
+all_AKT1_4dpf_globaleff <- all_AKT1_4dpf_globaleff[order(names(all_AKT1_4dpf_globaleff))]
+```
+
+```{r total Global Efficiency}
+correlation_result_CTRL_4dpf.globaleff <- cor.test(as.numeric(CTRL_4dpf.redcell.ratio), as.numeric(all_CTRL_4dpf_globaleff))
+correlation_result_CTRL_5dpf.globaleff <- cor.test(as.numeric(CTRL_5dpf.redcell.ratio), as.numeric(all_CTRL_5dpf_globaleff))
+
+correlation_result_HRASV12_4dpf.globaleff <- cor.test(as.numeric(HRASV12_4dpf.redcell.ratio), as.numeric(all_HRASV12_4dpf_globaleff))
+correlation_result_HRASV12_5dpf.globaleff <- cor.test(as.numeric(HRASV12_5dpf.redcell.ratio), as.numeric(all_HRASV12_5dpf_globaleff))
+
+correlation_result_AKT1_4dpf.globaleff <- cor.test(as.numeric(AKT1_4dpf.redcell.ratio), as.numeric(all_AKT1_4dpf_globaleff))
+correlation_result_AKT1_5dpf.globaleff <- cor.test(as.numeric(AKT1_5dpf.redcell.ratio), as.numeric(all_AKT1_5dpf_globaleff))
+
+print(paste0("CTRL 4dpf ", correlation_result_CTRL_4dpf.globaleff$p.value))
+print(paste0("CTRL 5dpf ", correlation_result_CTRL_5dpf.globaleff$p.value))
+print(paste0("HRASV12 4dpf ", correlation_result_HRASV12_4dpf.globaleff$p.value))
+print(paste0("HRASV12 5dpf ", correlation_result_HRASV12_5dpf.globaleff$p.value))
+print(paste0("AKT1 4dpf ", correlation_result_AKT1_4dpf.globaleff$p.value))
+print(paste0("AKT1 4dpf ", correlation_result_AKT1_5dpf.globaleff$p.value))
+```
+
+VS Clustering Coefficient
+
+```{r retrieve data}
+pattern <- "^(?!.*\\.RFP).*\\.clustcoeff$"
+
+all_AKT1_5dpf_clustcoeff <- c(
+    all_lists[["AKT1_5dpf_hind"]][grepl(pattern, names(all_lists[["AKT1_5dpf_hind"]]), perl = TRUE)], 
+    all_lists[["AKT1_5dpf_mid"]][grepl(pattern, names(all_lists[["AKT1_5dpf_mid"]]), perl = TRUE)]
+)
+
+# Order!
+all_AKT1_5dpf_clustcoeff <- all_AKT1_5dpf_clustcoeff[order(names(all_AKT1_5dpf_clustcoeff))]
+```
+
+```{r total Clustering Coefficient}
+correlation_result_CTRL_4dpf.clustcoeff <- cor.test(as.numeric(CTRL_4dpf.redcell.ratio), as.numeric(all_CTRL_4dpf_clustcoeff))
+correlation_result_CTRL_5dpf.clustcoeff <- cor.test(as.numeric(CTRL_5dpf.redcell.ratio), as.numeric(all_CTRL_5dpf_clustcoeff))
+
+correlation_result_HRASV12_4dpf.clustcoeff <- cor.test(as.numeric(HRASV12_4dpf.redcell.ratio), as.numeric(all_HRASV12_4dpf_clustcoeff))
+correlation_result_HRASV12_5dpf.clustcoeff <- cor.test(as.numeric(HRASV12_5dpf.redcell.ratio), as.numeric(all_HRASV12_5dpf_clustcoeff))
+
+correlation_result_AKT1_4dpf.clustcoeff <- cor.test(as.numeric(AKT1_4dpf.redcell.ratio), as.numeric(all_AKT1_4dpf_clustcoeff))
+correlation_result_AKT1_5dpf.clustcoeff <- cor.test(as.numeric(AKT1_5dpf.redcell.ratio), as.numeric(all_AKT1_5dpf_clustcoeff))
+
+print(paste0("CTRL 4dpf ", correlation_result_CTRL_4dpf.clustcoeff$p.value))
+print(paste0("CTRL 5dpf ", correlation_result_CTRL_5dpf.clustcoeff$p.value))
+print(paste0("HRASV12 4dpf ", correlation_result_HRASV12_4dpf.clustcoeff$p.value))
+print(paste0("HRASV12 5dpf ", correlation_result_HRASV12_5dpf.clustcoeff$p.value))
+print(paste0("AKT1 4dpf ", correlation_result_AKT1_4dpf.clustcoeff$p.value))
+print(paste0("AKT1 4dpf ", correlation_result_AKT1_5dpf.clustcoeff$p.value))
 ```
