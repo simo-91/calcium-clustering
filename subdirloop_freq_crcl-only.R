@@ -1,7 +1,7 @@
 library(pacman)
 p_load(utils, dplyr, tidyverse, ggplot2, plotly, tidyr, reshape2, factoextra, ggdendro,
        grid, RcppCNPy, cowplot, ggpubr, mmand, rstudioapi, reticulate, tcltk, ggfortify,
-       ggpubr, factoextra, parallel, ggpattern, ggsignif, car)
+       ggpubr, factoextra, parallel, ggpattern, ggsignif, car, igraph, ggraph)
 
 
 
@@ -23,7 +23,7 @@ subdirs_stat <- subdirs[grep("stat.npy", subdirs)]
 
 
 
-id_num <- 0115 #starting ID number
+id_num <- 0138 #starting ID number
 
 for (subdir in subdirs_stat) {
   id_num <- id_num + 1
@@ -52,14 +52,14 @@ for (subdir in subdirs_stat) {
   positives <- posXY$Cell
   positivesPLUSone <- positives+1
   
-  # Regression from 1sec/vol to 2sec/vol time resolution -----
-  regr_spks <- matrix(0, nrow = nrow(spks), ncol = ncol(spks)/2)
-  for (i in 1:(ncol(spks)/2)) {
-    regr_spks[, i] <- rowMeans(spks[, (2*i - 1):(2*i)])
-  }
-  rownames(regr_spks) <- rownames(spks)
-  spks <- regr_spks
-  # -----
+  # # Regression from 1sec/vol to 2sec/vol time resolution -----
+  # regr_spks <- matrix(0, nrow = nrow(spks), ncol = ncol(spks)/2)
+  # for (i in 1:(ncol(spks)/2)) {
+  #   regr_spks[, i] <- rowMeans(spks[, (2*i - 1):(2*i)])
+  # }
+  # rownames(regr_spks) <- rownames(spks)
+  # spks <- regr_spks
+  # # -----
   
   spks[is.na(spks)] <- 0
   spks <- spks[,50:ncol(spks)] #need to clean it from first 0 and select best window
@@ -67,8 +67,7 @@ for (subdir in subdirs_stat) {
   spks <- spks[positivesPLUSone,]  #select only positives (real cells)
   rownames(spks) <- positives #fix rownames with actual cells numbers
   spks[is.na(spks)] <- 0 #NAs replaced with 0
-  saveRDS(spks, file = paste0("~/calcium-clustering/data/", id_str, "_spks.rds"))
-  write.csv(spks, file = paste0("~/calcium-clustering/data/", id_str, "_spks.csv"))
+
   
   ## Cutoff function <- anything below 2*(row sd/cell) is 0, anytlong above is 1
   cutoff <- function(x) {
@@ -79,57 +78,71 @@ for (subdir in subdirs_stat) {
   }
   
   spksthresholded <- t(apply(spks, 1, cutoff))
-  saveRDS(spksthresholded, file = paste0("~/calcium-clustering/data/", id_str, "_spksthresholded.rds"))
-  write.csv(spksthresholded, file = paste0("~/calcium-clustering/data/", id_str, "_spksthresholded.csv"))
-  
-  ## Calculating percentage of active cells over time -------------------------
-  spksSUM <- colSums(spksthresholded)
-  spksSUM <- as.data.frame(spksSUM)
-  spksSUM$Time <- 0:(nrow(spksSUM)-1)
-  spksSUM$Perc <- spksSUM$spksSUM/nrow(spksthresholded)*100
-  saveRDS(spksSUM, file = paste0("~/calcium-clustering/data/", id_str, "_percentage_of_coactive_cells.rds"))
-  write.csv(spksSUM, file = paste0("~/calcium-clustering/data/", id_str, "_percentage_of_coactive_cells.csv"))
-  spksSUM.plt <- ggplot(spksSUM, aes(Time, Perc))+
-    geom_line()+ 
-    theme_pubr()
-  
   
   ## Frequency -cell thresholded events divided by 60 sec -----
   posXY$frequency <- rowSums(spksthresholded)/60 #events per minute
   frequency <- mean(rowSums(spksthresholded)/60)
-  saveRDS(frequency, file = paste0("~/calcium-clustering/data/", id_str, "_mean_frequency.rds"))
-  write.csv(frequency, file = paste0("~/calcium-clustering/data/", id_str, "_mean_frequency.csv"))
   
   assign(paste0(id_str, "_frequency"), frequency)
-  ### Compare number of events/min across samples?
+
+  # Graph analysis -------------------------------------------------------
+  ## Using thresholded values
+  # Create empty matrix that will host corr coefficents. 
+  T.allcellst <- t(spksthresholded)
+  ## Function to find max CCF between a and b in ±1 lag range
+  max_CCF<- function(a,b)
+  {
+    d <- ccf(a, b, plot = FALSE, lag.max = 1)
+    cor = d$acf[,,1]
+    return(max(cor))
+  } 
+  p_load(parallel)
   
-  ## Plot total calcium activity/time --------------------------------------
-  spksSUM2 <- colSums(spks)
-  spksSUM2 <- as.data.frame(spksSUM2)
-  spksSUM2$Time <- 0:(nrow(spksSUM2)-1)
-  spksSUM2$Mean <- spksSUM2$spksSUM2/nrow(spksSUM2)
-  saveRDS(spksSUM2, file = paste0("~/calcium-clustering/data/", id_str, "_total_activity.rds"))
-  write.csv(spksSUM2, file = paste0("~/calcium-clustering/data/", id_str, "_total_activity.csv"))
-  spksSUM2.plt <- ggplot(spksSUM2, aes(Time, Mean))+
-    geom_line()+ 
-    theme_pubr()+
-    geom_smooth()+
-    ylab("Ca2+")+
-    ylim(0, NA)
-  spksSUM2.ylim <- layer_scales(spksSUM2.plt)$y$get_limits()
-  ggsave(plot = spksSUM2.plt, file = paste0("~/calcium-clustering/plots/", id_str, "_total_activity.png"), 
-         device = "png",  bg = "white",
-         width = 20, height = 15, units = "cm", dpi = 320,
-         scale = 2)
+  # Set up parallel processing
+  n_cores <- detectCores()
+  cl <- makeCluster(n_cores)
+  clusterExport(cl, "T.allcellst")  # Export T.allcellst to the cluster
+  clusterExport(cl, "max_CCF")  # Export max_CCF function to the cluster
+  clusterEvalQ(cl, {
+    library(matrixStats)  # Load the matrixStats package on the cluster
+  })
   
+  # Define a function to compute max_CCF
+  max_CCF_parallel <- function(i, j) {
+    max_CCF(T.allcellst[, i], T.allcellst[, j])
+  }
+  
+  # Initialize the result matrix
+  n_cols <- ncol(T.allcellst)
+  cmat.allcellst <- matrix(0, n_cols, n_cols)
+  
+  # Loop through upper triangular part of the matrix in parallel
+  pb <- txtProgressBar(min = 0, max = n_cols, style = 3)
+  for (i in 1:(n_cols - 1)) {
+    res <- parLapply(cl, (i + 1):n_cols, max_CCF_parallel, i = i)
+    cmat.allcellst[i, (i + 1):n_cols] <- unlist(res)
+    setTxtProgressBar(pb, i)
+  }
+  
+  # Mirror the upper triangular part to the lower triangular part
+  cmat.allcellst[lower.tri(cmat.allcellst)] <- t(cmat.allcellst)[lower.tri(cmat.allcellst)]
+  
+  diag(cmat.allcellst) <- 1 # Set diagonal to 1
+  cmat.allcellst[is.na(cmat.allcellst)] <- 0 #(Temporary fix) NaN replaced with 0. This happens when manually adding a ROI on Suite2p mistakenly results in a constant time-series of zeroes (hence ccf() tries to divide by 0)
+  
+  # Clean up parallel processing
+  stopCluster(cl)
+  close(pb)
   ## Average activity PER CELL (deconvolved peaks) ---------------------------
   posXY$Mean <- rowMeans(spks)
   mean_Ca <- rowMeans(spks)
   assign(paste0(id_str, "_mean_Ca"), mean_Ca)
   
+  # General graph ----------------------------
+  graph <- graph.adjacency(as.matrix(cmat.allcellst), mode = "undirected", weighted = TRUE, diag = FALSE) # using thresholded values
+  graph <- delete.edges(graph, which(E(graph)$weight <0.30))
   
-  # Graph frequency circles
-  graph.btw.plt <- ggraph(graph, 
+  graph.freqcrcl.plt <- ggraph(graph, 
                           layout = as.matrix(posXY)[, c("X", "Y")]) +
     # geom_edge_link(aes(colour = weight, alpha = weight))+
     # scale_edge_alpha_continuous(range = c(0.1, 1), guide = "none")+
@@ -139,11 +152,14 @@ for (subdir in subdirs_stat) {
                         fill = posXY$frequency,
                         shape = as.factor(posXY$redcell)))+
     scale_fill_viridis(option = "C",
-                       direction = 1)+
+                       direction = 1,
+                       name = "Events/min")+
     scale_color_manual(values = c("0" = alpha("transparent"),
-                                  "1" = "red"))+
+                                  "1" = "red"),
+                       name = "Preneoplastic")+
     scale_shape_manual(values = c("0" = 21,
-                                  "1" = 25))+
+                                  "1" = 25),
+                       name = "Preneoplastic")+
     scale_size_manual(values = c("0" = 5,
                                  "1" = 14),
                       guide = "none")+
@@ -154,4 +170,10 @@ for (subdir in subdirs_stat) {
           legend.key.size = unit(0.5, 'cm'))+
     ggtitle(paste0(id_str, " freq circles ", final_subdir))+
     scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
+  
+  # Save graph
+  ggsave(plot = graph.freqcrcl.plt, file = paste0("~/calcium-clustering/plots/", id_str, "_graph.freqcrcl.plt.png"), 
+         device = "png",  bg = "white",
+         width = 20, height = 15, units = "cm", dpi = 320,
+         scale = 2)
 }
