@@ -443,7 +443,7 @@ for (subdir in subdirs_stat) {
   
   ## Global efficiency RFP (NaN if there are no connected triples in the graph)
   globaleff.RFP <- global_efficiency(graph.RFP)
-  id_str.globaleff.RFP <- paste0(id_str, ".globalcoeff.RFP")
+  id_str.globaleff.RFP <- paste0(id_str, ".globaleff.RFP")
   assign(id_str.globaleff.RFP, globaleff.RFP)
   
   # Network plots ------------------------------------------------------------
@@ -572,13 +572,13 @@ for (subdir in subdirs_stat) {
   graph.clusters = leading.eigenvector.community(graph, options = list(maxiter = 10000000))
   posXY$Community <- graph.clusters$membership
   
-  # Clustering coefficient RFP
+  # Clustering coefficient
   clustcoeff <- transitivity(graph)
   id_str.clustcoeff <- paste0(id_str, ".clustcoeff")
   assign(id_str.clustcoeff, clustcoeff)
-  # Global efficiency RFP
+  # Global efficiency
   globaleff <- global_efficiency(graph)
-  id_str.globaleff <- paste0(id_str, ".globalcoeff")
+  id_str.globaleff <- paste0(id_str, ".globaleff")
   assign(id_str.globaleff, globaleff)
   
   # Network plot ------------------------------------------------------------
@@ -664,31 +664,19 @@ for (subdir in subdirs_stat) {
          width = 20, height = 15, units = "cm", dpi = 320,
          scale = 2)
   
-  # Connections between normal and RFP+ cells
+  # Connections between normal and RFP+ cells ----
   graph.btw.plt <- ggraph(graph, 
                           layout = as.matrix(posXY)[, c("X", "Y")]) +
-    geom_edge_link(aes(colour = weight, alpha = weight))+
-    scale_edge_alpha_continuous(range = c(0.1, 1), guide = "none")+
-    scale_edge_color_viridis(name = "F. Corr",
-                             alpha = 1,
-                             begin = 0.3,
-                             end = 1,
-                             discrete = FALSE,
-                             option = "inferno",
-                             direction = 1,
-                             guide = guide_colourbar(available_aes = "edge_colour")
-    )+
+    # geom_edge_link(aes(colour = weight, alpha = weight))+
+    # scale_edge_alpha_continuous(range = c(0.1, 1), guide = "none")+
     # Calcium levels and degrees
-    geom_node_point(aes(fill = as.factor(posXY$redcell),
-                        size = as.factor(posXY$redcell)),
-                    shape = 21)+
-    # geom_node_text(aes(label = posXY$Cell), 
-    #                colour = "blue",
-    #                 repel = TRUE,
-    #                size = 2.5)+
-    scale_fill_manual(values = c("0" = "grey",
-                                 "1" = "red"),
-                      guide = "none")+
+    geom_node_point(aes(color = as.factor(posXY$redcell),
+                        size = as.factor(posXY$redcell),
+                        fill = posXY$frequency,
+                    shape = 21))+
+    geom_node_text(aes(label = posXY$redcell),
+                    repel = TRUE,
+                   size = 2.5)+
     scale_size_manual(values = c("0" = 5,
                                  "1" = 8),
                       guide = "none")+
@@ -696,13 +684,7 @@ for (subdir in subdirs_stat) {
                 plot_margin = margin(5, 5, 5, 5))+
     theme(legend.position = "right",
           legend.margin	= margin(1,1,1,1),
-          legend.key.size = unit(0.5, 'cm'), #change legend key size
-          # legend.key.height = unit(1, 'pt'), #change legend key height
-          # legend.key.width = unit(1, 'pt'), #change legend key width
-          # legend.title = element_text(size=5), #change legend title font size
-          # legend.text = element_text(size=4),
-          # legend.text.align = 0
-    )+
+          legend.key.size = unit(0.5, 'cm'))+
     ggtitle(paste0(id_str, " RFP+ highlighted", final_subdir))+
     scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
   
@@ -711,6 +693,8 @@ for (subdir in subdirs_stat) {
          device = "png",  bg = "white",
          width = 20, height = 15, units = "cm", dpi = 320,
          scale = 2)
+  
+  
   
   
   ## Histogram count of degrees
@@ -740,42 +724,6 @@ for (subdir in subdirs_stat) {
          device = "png",  bg = "white",
          width = 20, height = 15, units = "cm", dpi = 320,
          scale = 2)
-  
-  
-  # # PSD analysis for acquisition rate of 1sec per vol -----------------------------------------------------
-  # fft <- apply(spks, 1, fft)
-  # 
-  # # Calculate power spectrum for each time series
-  # psd <- abs(fft)^2/ncol(spks) # normalized by length of acquisition
-  # fs = 1 #sampling freq in Hertz; we take a sample every second (1 sample/1 seconds = 1)
-  # nyquist <- fs/2
-  # 
-  # psd <- round(psd, digits = 1)
-  # freq <- seq(0, nyquist, length.out=nrow(psd)) # calculate frequency range
-  # psd.melt <- as.data.frame(psd)
-  # psd.melt$frequency <- freq
-  # psd.melt <- melt(psd.melt, id.vars = "frequency", variable.name = "cell", value.name = "PSD")
-  # 
-  # psd_mean_colname <- paste0(id_str, " PSD mean")
-  # psd.mean <- summarise(psd.melt, "PSD mean" = mean(PSD), .by = "frequency")
-  # assign(paste0(id_str, ".psd.mean"), psd.mean)
-  # 
-  # # RFP only
-  # fft.RFP <- apply(RFP, 1, fft)
-  # 
-  # # Calculate power spectrum for each time series
-  # psd.RFP <- abs(fft.RFP)^2/ncol(RFP) # normalized by length of acquisition
-  # fs = 1 #sampling freq in Hertz; we take a sample every second (1 sample/1 seconds = 1)
-  # nyquist <- fs/2
-  # 
-  # psd.RFP <- round(psd.RFP, digits = 1)
-  # freq <- seq(0, nyquist, length.out=nrow(psd.RFP)) # calculate frequency range
-  # psd.RFP.melt <- as.data.frame(psd.RFP)
-  # psd.RFP.melt$frequency <- freq
-  # psd.RFP.melt <- melt(psd.RFP.melt, id.vars = "frequency", variable.name = "cell", value.name = "PSD")
-  # 
-  # psd.RFP.mean <- summarise(psd.RFP.melt, "PSD mean" = mean(PSD), .by = "frequency")
-  # assign(paste0(id_str, ".psd.RFP.mean"), psd.RFP.mean)
   
   
   # PSD analysis for acquisition rate of 2sec/vol--------------------------------------
