@@ -21,7 +21,7 @@ subdirs_stat <- subdirs[grep("stat.npy", subdirs)]
 
 
 
-id_num <- 0115 #starting ID number
+id_num <- 0160 #starting ID number minus 1
 
 for (subdir in subdirs_stat) {
   id_num <- id_num + 1
@@ -50,14 +50,14 @@ for (subdir in subdirs_stat) {
   positives <- posXY$Cell
   positivesPLUSone <- positives+1
   
-  # Regression from 1sec/vol to 2sec/vol time resolution -----
-  regr_spks <- matrix(0, nrow = nrow(spks), ncol = ncol(spks)/2)
-  for (i in 1:(ncol(spks)/2)) {
-    regr_spks[, i] <- rowMeans(spks[, (2*i - 1):(2*i)])
-  }
-  rownames(regr_spks) <- rownames(spks)
-  spks <- regr_spks
-  # -----
+  # # Regression from 1sec/vol to 2sec/vol time resolution -----
+  # regr_spks <- matrix(0, nrow = nrow(spks), ncol = ncol(spks)/2)
+  # for (i in 1:(ncol(spks)/2)) {
+  #   regr_spks[, i] <- rowMeans(spks[, (2*i - 1):(2*i)])
+  # }
+  # rownames(regr_spks) <- rownames(spks)
+  # spks <- regr_spks
+  # # -----
   
   spks[is.na(spks)] <- 0
   spks <- spks[,50:ncol(spks)] #need to clean it from first 0 and select best window
@@ -347,7 +347,7 @@ for (subdir in subdirs_stat) {
          device = "png",  bg = "white",
          width = 20, height = 15, units = "cm", dpi = 320,
          scale = 2)
-  
+
   # Graph analysis -------------------------------------------------------
   ## Using thresholded values
   # Create empty matrix that will host corr coefficents. 
@@ -397,6 +397,92 @@ for (subdir in subdirs_stat) {
   stopCluster(cl)
   close(pb)
   
+  # General graph ----------------------------
+  p_load("ggplot2", "igraph", "ggraph", "visNetwork", "tidyverse", "tidygraph",
+         "ggiraph", "ggnewscale", "grid", "gridExtra", "RColorBrewer", "pals")
+  
+  graph <- graph.adjacency(as.matrix(cmat.allcellst), mode = "undirected", weighted = TRUE, diag = FALSE) # using thresholded values
+  
+  # Threshold correlation degree. An interval is chosen because the Pearson correlation coeff goes -1 to 1, BUT -1 means anti-correlation.. so one neuron is active when the other isn't)
+  # Set weight threshold (set to 0.30 as per literature: Avitan et al., 2017 http://dx.doi.org/10.1016/j.cub.2017.06.056)
+  graph <- delete.edges(graph, which(E(graph)$weight <0.30))
+  
+  ## Robustness
+  # cohesion <- cohesion(graph)
+  
+  ## Communities detection ---------------------------------------------------
+  # greedy method (hierarchical, fast method)
+  graph.clusters = leading.eigenvector.community(graph, options = list(maxiter = 10000000))
+  posXY$Community <- graph.clusters$membership
+  
+  # Clustering coefficient
+  clustcoeff <- transitivity(graph)
+  id_str.clustcoeff <- paste0(id_str, ".clustcoeff")
+  assign(id_str.clustcoeff, clustcoeff)
+  # Global efficiency
+  globaleff <- global_efficiency(graph)
+  id_str.globaleff <- paste0(id_str, ".globaleff")
+  assign(id_str.globaleff, globaleff)
+  
+  # Network plot ------------------------------------------------------------
+  # Make composite palette
+  colorz = grDevices::colors()[grep('gr(a|e)y', grDevices::colors(), invert = T)]
+  colorz.invert = rev(colorz)
+  communities.palette.big <- c(colorz, brewer.pal(9,'Set1'),
+                               brewer.pal(8,'Set2'),
+                               brewer.pal(12,'Set3'),
+                               brewer.pal(8, 'Dark2'),
+                               brewer.pal(8, 'Accent'),
+                               brewer.pal(9,'Pastel1'),
+                               colorz.invert, colorz)
+  
+  communities.guide <- guide_legend(title = element_text("Communities"),
+                                    label = FALSE,
+                                    keywidth = 0.1)
+  
+  graph.plt <- ggraph(graph, 
+                      layout = as.matrix(posXY)[, c("X", "Y")]) +
+    geom_edge_link(aes(colour = weight, alpha = weight))+
+    scale_edge_alpha_continuous(range = c(0.1, 1), guide = "none")+
+    scale_edge_color_viridis(name = "F. Corr",
+                             alpha = 1,
+                             begin = 0.3,
+                             end = 1,
+                             discrete = FALSE,
+                             option = "inferno",
+                             direction = 1,
+                             guide = guide_colourbar(available_aes = "edge_colour")
+    )+
+    # Memberships and degrees
+    geom_node_point(aes(fill = ordered(leading.eigenvector.community(graph, options = list(maxiter = 10000000))$membership),
+                        size = degree(graph)),
+                    shape = 21)+
+    # geom_node_text(aes(label = posXY$Cell), 
+    #                colour = "red",
+    #                 repel = TRUE,
+    #                size = 2.5)+
+    geom_node_text(aes(label = ordered(leading.eigenvector.community(graph, options = list(maxiter = 10000000))$membership)),
+                   colour = "black",
+                   fontface = 1,
+                   size = 3)+
+    scale_fill_manual(values = communities.palette.big,
+                      guide = "none")+
+    scale_size_continuous(range = c(5, 12),
+                          guide = "none")+
+    theme_graph(background = "white",
+                plot_margin = margin(5, 5, 5, 5))+
+    theme(legend.position = "right",
+          legend.margin	= margin(1,1,1,1),
+          legend.key.size = unit(0.5, 'cm'))+
+    ggtitle(paste0(id_str, "-", final_subdir))+
+    scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
+  
+  # Save graph
+  ggsave(plot = graph.plt, file = paste0("~/calcium-clustering/plots/", id_str, "_graph.png"), 
+         device = "png",  bg = "white",
+         width = 20, height = 15, units = "cm", dpi = 320,
+         scale = 2)
+  
   
   ## RFP-redcells only --------------------
   T.RFPt <- t(RFPt)
@@ -413,8 +499,7 @@ for (subdir in subdirs_stat) {
   close(pb)
   ##
   
-  p_load("ggplot2", "igraph", "ggraph", "visNetwork", "tidyverse", "tidygraph",
-         "ggiraph", "ggnewscale", "grid", "gridExtra", "RColorBrewer", "pals")
+
   
   graph.RFP <- graph.adjacency(as.matrix(cmat.RFPt), mode = "undirected", weighted = TRUE, diag = FALSE) # using thresholded values
   
@@ -523,7 +608,7 @@ for (subdir in subdirs_stat) {
   ## Mean degree
   degree.mean.RFP <- mean(degree(graph.RFP))
   assign(paste0(id_str, ".degree.mean.RFP"), degree.mean.RFP)
-  
+
   # PCA  ----
   ## General population
   pca <- prcomp(spksthresholded, center = TRUE, scale = FALSE) # change to scale = FALSE if not normalised data
@@ -557,145 +642,36 @@ for (subdir in subdirs_stat) {
          width = 20, height = 15, units = "cm", dpi = 320,
          scale = 2)
   
-  # General graph ----------------------------
-  graph <- graph.adjacency(as.matrix(cmat.allcellst), mode = "undirected", weighted = TRUE, diag = FALSE) # using thresholded values
-  
-  # Threshold correlation degree. An interval is chosen because the Pearson correlation coeff goes -1 to 1, BUT -1 means anti-correlation.. so one neuron is active when the other isn't)
-  # Set weight threshold (set to 0.30 as per literature: Avitan et al., 2017 http://dx.doi.org/10.1016/j.cub.2017.06.056)
-  graph <- delete.edges(graph, which(E(graph)$weight <0.30))
-  
-  ## Robustness
-  # cohesion <- cohesion(graph)
-  
-  ## Communities detection ---------------------------------------------------
-  # greedy method (hierarchical, fast method)
-  graph.clusters = leading.eigenvector.community(graph, options = list(maxiter = 10000000))
-  posXY$Community <- graph.clusters$membership
-  
-  # Clustering coefficient
-  clustcoeff <- transitivity(graph)
-  id_str.clustcoeff <- paste0(id_str, ".clustcoeff")
-  assign(id_str.clustcoeff, clustcoeff)
-  # Global efficiency
-  globaleff <- global_efficiency(graph)
-  id_str.globaleff <- paste0(id_str, ".globaleff")
-  assign(id_str.globaleff, globaleff)
-  
-  # Network plot ------------------------------------------------------------
-  # Make composite palette
-  colorz = grDevices::colors()[grep('gr(a|e)y', grDevices::colors(), invert = T)]
-  colorz.invert = rev(colorz)
-  communities.palette.big <- c(colorz, brewer.pal(9,'Set1'),
-                               brewer.pal(8,'Set2'),
-                               brewer.pal(12,'Set3'),
-                               brewer.pal(8, 'Dark2'),
-                               brewer.pal(8, 'Accent'),
-                               brewer.pal(9,'Pastel1'),
-                               colorz.invert, colorz)
-  
-  communities.guide <- guide_legend(title = element_text("Communities"),
-                                    label = FALSE,
-                                    keywidth = 0.1)
-  
-  graph.plt <- ggraph(graph, 
-                      layout = as.matrix(posXY)[, c("X", "Y")]) +
-    geom_edge_link(aes(colour = weight, alpha = weight))+
-    scale_edge_alpha_continuous(range = c(0.1, 1), guide = "none")+
-    scale_edge_color_viridis(name = "F. Corr",
-                             alpha = 1,
-                             begin = 0.3,
-                             end = 1,
-                             discrete = FALSE,
-                             option = "inferno",
-                             direction = 1,
-                             guide = guide_colourbar(available_aes = "edge_colour")
-    )+
-    # Calcium levels and degrees
-    geom_node_point(aes(fill = ordered(leading.eigenvector.community(graph, options = list(maxiter = 10000000))$membership),
-                        size = degree(graph)),
-                    shape = 21)+
-    # geom_node_text(aes(label = posXY$Cell), 
-    #                colour = "red",
-    #                 repel = TRUE,
-    #                size = 2.5)+
-    geom_node_text(aes(label = ordered(leading.eigenvector.community(graph, options = list(maxiter = 10000000))$membership)),
-                   colour = "black",
-                   fontface = 1,
-                   size = 3)+
-    scale_fill_manual(values = communities.palette.big,
-                      guide = "none")+
-    scale_size_continuous(range = c(5, 12),
-                          guide = "none")+
-    # scale_shape_manual(values = c("TRUE" = 25, "FALSE" = 21))+
-    # scale_colour_manual(values = c("TRUE" = "#fc9272", "FALSE" = "black"))+
-    # labs(fill = "Ca")+
-    # Hubs
-    # annotate("text", x=45, y=20, 
-    #           label = "W. thresh. = 0.50")+
-    # annotate("text", x=40, y=35,
-    #          label = "Cohesion = ")+
-    # annotate("text", x=70, y=35,
-    #          label = cohesion)+
-    # geom_node_point(aes(fill = as.factor(posXY$synchron),
-  #                     size = as.factor(posXY$synchron),
-  #                     shape = as.factor(posXY$synchron)))+
-  # scale_size_manual(values = g.sizes.Sync, name = "Synchronous")+
-  # scale_fill_manual(values = g.palette.Sync, name = "Synchronous")+
-  # scale_shape_manual(values = g.shapes.Sync, name = "Synchronous")+
-  # geom_node_label(aes(label = posXY$Cell), repel = TRUE)+
-  
-  theme_graph(background = "white",
-              plot_margin = margin(5, 5, 5, 5))+
-    theme(legend.position = "right",
-          legend.margin	= margin(1,1,1,1),
-          legend.key.size = unit(0.5, 'cm'), #change legend key size
-          # legend.key.height = unit(1, 'pt'), #change legend key height
-          # legend.key.width = unit(1, 'pt'), #change legend key width
-          # legend.title = element_text(size=5), #change legend title font size
-          # legend.text = element_text(size=4),
-          # legend.text.align = 0
-    )+
-    ggtitle(paste0(id_str, "-", final_subdir))+
-    scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
-  
-  # Save graph
-  ggsave(plot = graph.plt, file = paste0("~/calcium-clustering/plots/", id_str, "_graph.png"), 
-         device = "png",  bg = "white",
-         width = 20, height = 15, units = "cm", dpi = 320,
-         scale = 2)
-  
+
   # Connections between normal and RFP+ cells ----
-  graph.btw.plt <- ggraph(graph, 
-                          layout = as.matrix(posXY)[, c("X", "Y")]) +
-    # geom_edge_link(aes(colour = weight, alpha = weight))+
-    # scale_edge_alpha_continuous(range = c(0.1, 1), guide = "none")+
-    # Calcium levels and degrees
-    geom_node_point(aes(color = as.factor(posXY$redcell),
-                        size = as.factor(posXY$redcell),
-                        fill = posXY$frequency,
-                    shape = 21))+
-    geom_node_text(aes(label = posXY$redcell),
-                    repel = TRUE,
-                   size = 2.5)+
-    scale_size_manual(values = c("0" = 5,
-                                 "1" = 8),
-                      guide = "none")+
-    theme_graph(background = "white",
-                plot_margin = margin(5, 5, 5, 5))+
-    theme(legend.position = "right",
-          legend.margin	= margin(1,1,1,1),
-          legend.key.size = unit(0.5, 'cm'))+
-    ggtitle(paste0(id_str, " RFP+ highlighted", final_subdir))+
-    scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
-  
-  # Save graph
-  ggsave(plot = graph.btw.plt, file = paste0("~/calcium-clustering/plots/", id_str, "_graph.btw.plt.png"), 
-         device = "png",  bg = "white",
-         width = 20, height = 15, units = "cm", dpi = 320,
-         scale = 2)
-  
-  
-  
+  # graph.btw.plt <- ggraph(graph, 
+  #                         layout = as.matrix(posXY)[, c("X", "Y")]) +
+  #   # geom_edge_link(aes(colour = weight, alpha = weight))+
+  #   # scale_edge_alpha_continuous(range = c(0.1, 1), guide = "none")+
+  #   # Calcium levels and degrees
+  #   geom_node_point(aes(color = as.factor(posXY$redcell),
+  #                       size = as.factor(posXY$redcell),
+  #                       fill = posXY$frequency,
+  #                       shape = 21))+
+  #   geom_node_text(aes(label = posXY$redcell),
+  #                   repel = TRUE,
+  #                  size = 2.5)+
+  #   scale_size_manual(values = c("0" = 5,
+  #                                "1" = 8),
+  #                     guide = "none")+
+  #   theme_graph(background = "white",
+  #               plot_margin = margin(5, 5, 5, 5))+
+  #   theme(legend.position = "right",
+  #         legend.margin	= margin(1,1,1,1),
+  #         legend.key.size = unit(0.5, 'cm'))+
+  #   ggtitle(paste0(id_str, " RFP+ highlighted", final_subdir))+
+  #   scale_y_reverse() #this is because in images/movies y axis in coordinates is reversed
+  # 
+  # # Save graph
+  # ggsave(plot = graph.btw.plt, file = paste0("~/calcium-clustering/plots/", id_str, "_graph.btw.plt.png"), 
+  #        device = "png",  bg = "white",
+  #        width = 20, height = 15, units = "cm", dpi = 320,
+  #        scale = 2)
   
   ## Histogram count of degrees
   posXY$Degree <- degree(graph)
