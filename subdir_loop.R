@@ -21,7 +21,7 @@ subdirs_stat <- subdirs[grep("stat.npy", subdirs)]
 
 
 
-id_num <- 0160 #starting ID number minus 1
+id_num <- 0145 #starting ID number minus 1
 
 for (subdir in subdirs_stat) {
   id_num <- id_num + 1
@@ -93,8 +93,8 @@ for (subdir in subdirs_stat) {
   
   
   ## Frequency -cell thresholded events divided by 60 sec -----
-  posXY$frequency <- rowSums(spksthresholded)/60 #events per minute
-  frequency <- mean(rowSums(spksthresholded)/60)
+  posXY$frequency <- rowSums(spksthresholded)/120 #events per minute
+  frequency <- mean(rowSums(spksthresholded)/120)
   saveRDS(frequency, file = paste0("~/calcium-clustering/data/", id_str, "_mean_frequency.rds"))
   write.csv(frequency, file = paste0("~/calcium-clustering/data/", id_str, "_mean_frequency.csv"))
   
@@ -177,7 +177,7 @@ for (subdir in subdirs_stat) {
           axis.text.y = element_blank(),
           axis.text.x = element_blank(),
           plot.title = element_text(colour = "red", hjust = .5))+
-  ggtitle(paste0(id_str, " hclust", final_subdir), subtitle = sprintf("Mean frequency is: %s events/min", round(frequency, digits = 3)))
+  ggtitle(paste0(id_str, final_subdir, " hclust"), subtitle = sprintf("Mean frequency is: %s events/min", round(frequency, digits = 3)))
   
   ## GRID raster/sums
   plots <- align_plots(raster.hc, spksSUM.plt, align = 'v', axis = 'l')
@@ -406,6 +406,8 @@ for (subdir in subdirs_stat) {
   # Threshold correlation degree. An interval is chosen because the Pearson correlation coeff goes -1 to 1, BUT -1 means anti-correlation.. so one neuron is active when the other isn't)
   # Set weight threshold (set to 0.30 as per literature: Avitan et al., 2017 http://dx.doi.org/10.1016/j.cub.2017.06.056)
   graph <- delete.edges(graph, which(E(graph)$weight <0.30))
+  id_str.graph <- paste0(id_str, ".graph")
+  assign(id_str.graph, graph)
   
   ## Robustness
   # cohesion <- cohesion(graph)
