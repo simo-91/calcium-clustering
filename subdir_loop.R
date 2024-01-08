@@ -21,7 +21,7 @@ subdirs_stat <- subdirs[grep("stat.npy", subdirs)]
 
 
 
-id_num <- 0145 #starting ID number minus 1
+id_num <- 0185 #starting ID number minus 1
 
 for (subdir in subdirs_stat) {
   id_num <- id_num + 1
@@ -90,7 +90,8 @@ for (subdir in subdirs_stat) {
   spksSUM.plt <- ggplot(spksSUM, aes(Time, Perc))+
     geom_line()+ 
     theme_pubr()
-  
+  mean_perc_active_cells <- mean(spksSUM$spksSUM)
+  assign(paste0(id_str, "_mean_perc_active_cells"), frequency)
   
   ## Frequency -cell thresholded events divided by 60 sec -----
   posXY$frequency <- rowSums(spksthresholded)/120 #events per minute
@@ -415,7 +416,22 @@ for (subdir in subdirs_stat) {
   ## Communities detection ---------------------------------------------------
   # greedy method (hierarchical, fast method)
   graph.clusters = leading.eigenvector.community(graph, options = list(maxiter = 10000000))
+  id_str.graph.clusters <- paste0(id_str, ".graph.clusters")
+  assign(id_str.graph.clusters, graph.clusters)
+  
   posXY$Community <- graph.clusters$membership
+  
+  # Get the size of each community
+  community_sizes <- sizes(graph.clusters)
+  
+  # Sort the communities by size in descending order
+  sorted_communities <- sort(community_sizes, decreasing = TRUE)
+  
+  # To get the top N communities
+  top_n <- 5  # Adjust this to the number of top communities you want
+  top_communities <- head(sorted_communities, n = top_n)
+  
+  
   
   # Clustering coefficient
   clustcoeff <- transitivity(graph)
