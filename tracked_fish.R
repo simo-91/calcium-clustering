@@ -287,11 +287,144 @@ ggline(tracked.CTRL_mean_Ca_long,
        x = "Age", 
        y = "Mean Ca", 
        group = "fish no", 
-       color = "fish no", 
-       add = "mean_se") +
+       color = "fish no") +
   theme_minimal() +
   labs(title = "Control",
        x = "Age (dpf)",
        y = "Mean Ca2+")+
   theme(legend.position = "none")
+
+
+# Frequency as events/min
+# Create vectors for each day post-fertilization (dpf) with the corresponding frequency variable names
+dpf_4_freq <- c(ID0186_frequency, ID0187_frequency, ID0188_frequency, ID0189_frequency, 
+                ID0190_frequency, ID0191_frequency, ID0192_frequency, ID0193_frequency, 
+                ID0194_frequency, ID0195_frequency)
+dpf_5_freq <- c(ID0196_frequency, ID0197_frequency, ID0198_frequency, ID0199_frequency, 
+                ID0200_frequency, ID0201_frequency, ID0202_frequency, ID0203_frequency, 
+                ID0204_frequency, ID0205_frequency)
+dpf_6_freq <- c(ID0206_frequency, ID0207_frequency, ID0208_frequency, ID0209_frequency, 
+                ID0210_frequency, ID0211_frequency, ID0212_frequency, NA, 
+                ID0213_frequency, ID0214_frequency)
+dpf_8_freq <- c(ID0215_frequency, NA, ID0216_frequency, ID0217_frequency, ID0218_frequency, 
+                ID0219_frequency, ID0220_frequency, NA, NA, ID0221_frequency)
+
+# Combine into a dataframe
+tracked.CTRL_frequency <- data.frame(
+  "fish no" = fish_names,
+  "4dpf" = dpf_4_freq,
+  "5dpf" = dpf_5_freq,
+  "6dpf" = dpf_6_freq,
+  "8dpf" = dpf_8_freq
+)
+
+colnames(tracked.CTRL_frequency) <- c("fish no", "4dpf", "5dpf", "6dpf", "8dpf")
+# Reshape the data to long format for plotting or analysis
+tracked.CTRL_frequency_long <- pivot_longer(tracked.CTRL_frequency, 
+                                            cols = c("4dpf", "5dpf", "6dpf", "8dpf"), 
+                                            names_to = "Age", 
+                                            values_to = "Frequency")
+
+ggline(tracked.CTRL_frequency_long, 
+       x = "Age", 
+       y = "Frequency", 
+       group = "fish no", 
+       color = "fish no") +
+  theme_minimal() +
+  labs(title = "Control events/min",
+       x = "Age (dpf)",
+       y = "Frequency (events/minute)") +
+  theme(legend.position = "none")
+
+
+
+# Clustering coefficient
+# Create vectors for each day post-fertilization (dpf) with the corresponding clustering coefficient variable names
+dpf_4_clustcoeff <- c(ID0186.clustcoeff, ID0187.clustcoeff, ID0188.clustcoeff, ID0189.clustcoeff, 
+                      ID0190.clustcoeff, ID0191.clustcoeff, ID0192.clustcoeff, ID0193.clustcoeff, 
+                      ID0194.clustcoeff, ID0195.clustcoeff)
+dpf_5_clustcoeff <- c(ID0196.clustcoeff, ID0197.clustcoeff, ID0198.clustcoeff, ID0199.clustcoeff, 
+                      ID0200.clustcoeff, ID0201.clustcoeff, ID0202.clustcoeff, ID0203.clustcoeff, 
+                      ID0204.clustcoeff, ID0205.clustcoeff)
+dpf_6_clustcoeff <- c(ID0206.clustcoeff, ID0207.clustcoeff, ID0208.clustcoeff, ID0209.clustcoeff, 
+                      ID0210.clustcoeff, ID0211.clustcoeff, ID0212.clustcoeff, NA, 
+                      ID0213.clustcoeff, ID0214.clustcoeff)
+dpf_8_clustcoeff <- c(ID0215.clustcoeff, NA, ID0216.clustcoeff, ID0217.clustcoeff, ID0218.clustcoeff, 
+                      ID0219.clustcoeff, ID0220.clustcoeff, NA, NA, ID0221.clustcoeff)
+
+# Combine into a dataframe
+tracked.CTRL_clustcoeff <- data.frame(
+  "fish no" = fish_names,
+  "4dpf" = dpf_4_clustcoeff,
+  "5dpf" = dpf_5_clustcoeff,
+  "6dpf" = dpf_6_clustcoeff,
+  "8dpf" = dpf_8_clustcoeff
+)
+
+# Set column names
+colnames(tracked.CTRL_clustcoeff) <- c("fish no", "4dpf", "5dpf", "6dpf", "8dpf")
+
+# Reshape the data to long format for plotting or analysis
+tracked.CTRL_clustcoeff_long <- pivot_longer(tracked.CTRL_clustcoeff, 
+                                             cols = c("4dpf", "5dpf", "6dpf", "8dpf"), 
+                                             names_to = "Age", 
+                                             values_to = "ClustCoeff")
+
+ggline(tracked.CTRL_clustcoeff_long, 
+       x = "Age", 
+       y = "ClustCoeff", 
+       group = "fish no", 
+       color = "fish no") +
+  theme_minimal() +
+  labs(title = "Control Clustering Coefficienc C",
+       x = "Age (dpf)",
+       y = "ClustCoeff") +
+  theme(legend.position = "none")
+
+
+#  Global efficiency
+# Global Efficiency
+# Create vectors for each day post-fertilization (dpf) with the corresponding global efficiency variable names
+dpf_4_globaleff <- c(ID0186.globaleff, ID0187.globaleff, ID0188.globaleff, ID0189.globaleff, 
+                     ID0190.globaleff, ID0191.globaleff, ID0192.globaleff, ID0193.globaleff, 
+                     ID0194.globaleff, ID0195.globaleff)
+dpf_5_globaleff <- c(ID0196.globaleff, ID0197.globaleff, ID0198.globaleff, ID0199.globaleff, 
+                     ID0200.globaleff, ID0201.globaleff, ID0202.globaleff, ID0203.globaleff, 
+                     ID0204.globaleff, ID0205.globaleff)
+dpf_6_globaleff <- c(ID0206.globaleff, ID0207.globaleff, ID0208.globaleff, ID0209.globaleff, 
+                     ID0210.globaleff, ID0211.globaleff, ID0212.globaleff, NA, 
+                     ID0213.globaleff, ID0214.globaleff)
+dpf_8_globaleff <- c(ID0215.globaleff, NA, ID0216.globaleff, ID0217.globaleff, ID0218.globaleff, 
+                     ID0219.globaleff, ID0220.globaleff, NA, NA, ID0221.globaleff)
+
+# Combine into a dataframe
+tracked.CTRL_globaleff <- data.frame(
+  "fish no" = fish_names,
+  "4dpf" = dpf_4_globaleff,
+  "5dpf" = dpf_5_globaleff,
+  "6dpf" = dpf_6_globaleff,
+  "8dpf" = dpf_8_globaleff
+)
+
+# Set column names
+colnames(tracked.CTRL_globaleff) <- c("fish no", "4dpf", "5dpf", "6dpf", "8dpf")
+
+# Reshape the data to long format for plotting or analysis
+tracked.CTRL_globaleff_long <- pivot_longer(tracked.CTRL_globaleff, 
+                                            cols = c("4dpf", "5dpf", "6dpf", "8dpf"), 
+                                            names_to = "Age", 
+                                            values_to = "GlobalEff")
+
+# Plotting
+ggline(tracked.CTRL_globaleff_long, 
+       x = "Age", 
+       y = "GlobalEff", 
+       group = "fish no", 
+       color = "fish no") +
+  theme_minimal() +
+  labs(title = "Control Global Efficiency by Age",
+       x = "Age (dpf)",
+       y = "Global Efficiency") +
+  theme(legend.position = "none")
+
 
