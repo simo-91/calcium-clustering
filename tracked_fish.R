@@ -275,6 +275,7 @@ tracked.CTRL_mean_Ca <- data.frame(
   "6dpf" = dpf_6,
   "8dpf" = dpf_8
 )
+colnames(tracked.CTRL_frequency) <- c("fish no", "4dpf", "5dpf", "6dpf", "8dpf")
 
 # Reshape the data to long format
 tracked.CTRL_mean_Ca_long <- pivot_longer(tracked.CTRL_mean_Ca, 
@@ -416,7 +417,7 @@ tracked.CTRL_globaleff_long <- pivot_longer(tracked.CTRL_globaleff,
                                             values_to = "GlobalEff")
 
 # Plotting
-ggline(tracked.CTRL_globaleff_long, 
+plot222 <- ggline(tracked.CTRL_globaleff_long, 
        x = "Age", 
        y = "GlobalEff", 
        group = "fish no", 
@@ -428,3 +429,129 @@ ggline(tracked.CTRL_globaleff_long,
   theme(legend.position = "none")
 
 
+
+# AKT1
+
+#  Mean_Ca
+# AKT1 Mean Calcium
+# Create vectors for each day post-fertilization (dpf) with the corresponding mean calcium variable names
+dpf_4_mean_Ca_AKT1 <- c(mean(ID0152_mean_Ca), mean(ID0153_mean_Ca), mean(ID0154_mean_Ca), mean(ID0155_mean_Ca), 
+                        mean(ID0156_mean_Ca), mean(ID0157_mean_Ca), NA, mean(ID0159_mean_Ca), mean(ID0160_mean_Ca))
+dpf_5_mean_Ca_AKT1 <- c(mean(ID0161_mean_Ca), mean(ID0162_mean_Ca), mean(ID0163_mean_Ca), mean(ID0164_mean_Ca), 
+                        mean(ID0165_mean_Ca), mean(ID0166_mean_Ca), NA, mean(ID0168_mean_Ca), mean(ID0169_mean_Ca))
+dpf_6_mean_Ca_AKT1 <- c(mean(ID0170_mean_Ca), mean(ID0171_mean_Ca), mean(ID0172_mean_Ca), mean(ID0173_mean_Ca), 
+                        mean(ID0174_mean_Ca), NA, NA, mean(ID0176_mean_Ca), mean(ID0177_mean_Ca))
+dpf_8_mean_Ca_AKT1 <- c(mean(ID0178_mean_Ca), mean(ID0179_mean_Ca), NA, mean(ID0181_mean_Ca), mean(ID0182_mean_Ca), 
+                        NA, NA, mean(ID0184_mean_Ca), mean(ID0185_mean_Ca))
+
+# Combine into a dataframe
+tracked.AKT1_mean_Ca <- data.frame(
+  "fish no" = c("fish1", "fish2", "fish3", "fish4", "fish5", "fish6", "fish7", "fish8", "fish9"),
+  "4dpf" = dpf_4_mean_Ca_AKT1,
+  "5dpf" = dpf_5_mean_Ca_AKT1,
+  "6dpf" = dpf_6_mean_Ca_AKT1,
+  "8dpf" = dpf_8_mean_Ca_AKT1
+)
+
+# Set column names
+colnames(tracked.AKT1_mean_Ca) <- c("fish no", "4dpf", "5dpf", "6dpf", "8dpf")
+
+# Reshape the data to long format for plotting or analysis
+tracked.AKT1_mean_Ca_long <- pivot_longer(tracked.AKT1_mean_Ca, 
+                                          cols = c("4dpf", "5dpf", "6dpf", "8dpf"), 
+                                          names_to = "Age", 
+                                          values_to = "Mean_Ca")
+
+# Plotting
+ggline(tracked.AKT1_mean_Ca_long, 
+       x = "Age", 
+       y = "Mean_Ca", 
+       group = "fish no", 
+       color = "fish no") +
+  theme_minimal() +
+  labs(title = "AKT1 Mean Calcium Levels by Age",
+       x = "Age (dpf)",
+       y = "Mean Calcium Level") +
+  theme(legend.position = "none")
+
+# AKT1 Frequency
+# Create vectors for each day post-fertilization (dpf) with the corresponding frequency variable names
+dpf_4_freq_AKT1 <- c(ID0152_frequency, ID0153_frequency, ID0154_frequency, ID0155_frequency, 
+                     ID0156_frequency, ID0157_frequency, NA, ID0159_frequency, ID0160_frequency)
+dpf_5_freq_AKT1 <- c(ID0161_frequency, ID0162_frequency, ID0163_frequency, ID0164_frequency, 
+                     ID0165_frequency, ID0166_frequency, NA, ID0168_frequency, ID0169_frequency)
+dpf_6_freq_AKT1 <- c(ID0170_frequency, ID0171_frequency, ID0172_frequency, ID0173_frequency, 
+                     ID0174_frequency, NA, NA, ID0176_frequency, ID0177_frequency)
+dpf_8_freq_AKT1 <- c(ID0178_frequency, ID0179_frequency, NA, ID0181_frequency, ID0182_frequency, 
+                     NA, NA, ID0184_frequency, ID0185_frequency)
+
+# Combine into a dataframe
+tracked.AKT1_frequency <- data.frame(
+  "fish no" = c("fish1", "fish2", "fish3", "fish4", "fish5", "fish6", "fish7", "fish8", "fish9"),
+  "4dpf" = dpf_4_freq_AKT1,
+  "5dpf" = dpf_5_freq_AKT1,
+  "6dpf" = dpf_6_freq_AKT1,
+  "8dpf" = dpf_8_freq_AKT1
+)
+
+colnames(tracked.AKT1_frequency) <- c("fish no", "4dpf", "5dpf", "6dpf", "8dpf")
+
+# Reshape the data to long format for plotting or analysis
+tracked.AKT1_frequency_long <- pivot_longer(tracked.AKT1_frequency, 
+                                            cols = c("4dpf", "5dpf", "6dpf", "8dpf"), 
+                                            names_to = "Age", 
+                                            values_to = "Frequency")
+
+# Plotting
+ggline(tracked.AKT1_frequency_long, 
+                  x = "Age", 
+                  y = "Frequency", 
+                  group = "fish no", 
+                  color = "fish no") +
+  theme_minimal() +
+  labs(title = "AKT1 events/min by Age",
+       x = "Age (dpf)",
+       y = "Events/min") +
+  theme(legend.position = "none")
+
+
+# AKT1 Clustering Coefficient
+# Create vectors for each day post-fertilization (dpf) with the corresponding clustering coefficient variable names
+dpf_4_clustcoeff_AKT1 <- c(ID0152.clustcoeff, ID0153.clustcoeff, ID0154.clustcoeff, ID0155.clustcoeff, 
+                           ID0156.clustcoeff, ID0157.clustcoeff, NA, ID0159.clustcoeff, ID0160.clustcoeff)
+dpf_5_clustcoeff_AKT1 <- c(ID0161.clustcoeff, ID0162.clustcoeff, ID0163.clustcoeff, ID0164.clustcoeff, 
+                           ID0165.clustcoeff, ID0166.clustcoeff, NA, ID0168.clustcoeff, ID0169.clustcoeff)
+dpf_6_clustcoeff_AKT1 <- c(ID0170.clustcoeff, ID0171.clustcoeff, ID0172.clustcoeff, ID0173.clustcoeff, 
+                           ID0174.clustcoeff, NA, NA, ID0176.clustcoeff, ID0177.clustcoeff)
+dpf_8_clustcoeff_AKT1 <- c(ID0178.clustcoeff, ID0179.clustcoeff, NA, ID0181.clustcoeff, ID0182.clustcoeff, 
+                           NA, NA, ID0184.clustcoeff, ID0185.clustcoeff)
+
+# Combine into a dataframe
+tracked.AKT1_clustcoeff <- data.frame(
+  "fish no" = c("fish1", "fish2", "fish3", "fish4", "fish5", "fish6", "fish7", "fish8", "fish9"),
+  "4dpf" = dpf_4_clustcoeff_AKT1,
+  "5dpf" = dpf_5_clustcoeff_AKT1,
+  "6dpf" = dpf_6_clustcoeff_AKT1,
+  "8dpf" = dpf_8_clustcoeff_AKT1
+)
+
+# Set column names
+colnames(tracked.AKT1_clustcoeff) <- c("fish no", "4dpf", "5dpf", "6dpf", "8dpf")
+
+# Reshape the data to long format for plotting or analysis
+tracked.AKT1_clustcoeff_long <- pivot_longer(tracked.AKT1_clustcoeff, 
+                                             cols = c("4dpf", "5dpf", "6dpf", "8dpf"), 
+                                             names_to = "Age", 
+                                             values_to = "ClustCoeff")
+
+# Plotting
+ggline(tracked.AKT1_clustcoeff_long, 
+       x = "Age", 
+       y = "ClustCoeff", 
+       group = "fish no", 
+       color = "fish no") +
+  theme_minimal() +
+  labs(title = "AKT1 Clustering Coefficient by Age",
+       x = "Age (dpf)",
+       y = "Clustering Coefficient") +
+  theme(legend.position = "none")
