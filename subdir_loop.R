@@ -1,7 +1,7 @@
 library(pacman)
 p_load(utils, dplyr, tidyverse, ggplot2, plotly, tidyr, reshape2, factoextra, ggdendro,
        grid, RcppCNPy, cowplot, ggpubr, mmand, rstudioapi, reticulate, tcltk, ggfortify,
-       ggpubr, factoextra, parallel, ggpattern, ggsignif, car)
+       ggpubr, factoextra, parallel, ggpattern, ggsignif, car, gtools)
 
 # Function to choose a directory with platform-independent GUI
 choose_directory = function(caption = 'Select data directory') {
@@ -18,10 +18,10 @@ main.dir <- choose_directory()
 # Loop over each subdirectory in the main directory
 subdirs <- list.files(path = main.dir, recursive = TRUE, full.names = TRUE, include.dirs = TRUE)
 subdirs_stat <- subdirs[grep("stat.npy", subdirs)]
+subdirs_stat <- mixedsort(subdirs_stat)
 
 
-
-id_num <- 0185 #starting ID number minus 1
+id_num <- 0243 #starting ID number minus 1
 
 for (subdir in subdirs_stat) {
   id_num <- id_num + 1
@@ -29,7 +29,9 @@ for (subdir in subdirs_stat) {
   
   ## Navigate to the subdirectory and load the necessary files
   setwd((dirname(subdir)))
-  final_subdir <- basename(dirname(dirname(dirname(dirname(subdir)))))
+  path_parts <- strsplit(subdir, "/")[[1]]
+  final_subdir <- path_parts[4]
+  
   np <- import("numpy")
   stat <- np$load("stat.npy", allow_pickle = TRUE)
   redcell <- np$load("redcell.npy", allow_pickle = TRUE)
@@ -424,13 +426,13 @@ for (subdir in subdirs_stat) {
   # Get the size of each community
   community_sizes <- sizes(graph.clusters)
   
-  # Sort the communities by size in descending order
-  sorted_communities <- sort(community_sizes, decreasing = TRUE)
+  # Identify "big" communities (more than 20 members)
+  big_communities <- community_sizes[community_sizes > 20]
   
-  # To get the top N communities
-  top_n <- 5  # Adjust this to the number of top communities you want
-  top_communities <- head(sorted_communities, n = top_n)
-  
+  # Count the number of "big" communities
+  number_of_big_communities <- length(big_communities)
+  id_str.big_communities <- paste0(id_str, ".big_communities")
+  assign(id_str.big_communities, number_of_big_communities)
   
   
   # Clustering coefficient

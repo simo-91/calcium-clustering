@@ -198,6 +198,14 @@ CTRL.df <- data.frame(
 )
 
 
+# CTRL.mean_ca.df <- data.frame(
+#   Mean_Ca_4dpf = c(mean(ID0144_mean_Ca), mean(ID0145_mean_Ca), mean(ID0186_mean_Ca), mean(ID0187_mean_Ca), mean(ID0188_mean_Ca), mean(ID0189_mean_Ca), mean(ID0190_mean_Ca), mean(ID0191_mean_Ca), mean(ID0192_mean_Ca), mean(ID0193_mean_Ca), mean(ID0194_mean_Ca), mean(ID0195_mean_Ca)),
+#   Mean_Ca_5dpf = c(mean(ID0146_mean_Ca), mean(ID0147_mean_Ca), mean(ID0148_mean_Ca), mean(ID0146_mean_Ca), mean(ID0196_mean_Ca), mean(ID0197_mean_Ca), mean(ID0198_mean_Ca), mean(ID0199_mean_Ca), mean(ID0200_mean_Ca), mean(ID0201_mean_Ca), mean(ID0202_mean_Ca), mean(ID0203_mean_Ca), mean(ID0204_mean_Ca), mean(ID0205_mean_Ca)),
+#   Mean_Ca_6dpf = c(mean(ID0206_mean_Ca), mean(ID0207_mean_Ca), mean(ID0208_mean_Ca), mean(ID0209_mean_Ca), mean(ID0210_mean_Ca), mean(ID0211_mean_Ca), mean(ID0212_mean_Ca), mean(ID0213_mean_Ca), mean(ID0214_mean_Ca)),
+#   Mean_Ca_8dpf = c(mean(ID0215_mean_Ca), mean(ID0216_mean_Ca), mean(ID0217_mean_Ca), mean(ID0218_mean_Ca), mean(ID0219_mean_Ca), mean(ID0220_mean_Ca), mean(ID0221_mean_Ca))
+# )
+
+
 # Unique fish identifiers
 unique_fish <- unique(CTRL.df$Fish_no)
 
@@ -241,3 +249,49 @@ for (fish in unique_fish) {
   # Print the combined plot to the R console (optional)
   print(combined_plot)
 }
+
+# CTRL tracked
+  # Create a list of fish names
+  fish_names <- paste0("fish", 1:10)
+
+# Create vectors for each day post-fertilization (dpf) with the corresponding variable names
+dpf_4 <- c(mean(ID0186_mean_Ca), mean(ID0187_mean_Ca), mean(ID0188_mean_Ca), mean(ID0189_mean_Ca), 
+           mean(ID0190_mean_Ca), mean(ID0191_mean_Ca), mean(ID0192_mean_Ca), mean(ID0193_mean_Ca), 
+           mean(ID0194_mean_Ca), mean(ID0195_mean_Ca))
+dpf_5 <- c(mean(ID0196_mean_Ca), mean(ID0197_mean_Ca), mean(ID0198_mean_Ca), mean(ID0199_mean_Ca), 
+           mean(ID0200_mean_Ca), mean(ID0201_mean_Ca), mean(ID0202_mean_Ca), mean(ID0203_mean_Ca), 
+           mean(ID0204_mean_Ca), mean(ID0205_mean_Ca))
+dpf_6 <- c(mean(ID0206_mean_Ca), mean(ID0207_mean_Ca), mean(ID0208_mean_Ca), mean(ID0209_mean_Ca), 
+           mean(ID0210_mean_Ca), mean(ID0211_mean_Ca), mean(ID0212_mean_Ca), NA, 
+           mean(ID0213_mean_Ca), mean(ID0214_mean_Ca))
+dpf_8 <- c(mean(ID0215_mean_Ca), NA, mean(ID0216_mean_Ca), mean(ID0217_mean_Ca), mean(ID0218_mean_Ca), 
+           mean(ID0219_mean_Ca), mean(ID0220_mean_Ca), NA, NA, mean(ID0221_mean_Ca))
+
+# Combine into a dataframe
+tracked.CTRL_mean_Ca <- data.frame(
+  "fish no" = fish_names,
+  "4dpf" = dpf_4,
+  "5dpf" = dpf_5,
+  "6dpf" = dpf_6,
+  "8dpf" = dpf_8
+)
+
+# Reshape the data to long format
+tracked.CTRL_mean_Ca_long <- pivot_longer(tracked.CTRL_mean_Ca, 
+                                          cols = c("4dpf", "5dpf", "6dpf", "8dpf"), 
+                                          names_to = "Age", 
+                                          values_to = "Mean Ca")
+
+# Plotting
+ggline(tracked.CTRL_mean_Ca_long, 
+       x = "Age", 
+       y = "Mean Ca", 
+       group = "fish no", 
+       color = "fish no", 
+       add = "mean_se") +
+  theme_minimal() +
+  labs(title = "Control",
+       x = "Age (dpf)",
+       y = "Mean Ca2+")+
+  theme(legend.position = "none")
+
