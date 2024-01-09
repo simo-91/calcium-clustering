@@ -555,3 +555,323 @@ ggline(tracked.AKT1_clustcoeff_long,
        x = "Age (dpf)",
        y = "Clustering Coefficient") +
   theme(legend.position = "none")
+
+
+
+# AKT1 Global efficiency G
+# Create vectors for each day post-fertilization (dpf) with the corresponding clustering coefficient variable names
+dpf_4_globaleff_AKT1 <- c(ID0152.globaleff, ID0153.globaleff, ID0154.globaleff, ID0155.globaleff, 
+                           ID0156.globaleff, ID0157.globaleff, NA, ID0159.globaleff, ID0160.globaleff)
+dpf_5_globaleff_AKT1 <- c(ID0161.globaleff, ID0162.globaleff, ID0163.globaleff, ID0164.globaleff, 
+                           ID0165.globaleff, ID0166.globaleff, NA, ID0168.globaleff, ID0169.globaleff)
+dpf_6_globaleff_AKT1 <- c(ID0170.globaleff, ID0171.globaleff, ID0172.globaleff, ID0173.globaleff, 
+                           ID0174.globaleff, NA, NA, ID0176.globaleff, ID0177.globaleff)
+dpf_8_globaleff_AKT1 <- c(ID0178.globaleff, ID0179.globaleff, NA, ID0181.globaleff, ID0182.globaleff, 
+                           NA, NA, ID0184.globaleff, ID0185.globaleff)
+
+# Combine into a dataframe
+tracked.AKT1_globaleff <- data.frame(
+  "fish no" = c("fish1", "fish2", "fish3", "fish4", "fish5", "fish6", "fish7", "fish8", "fish9"),
+  "4dpf" = dpf_4_globaleff_AKT1,
+  "5dpf" = dpf_5_globaleff_AKT1,
+  "6dpf" = dpf_6_globaleff_AKT1,
+  "8dpf" = dpf_8_globaleff_AKT1
+)
+
+# Set column names
+colnames(tracked.AKT1_globaleff) <- c("fish no", "4dpf", "5dpf", "6dpf", "8dpf")
+
+# Reshape the data to long format for plotting or analysis
+tracked.AKT1_globaleff_long <- pivot_longer(tracked.AKT1_globaleff, 
+                                             cols = c("4dpf", "5dpf", "6dpf", "8dpf"), 
+                                             names_to = "Age", 
+                                             values_to = "globaleff")
+
+# Plotting
+ggline(tracked.AKT1_globaleff_long, 
+       x = "Age", 
+       y = "globaleff", 
+       group = "fish no", 
+       color = "fish no") +
+  theme_minimal() +
+  labs(title = "AKT1 Global Efficiency by Age",
+       x = "Age (dpf)",
+       y = "Global Efficiency") +
+  theme(legend.position = "none")
+
+
+# Extracting 4dpf data for CTRL and AKT1, omitting NAs
+CTRL_4dpf <- na.omit(tracked.CTRL_mean_Ca$`4dpf`)
+AKT1_4dpf <- na.omit(tracked.AKT1_mean_Ca$`4dpf`)
+
+# Find the maximum length of the two vectors
+max_length <- max(length(CTRL_4dpf), length(AKT1_4dpf))
+
+# Extend both vectors to the maximum length by adding NAs
+CTRL_4dpf_extended <- c(CTRL_4dpf, rep(NA, max_length - length(CTRL_4dpf)))
+AKT1_4dpf_extended <- c(AKT1_4dpf, rep(NA, max_length - length(AKT1_4dpf)))
+
+# Creating a combined dataframe with equal length vectors
+data_4dpf <- data.frame(
+  Mean_Ca = c(CTRL_4dpf_extended, AKT1_4dpf_extended),
+  Condition = rep(c("CTRL", "AKT1"), each = max_length)
+)
+
+# Plotting the boxplot
+CTRLvsAKT1.4dpf_mean_Ca.plt <- ggplot(data_4dpf, aes(x = Condition, y = Mean_Ca, fill = Condition)) +
+  geom_boxplot() +
+  labs(title = "Comparison of 4dpf-CTRL vs 4dpf-AKT1",
+       x = "Condition",
+       y = "Mean Calcium Level") +
+  theme_minimal()
+
+
+# Extracting 5dpf data for CTRL and AKT1, omitting NAs
+CTRL_5dpf <- na.omit(tracked.CTRL_mean_Ca$`5dpf`)
+AKT1_5dpf <- na.omit(tracked.AKT1_mean_Ca$`5dpf`)
+
+# Perform Mann-Whitney U test
+mw_test_result <- wilcox.test(CTRL_5dpf, AKT1_5dpf)
+
+# Extract the p-value
+p_value <- mw_test_result$p.value
+
+# Create a combined dataframe
+max_length <- max(length(CTRL_5dpf), length(AKT1_5dpf))
+data_5dpf <- data.frame(
+  Mean_Ca = c(CTRL_5dpf, rep(NA, max_length - length(CTRL_5dpf)), 
+              AKT1_5dpf, rep(NA, max_length - length(AKT1_5dpf))),
+  Condition = factor(rep(c("CTRL", "AKT1"), each = max_length))
+)
+
+# Plotting the boxplot with p-value
+CTRLvsAKT1.5dpf_mean_Ca.plt <- ggplot(data_5dpf, aes(x = Condition, y = Mean_Ca, fill = Condition)) +
+  geom_boxplot() +
+  labs(title = "Comparison of 5dpf-CTRL vs 5dpf-AKT1",
+       x = "Condition",
+       y = "Mean Calcium Level") +
+  theme_minimal() +
+  geom_text(aes(label = paste("p =", format(p_value, digits = 2)), 
+                x = 1.5, y = max(data_5dpf$Mean_Ca, na.rm = TRUE)), 
+            vjust = -1)
+
+
+
+# Extracting 6dpf data for CTRL and AKT1, omitting NAs
+CTRL_6dpf <- na.omit(tracked.CTRL_mean_Ca$`6dpf`)
+AKT1_6dpf <- na.omit(tracked.AKT1_mean_Ca$`6dpf`)
+
+# Perform Mann-Whitney U test for 6dpf
+mw_test_result_6dpf <- wilcox.test(CTRL_6dpf, AKT1_6dpf)
+
+# Extract the p-value for 6dpf
+p_value_6dpf <- mw_test_result_6dpf$p.value
+
+# Create a combined dataframe for 6dpf
+max_length_6dpf <- max(length(CTRL_6dpf), length(AKT1_6dpf))
+data_6dpf <- data.frame(
+  Mean_Ca = c(CTRL_6dpf, rep(NA, max_length_6dpf - length(CTRL_6dpf)), 
+              AKT1_6dpf, rep(NA, max_length_6dpf - length(AKT1_6dpf))),
+  Condition = factor(rep(c("CTRL", "AKT1"), each = max_length_6dpf))
+)
+
+# Plotting the boxplot with p-value for 6dpf
+CTRLvsAKT1.6dpf_mean_Ca.plt <- ggplot(data_6dpf, aes(x = Condition, y = Mean_Ca, fill = Condition)) +
+  geom_boxplot() +
+  labs(title = "Comparison of 6dpf-CTRL vs 6dpf-AKT1",
+       x = "Condition",
+       y = "Mean Calcium Level") +
+  theme_minimal() +
+  geom_text(aes(label = paste("p =", format(p_value_6dpf, digits = 2)), 
+                x = 1.5, y = max(data_6dpf$Mean_Ca, na.rm = TRUE)), 
+            vjust = -1)
+
+# Extracting 8dpf data for CTRL and AKT1, omitting NAs
+CTRL_8dpf <- na.omit(tracked.CTRL_mean_Ca$`8dpf`)
+AKT1_8dpf <- na.omit(tracked.AKT1_mean_Ca$`8dpf`)
+
+# Equalize the length of both vectors by padding with NAs
+max_length <- max(length(CTRL_8dpf), length(AKT1_8dpf))
+length(CTRL_8dpf) <- max_length
+length(AKT1_8dpf) <- max_length
+
+# Perform Mann-Whitney U test
+mw_test_8dpf <- wilcox.test(CTRL_8dpf, AKT1_8dpf, exact = FALSE)
+
+# Extract the p-value
+p_value_8dpf <- mw_test_8dpf$p.value
+
+# Create a combined dataframe
+data_8dpf <- data.frame(
+  Mean_Ca = c(CTRL_8dpf, AKT1_8dpf),
+  Condition = rep(c("CTRL", "AKT1"), each = max_length)
+)
+
+# Plotting the boxplot for 8dpf with p-value
+CTRLvsAKT1.8dpf_mean_Ca.plt <- ggplot(data_8dpf, aes(x = Condition, y = Mean_Ca, fill = Condition)) +
+  geom_boxplot() +
+  labs(title = "Comparison of 8dpf-CTRL vs 8dpf-AKT1",
+       x = "Condition",
+       y = "Mean Calcium Level") +
+  theme_minimal() +
+  geom_text(aes(label = paste("p =", format(p_value_8dpf, digits = 2)), 
+                x = 1.5, y = max(data_8dpf$Mean_Ca, na.rm = TRUE)), 
+            vjust = -1)
+
+
+
+# FREQUENCY
+# Extracting 4dpf frequency data for CTRL and AKT1, omitting NAs
+CTRL_4dpf_freq <- na.omit(tracked.CTRL_frequency$`4dpf`)
+AKT1_4dpf_freq <- na.omit(tracked.AKT1_frequency$`4dpf`)
+
+# Equalize the length of both vectors by padding with NAs
+max_length <- max(length(CTRL_4dpf_freq), length(AKT1_4dpf_freq))
+CTRL_4dpf_freq_extended <- c(CTRL_4dpf_freq, rep(NA, max_length - length(CTRL_4dpf_freq)))
+AKT1_4dpf_freq_extended <- c(AKT1_4dpf_freq, rep(NA, max_length - length(AKT1_4dpf_freq)))
+
+# Perform Mann-Whitney U test
+mw_test_4dpf_freq <- wilcox.test(CTRL_4dpf_freq_extended, AKT1_4dpf_freq_extended, exact = FALSE)
+
+# Extract the p-value
+p_value_4dpf_freq <- mw_test_4dpf_freq$p.value
+
+# Create combined dataframe for 4dpf frequency
+data_4dpf_freq <- data.frame(
+  Frequency = c(CTRL_4dpf_freq_extended, AKT1_4dpf_freq_extended),
+  Condition = rep(c("CTRL", "AKT1"), each = max_length)
+)
+
+
+ggplot(data_4dpf_freq, aes(x = Condition, y = Frequency, fill = Condition)) +
+  geom_boxplot() +
+  labs(title = "4dpf Frequency Comparison: CTRL vs AKT1",
+       x = "Condition",
+       y = "Frequency") +
+  theme_minimal() +
+  geom_text(aes(label = paste("p =", format(p_value_4dpf_freq, digits = 2)), 
+                x = 1.5, y = max(data_4dpf_freq$Frequency, na.rm = TRUE)), 
+            vjust = -1)
+
+
+# Equalize the length of both vectors by padding with NAs
+max_length_4dpf <- max(length(CTRL_4dpf_freq), length(AKT1_4dpf_freq))
+length(CTRL_4dpf_freq) <- max_length_4dpf
+length(AKT1_4dpf_freq) <- max_length_4dpf
+
+# Perform Mann-Whitney U test
+mw_test_4dpf_freq <- wilcox.test(CTRL_4dpf_freq, AKT1_4dpf_freq, exact = FALSE)
+
+# Extract the p-value
+p_value_4dpf_freq <- mw_test_4dpf_freq$p.value
+
+# Create combined dataframe and plot for 4dpf frequency
+data_4dpf_freq <- data.frame(
+  Frequency = c(CTRL_4dpf_freq, AKT1_4dpf_freq),
+  Condition = rep(c("CTRL", "AKT1"), each = max_length_4dpf)
+)
+
+CTRLvsAKT1.4dpf_frequency.plt <- ggplot(data_4dpf_freq, aes(x = Condition, y = Frequency, fill = Condition)) +
+  geom_boxplot() +
+  labs(title = "4dpf Frequency Comparison: CTRL vs AKT1",
+       x = "",
+       y = "Events/min") +
+  theme_pubr() +
+  geom_text(aes(label = paste("p =", format(p_value_4dpf_freq, digits = 2)), 
+                x = 1.5, y = max(data_4dpf_freq$Frequency, na.rm = TRUE)), 
+            vjust = -1)
+
+
+# Extracting 5dpf frequency data for CTRL and AKT1, omitting NAs
+CTRL_5dpf_freq <- na.omit(tracked.CTRL_frequency$`5dpf`)
+AKT1_5dpf_freq <- na.omit(tracked.AKT1_frequency$`5dpf`)
+
+# Equalize the length of both vectors by padding with NAs
+max_length_5dpf <- max(length(CTRL_5dpf_freq), length(AKT1_5dpf_freq))
+length(CTRL_5dpf_freq) <- max_length_5dpf
+length(AKT1_5dpf_freq) <- max_length_5dpf
+
+# Perform Mann-Whitney U test
+mw_test_5dpf_freq <- wilcox.test(CTRL_5dpf_freq, AKT1_5dpf_freq, exact = FALSE)
+
+# Extract the p-value
+p_value_5dpf_freq <- mw_test_5dpf_freq$p.value
+
+# Create combined dataframe and plot for 5dpf frequency
+data_5dpf_freq <- data.frame(
+  Frequency = c(CTRL_5dpf_freq, AKT1_5dpf_freq),
+  Condition = rep(c("CTRL", "AKT1"), each = max_length_5dpf)
+)
+
+CTRLvsAKT1.5dpf_frequency.plt <- ggplot(data_5dpf_freq, aes(x = Condition, y = Frequency, fill = Condition)) +
+  geom_boxplot() +
+  labs(title = "5dpf Frequency Comparison: CTRL vs AKT1",
+       x = "",
+       y = "Events/min") +
+  theme_pubr() +
+  geom_text(aes(label = paste("p =", format(p_value_5dpf_freq, digits = 2)), 
+                x = 1.5, y = max(data_5dpf_freq$Frequency, na.rm = TRUE)), 
+            vjust = -1)
+
+
+# Extracting 6dpf frequency data for CTRL and AKT1, omitting NAs
+CTRL_6dpf_freq <- na.omit(tracked.CTRL_frequency$`6dpf`)
+AKT1_6dpf_freq <- na.omit(tracked.AKT1_frequency$`6dpf`)
+
+# Equalize the length of both vectors by padding with NAs
+max_length_6dpf <- max(length(CTRL_6dpf_freq), length(AKT1_6dpf_freq))
+length(CTRL_6dpf_freq) <- max_length_6dpf
+length(AKT1_6dpf_freq) <- max_length_6dpf
+
+# Perform Mann-Whitney U test
+mw_test_6dpf_freq <- wilcox.test(CTRL_6dpf_freq, AKT1_6dpf_freq, exact = FALSE)
+
+# Extract the p-value
+p_value_6dpf_freq <- mw_test_6dpf_freq$p.value
+
+# Create combined dataframe and plot for 6dpf frequency
+data_6dpf_freq <- data.frame(
+  Frequency = c(CTRL_6dpf_freq, AKT1_6dpf_freq),
+  Condition = rep(c("CTRL", "AKT1"), each = max_length_6dpf)
+)
+
+CTRLvsAKT1.6dpf_frequency.plt <- ggplot(data_6dpf_freq, aes(x = Condition, y = Frequency, fill = Condition)) +
+  geom_boxplot() +
+  labs(title = "6dpf Frequency Comparison: CTRL vs AKT1",
+       x = "",
+       y = "Events/min") +
+  theme_pubr() +
+  geom_text(aes(label = paste("p =", format(p_value_6dpf_freq, digits = 2)), 
+                x = 1.5, y = max(data_6dpf_freq$Frequency, na.rm = TRUE)), 
+            vjust = -1)
+
+# Extracting 8dpf frequency data for CTRL and AKT1, omitting NAs
+CTRL_8dpf_freq <- na.omit(tracked.CTRL_frequency$`8dpf`)
+AKT1_8dpf_freq <- na.omit(tracked.AKT1_frequency$`8dpf`)
+
+# Equalize the length of both vectors by padding with NAs
+max_length_8dpf <- max(length(CTRL_8dpf_freq), length(AKT1_8dpf_freq))
+length(CTRL_8dpf_freq) <- max_length_8dpf
+length(AKT1_8dpf_freq) <- max_length_8dpf
+
+# Perform Mann-Whitney U test
+mw_test_8dpf_freq <- wilcox.test(CTRL_8dpf_freq, AKT1_8dpf_freq, exact = FALSE)
+
+# Extract the p-value
+p_value_8dpf_freq <- mw_test_8dpf_freq$p.value
+
+# Create combined dataframe and plot for 8dpf frequency
+data_8dpf_freq <- data.frame(
+  Frequency = c(CTRL_8dpf_freq, AKT1_8dpf_freq),
+  Condition = rep(c("CTRL", "AKT1"), each = max_length_8dpf)
+)
+
+CTRLvsAKT1.8dpf_frequency.plt <- ggplot(data_8dpf_freq, aes(x = Condition, y = Frequency, fill = Condition)) +
+  geom_boxplot() +
+  labs(title = "8dpf Frequency Comparison: CTRL vs AKT1",
+       x = "",
+       y = "Events/min") +
+  theme_pubr() +
+  geom_text(aes(label = paste("p =", format(p_value_8dpf_freq, digits = 2)), 
+                x = 1.5, y = max(data_8dpf_freq$Frequency, na.rm = TRUE)), 
+            vjust = -1)
