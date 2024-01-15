@@ -1,3 +1,4 @@
+```{r background code, include=FALSE}
 # AKT1
 
 AKT1.df <- data.frame(
@@ -598,8 +599,11 @@ ggline(tracked.AKT1_globaleff_long,
        x = "Age (dpf)",
        y = "Global Efficiency") +
   theme(legend.position = "none")
+```
 
-
+```{r Mean Ca 4dpf, echo=FALSE, warning=FALSE}
+# Comparisons of CTRL vs AKT1
+# Mean Calcium levels ----
 # Extracting 4dpf data for CTRL and AKT1, omitting NAs
 CTRL_4dpf <- na.omit(tracked.CTRL_mean_Ca$`4dpf`)
 AKT1_4dpf <- na.omit(tracked.AKT1_mean_Ca$`4dpf`)
@@ -620,12 +624,18 @@ data_4dpf <- data.frame(
 # Plotting the boxplot
 CTRLvsAKT1.4dpf_mean_Ca.plt <- ggplot(data_4dpf, aes(x = Condition, y = Mean_Ca, fill = Condition)) +
   geom_boxplot() +
-  labs(title = "Comparison of 4dpf-CTRL vs 4dpf-AKT1",
+  geom_jitter(position = position_jitter(width = 0.2), alpha = 1) +  # Set alpha to 1 for dots
+  labs(title = "4dpf",
        x = "Condition",
        y = "Mean Calcium Level") +
-  theme_minimal()
+  theme_pubr()+
+  theme(axis.title.x = element_blank(),
+        legend.position = "none") +
+  ylab(expression(Ca^"2+"))
+CTRLvsAKT1.4dpf_mean_Ca.plt
+```
 
-
+```{r Mean Ca 5dpf, echo=FALSE, warning=FALSE}
 # Extracting 5dpf data for CTRL and AKT1, omitting NAs
 CTRL_5dpf <- na.omit(tracked.CTRL_mean_Ca$`5dpf`)
 AKT1_5dpf <- na.omit(tracked.AKT1_mean_Ca$`5dpf`)
@@ -647,16 +657,21 @@ data_5dpf <- data.frame(
 # Plotting the boxplot with p-value
 CTRLvsAKT1.5dpf_mean_Ca.plt <- ggplot(data_5dpf, aes(x = Condition, y = Mean_Ca, fill = Condition)) +
   geom_boxplot() +
-  labs(title = "Comparison of 5dpf-CTRL vs 5dpf-AKT1",
+  geom_jitter(position = position_jitter(width = 0.2), alpha = 1) +  # Set alpha to 1 for dots
+  labs(title = "5dpf",
        x = "Condition",
        y = "Mean Calcium Level") +
-  theme_minimal() +
+  theme_pubr() +
   geom_text(aes(label = paste("p =", format(p_value, digits = 2)), 
                 x = 1.5, y = max(data_5dpf$Mean_Ca, na.rm = TRUE)), 
-            vjust = -1)
+            vjust = 2.5)+
+  theme(axis.title.x = element_blank(),
+        legend.position = "none") +
+  ylab(expression(Ca^"2+"))
+CTRLvsAKT1.5dpf_mean_Ca.plt
+```
 
-
-
+```{r Mean Ca 6dpf, warning=FALSE echo = FALSE}
 # Extracting 6dpf data for CTRL and AKT1, omitting NAs
 CTRL_6dpf <- na.omit(tracked.CTRL_mean_Ca$`6dpf`)
 AKT1_6dpf <- na.omit(tracked.AKT1_mean_Ca$`6dpf`)
@@ -678,14 +693,20 @@ data_6dpf <- data.frame(
 # Plotting the boxplot with p-value for 6dpf
 CTRLvsAKT1.6dpf_mean_Ca.plt <- ggplot(data_6dpf, aes(x = Condition, y = Mean_Ca, fill = Condition)) +
   geom_boxplot() +
-  labs(title = "Comparison of 6dpf-CTRL vs 6dpf-AKT1",
+  geom_jitter(position = position_jitter(width = 0.2), alpha = 1) +  # Set alpha to 1 for dots
+  labs(title = "6dpf",
        x = "Condition",
        y = "Mean Calcium Level") +
-  theme_minimal() +
+  theme_pubr() +
   geom_text(aes(label = paste("p =", format(p_value_6dpf, digits = 2)), 
                 x = 1.5, y = max(data_6dpf$Mean_Ca, na.rm = TRUE)), 
-            vjust = -1)
+            vjust = 2.5)+
+  theme(axis.title.x = element_blank(),
+        legend.position = "none") +
+  ylab(expression(Ca^"2+"))
+```
 
+```{r Mean Ca 8dpf, echo=FALSE, warning=FALSE}
 # Extracting 8dpf data for CTRL and AKT1, omitting NAs
 CTRL_8dpf <- na.omit(tracked.CTRL_mean_Ca$`8dpf`)
 AKT1_8dpf <- na.omit(tracked.AKT1_mean_Ca$`8dpf`)
@@ -710,17 +731,22 @@ data_8dpf <- data.frame(
 # Plotting the boxplot for 8dpf with p-value
 CTRLvsAKT1.8dpf_mean_Ca.plt <- ggplot(data_8dpf, aes(x = Condition, y = Mean_Ca, fill = Condition)) +
   geom_boxplot() +
-  labs(title = "Comparison of 8dpf-CTRL vs 8dpf-AKT1",
+  geom_jitter(position = position_jitter(width = 0.2), alpha = 1) +  # Set alpha to 1 for dots
+  labs(title = "8dpf",
        x = "Condition",
        y = "Mean Calcium Level") +
-  theme_minimal() +
+  theme_pubr() +
   geom_text(aes(label = paste("p =", format(p_value_8dpf, digits = 2)), 
                 x = 1.5, y = max(data_8dpf$Mean_Ca, na.rm = TRUE)), 
-            vjust = -1)
+            vjust = 3.5)+
+  theme(axis.title.x = element_blank(),
+        legend.position = "none") +
+  ylab(expression(Ca^"2+"))
+```
 
-
-
-# FREQUENCY
+Frequency (as events/min)
+```{r Frequency 4dpf, echo=FALSE, warning=FALSE}
+# FREQUENCY ----------------
 # Extracting 4dpf frequency data for CTRL and AKT1, omitting NAs
 CTRL_4dpf_freq <- na.omit(tracked.CTRL_frequency$`4dpf`)
 AKT1_4dpf_freq <- na.omit(tracked.AKT1_frequency$`4dpf`)
@@ -773,15 +799,20 @@ data_4dpf_freq <- data.frame(
 
 CTRLvsAKT1.4dpf_frequency.plt <- ggplot(data_4dpf_freq, aes(x = Condition, y = Frequency, fill = Condition)) +
   geom_boxplot() +
+  geom_jitter()+
   labs(title = "4dpf Frequency Comparison: CTRL vs AKT1",
        x = "",
        y = "Events/min") +
   theme_pubr() +
+  theme(axis.title.x = element_blank(),
+        legend.position = "none") +
   geom_text(aes(label = paste("p =", format(p_value_4dpf_freq, digits = 2)), 
                 x = 1.5, y = max(data_4dpf_freq$Frequency, na.rm = TRUE)), 
-            vjust = -1)
+            vjust = 2.5)
 
+```
 
+```{r Frequency 5dpf, echo=FALSE, warning=FALSE}
 # Extracting 5dpf frequency data for CTRL and AKT1, omitting NAs
 CTRL_5dpf_freq <- na.omit(tracked.CTRL_frequency$`5dpf`)
 AKT1_5dpf_freq <- na.omit(tracked.AKT1_frequency$`5dpf`)
@@ -805,15 +836,20 @@ data_5dpf_freq <- data.frame(
 
 CTRLvsAKT1.5dpf_frequency.plt <- ggplot(data_5dpf_freq, aes(x = Condition, y = Frequency, fill = Condition)) +
   geom_boxplot() +
+  geom_jitter()+
   labs(title = "5dpf Frequency Comparison: CTRL vs AKT1",
        x = "",
        y = "Events/min") +
   theme_pubr() +
+  theme(axis.title.x = element_blank(),
+        legend.position = "none") +
   geom_text(aes(label = paste("p =", format(p_value_5dpf_freq, digits = 2)), 
-                x = 1.5, y = max(data_5dpf_freq$Frequency, na.rm = TRUE)), 
-            vjust = -1)
+                x = 1.75, y = max(data_5dpf_freq$Frequency, na.rm = TRUE)), 
+            vjust = 2.5)
 
+```
 
+```{r Frequency 6dpf, echo=FALSE, warning=FALSE}
 # Extracting 6dpf frequency data for CTRL and AKT1, omitting NAs
 CTRL_6dpf_freq <- na.omit(tracked.CTRL_frequency$`6dpf`)
 AKT1_6dpf_freq <- na.omit(tracked.AKT1_frequency$`6dpf`)
@@ -837,14 +873,19 @@ data_6dpf_freq <- data.frame(
 
 CTRLvsAKT1.6dpf_frequency.plt <- ggplot(data_6dpf_freq, aes(x = Condition, y = Frequency, fill = Condition)) +
   geom_boxplot() +
+  geom_jitter()+
   labs(title = "6dpf Frequency Comparison: CTRL vs AKT1",
        x = "",
        y = "Events/min") +
   theme_pubr() +
+  theme(axis.title.x = element_blank(),
+        legend.position = "none") +
   geom_text(aes(label = paste("p =", format(p_value_6dpf_freq, digits = 2)), 
-                x = 1.5, y = max(data_6dpf_freq$Frequency, na.rm = TRUE)), 
-            vjust = -1)
+                x = 1.75, y = max(data_6dpf_freq$Frequency, na.rm = TRUE)), 
+            vjust = 2.5)
+```
 
+```{r Frequency 8dpf, echo=FALSE, warning=FALSE}
 # Extracting 8dpf frequency data for CTRL and AKT1, omitting NAs
 CTRL_8dpf_freq <- na.omit(tracked.CTRL_frequency$`8dpf`)
 AKT1_8dpf_freq <- na.omit(tracked.AKT1_frequency$`8dpf`)
@@ -868,10 +909,225 @@ data_8dpf_freq <- data.frame(
 
 CTRLvsAKT1.8dpf_frequency.plt <- ggplot(data_8dpf_freq, aes(x = Condition, y = Frequency, fill = Condition)) +
   geom_boxplot() +
+  geom_jitter()+
   labs(title = "8dpf Frequency Comparison: CTRL vs AKT1",
        x = "",
        y = "Events/min") +
   theme_pubr() +
+  theme(axis.title.x = element_blank(),
+        legend.position = "none") +
   geom_text(aes(label = paste("p =", format(p_value_8dpf_freq, digits = 2)), 
-                x = 1.5, y = max(data_8dpf_freq$Frequency, na.rm = TRUE)), 
-            vjust = -1)
+                x = 1.75, y = max(data_8dpf_freq$Frequency, na.rm = TRUE)), 
+            vjust = 2.5)
+
+```
+
+```{r comparisons background code, include=FALSE}
+# Comparisons -----
+
+CTRLvsAKT1_mean_Ca.plt <- ggarrange(CTRLvsAKT1.4dpf_mean_Ca.plt, CTRLvsAKT1.5dpf_mean_Ca.plt,
+                                CTRLvsAKT1.6dpf_mean_Ca.plt, CTRLvsAKT1.8dpf_mean_Ca.plt)
+
+CTRLvsAKT1_frequency.plt <- ggarrange(CTRLvsAKT1.4dpf_frequency.plt, CTRLvsAKT1.5dpf_frequency.plt,
+                                  CTRLvsAKT1.6dpf_frequency.plt, CTRLvsAKT1.8dpf_frequency.plt)
+# Condition during time
+CTRL_frequency_over_days.plt <- ggboxplot(data = tracked.CTRL_frequency_long2, x = "Age", y = "Frequency", 
+                                          fill = "lightblue", # Change the fill color
+                                          palette = "jco",    # Use a predefined color palette
+                                          add = c("mean_bar", "jitter"),    # Add mean and standard deviation
+                                          title = "CTRL Events/min by Age",  # Add a title
+                                          xlab = "Age",       # Label for the x-axis
+                                          ylab = "Events/min")+
+                                    theme_pubr()
+
+
+AKT1_frequency_over_days.plt <- ggboxplot(data = tracked.AKT1_frequency_long2, x = "Age", y = "Frequency", 
+                                          fill = "red", # Change the fill color
+                                          palette = "jco",    # Use a predefined color palette
+                                          add = c("mean_bar", "jitter"),    # Add mean and standard deviation
+                                          title = "AKT1 Events/min by Age",  # Add a title
+                                          xlab = "Age",       # Label for the x-axis
+                                          ylab = "Events/min") + 
+  theme_pubr() + # Using a predefined theme
+  ylim(0, 1.5)   # Set the y-axis limits
+
+
+# Both AKT1 and CTRL overlapping over time
+# Merge the two dataframes
+CTRL_AKT1_frequency_merged_data.df <- rbind(
+  data.frame(Group = "CTRL", tracked.CTRL_frequency_long2),
+  data.frame(Group = "AKT1", tracked.AKT1_frequency_long2)
+)
+
+# Create the combined plot with overlapping data
+CTRL_AKT1_frequency_merged.plt <- ggboxplot(CTRL_AKT1_frequency_merged_data.df, x = "Age", y = "Frequency",
+                                            fill = "Group",
+                                            palette = c("CTRL" = "blue", "AKT1" = "red"),
+                                            add = "boxplot",
+                                            title = "Frequency Comparison: CTRL vs AKT1",
+                                            xlab = "Age",
+                                            ylab = "Events/min") +
+  theme(legend.position = "none") + # Using a predefined theme
+  ylim(0, 1.5) 
+
+
+ggboxplot(CTRL_AKT1_frequency_merged_data.df, x = "Age", y = "Frequency",
+          fill = "Group",
+          palette = c("CTRL" = "blue", "AKT1" = "red"),
+          add = "boxplot",
+          title = "Frequency Comparison: CTRL vs AKT1",
+          xlab = "Age",
+          ylab = "Events/min") +
+  theme(legend.position = "none") + # Remove legend
+  ylim(0, 1.5) +
+  stat_compare_means(method = "wilcox.test", 
+                     comparisons = list(c("CTRL", "AKT1")), 
+                     label = "p.format",
+                     method.args = list(alternative = "two.sided", exact = FALSE))
+
+
+
+
+# Clustering Coefficient comparisons ----
+CTRL_AKT1_clustcoeff.df <- rbind(
+  data.frame(Group = "CTRL", tracked.CTRL_clustcoeff_long),
+  data.frame(Group = "AKT1", tracked.AKT1_clustcoeff_long)
+)
+
+
+CTRL_AKT1_clustcoeff.df <- na.omit(CTRL_AKT1_clustcoeff.df)
+
+CTRL_AKT1_clustcoeff.plt <- ggboxplot(CTRL_AKT1_clustcoeff.df, x = "Age", y = "ClustCoeff",
+                                                                  fill = "Group",
+                                                                  palette = c("CTRL" = "blue", "AKT1" = "red"),
+                                                                  add = "boxplot",
+                                                                  title = "Clustering Coefficients Comparison: CTRL vs AKT1",
+                                                                  xlab = "Age",
+                                                                  ylab = "C(g)") +
+                          theme(legend.position = "none") + # Remove legend
+                          ylim(0, 1.5) +
+                          stat_compare_means(data = CTRL_AKT1_clustcoeff.df, method = "wilcox.test", 
+                                             comparisons = list(c("CTRL", "AKT1")), label = "p.format")
+
+
+# Global Efficiency comparisons ---------
+# Create a data frame for global efficiency
+CTRL_AKT1_globaleff.df <- rbind(
+  data.frame(Group = "CTRL", tracked.CTRL_globaleff_long), # Replace with your actual data frame for CTRL global efficiency
+  data.frame(Group = "AKT1", tracked.AKT1_globaleff_long)  # Replace with your actual data frame for AKT1 global efficiency
+)
+
+# Remove NA values
+CTRL_AKT1_globaleff.df <- na.omit(CTRL_AKT1_globaleff.df)
+
+# Create the boxplot with statistical comparison
+CTRL_AKT1_globaleff.plt <- ggboxplot(CTRL_AKT1_globaleff.df, x = "Age", y = "GlobalEff", # Make sure to replace 'GlobalEff' with your actual column name
+                                     fill = "Group",
+                                     palette = c("CTRL" = "blue", "AKT1" = "red"),
+                                     add = "boxplot",
+                                     title = "Global Efficiency Comparison: CTRL vs AKT1",
+                                     xlab = "Age",
+                                     ylab = "Global Efficiency") +
+  theme(legend.position = "centre") + # Remove legend
+  ylim(0, 1.5) +
+  geom_signif()
+
+# CTRL
+mean_data <- tracked.CTRL_globaleff_long %>%
+  group_by(Age) %>%
+  summarise(MeanGlobalEff = mean(GlobalEff))
+
+mean_sd_data <- tracked.CTRL_globaleff_long %>%
+  group_by(Age) %>%
+  summarise(MeanGlobalEff = mean(GlobalEff),
+            SdGlobalEff = sd(GlobalEff))
+
+mean_sd_data <- tracked.CTRL_globaleff_long %>%
+                group_by(Age) %>%
+                summarise(MeanGlobalEff = mean(GlobalEff), 
+                          SdGlobalEff = sd(GlobalEff))
+
+# Create the plot
+tracked.CTRL_globaleff_long.plt <- ggplot(tracked.CTRL_globaleff_long, aes(x = Age, y = GlobalEff)) +
+                                      geom_boxplot(fill = "lightblue", color = "black", alpha = 0.7, outlier.shape = NA) +
+                                      geom_jitter(position = position_jitter(width = 0.2), color = "black", size = 2, alpha = 1) +
+                                      labs(
+                                        title = "Global Efficiency by Age in CTRL",
+                                        y = "Global Efficiency"
+                                      ) +
+                                      theme_pubr() +
+                                      theme(
+                                        plot.title = element_text(hjust = 0.5),
+                                        axis.title.x = element_blank(),
+                                        axis.title.y = element_text(margin = margin(r = 10)),
+                                        axis.text = element_text(size = 12),
+                                        axis.title = element_text(size = 14),
+                                        legend.position = "none"  # Remove legend
+  )
+
+  
+tracked.AKT1_globaleff_long.plt <- ggplot(tracked.AKT1_globaleff_long, aes(x = Age, y = GlobalEff)) +
+  geom_boxplot(fill = "#f03b20", color = "black", alpha = 0.7, outlier.shape = NA) +
+  geom_jitter(position = position_jitter(width = 0.2), color = "black", size = 2, alpha = 1) +
+  labs(
+    title = "Global Efficiency by Age in AKT1",
+    y = "Global Efficiency"
+  ) +
+  theme_pubr() +
+  theme(
+    plot.title = element_text(hjust = 0.5),
+    axis.title.x = element_blank(),
+    axis.title.y = element_text(margin = margin(r = 10)),
+    axis.text = element_text(size = 12),
+    axis.title = element_text(size = 14),
+    legend.position = "none"  # Remove legend
+  )
+
+
+
+# HRASV12 ----
+# Create a list of fish names for HRASV12 condition
+fish_names_hrasv12 <- paste0("fish", 1:17)
+
+# Define NA vector for missing values in each dpf column
+na_vec_4dpf <- rep(NA, 17)
+na_vec_5dpf <- rep(NA, 17)
+na_vec_6dpf <- rep(NA, 17)
+na_vec_8dpf <- rep(NA, 17)
+
+# Fill the 4dpf column
+dpf_4_hrasv12 <- c(mean(ID0222_mean_Ca), mean(ID0223_mean_Ca), mean(ID0224_mean_Ca), mean(ID0225_mean_Ca), 
+                   mean(ID0226_mean_Ca), mean(ID0227_mean_Ca), mean(ID0228_mean_Ca), mean(ID0229_mean_Ca), 
+                   mean(ID0230_mean_Ca), mean(ID0231_mean_Ca), mean(ID0247_mean_Ca), mean(ID0248_mean_Ca), 
+                   mean(ID0249_mean_Ca), mean(ID0250_mean_Ca), mean(ID0251_mean_Ca), mean(ID0252_mean_Ca), 
+                   mean(ID0253_mean_Ca))
+na_vec_4dpf[1:17] <- dpf_4_hrasv12
+
+# Fill the 5dpf column
+dpf_5_hrasv12 <- c(mean(ID0232_mean_Ca), mean(ID0233_mean_Ca), NA, mean(ID0234_mean_Ca), mean(ID0235_mean_Ca), 
+                   mean(ID0236_mean_Ca), NA, NA, mean(ID0237_mean_Ca), mean(ID0238_mean_Ca), NA, mean(ID0254_mean_Ca), 
+                   mean(ID0255_mean_Ca), NA, mean(ID0256_mean_Ca), mean(ID0257_mean_Ca), mean(ID0258_mean_Ca))
+na_vec_5dpf[1:17] <- dpf_5_hrasv12
+
+# Fill the 6dpf column
+dpf_6_hrasv12 <- c(mean(ID0239_mean_Ca), NA, NA, mean(ID0240_mean_Ca), mean(ID0241_mean_Ca), NA, NA, NA, 
+                   mean(ID0242_mean_Ca), mean(ID0243_mean_Ca), NA, mean(ID0259_mean_Ca), mean(ID0260_mean_Ca), NA, 
+                   NA, mean(ID0261_mean_Ca), mean(ID0262_mean_Ca))
+na_vec_6dpf[1:17] <- dpf_6_hrasv12
+
+# Fill the 8dpf column
+dpf_8_hrasv12 <- c(mean(ID0244_mean_Ca), NA, NA, mean(ID0245_mean_Ca), mean(ID0246_mean_Ca), NA, NA, NA, NA, NA, 
+                   NA, mean(ID0263_mean_Ca), mean(ID0264_mean_Ca), NA, NA, NA, mean(ID0265_mean_Ca))
+na_vec_8dpf[1:17] <- dpf_8_hrasv12
+
+# Combine into a dataframe
+tracked.HRASV12_mean_Ca <- data.frame(
+  "fish no" = fish_names_hrasv12,
+  "4dpf" = na_vec_4dpf,
+  "5dpf" = na_vec_5dpf,
+  "6dpf" = na_vec_6dpf,
+  "8dpf" = na_vec_8dpf
+)
+
+# Correct the column names if necessary
+colnames(tracked.HRASV12_mean_Ca) <- c("fish no", "4dpf", "5dpf", "6dpf", "8dpf")
