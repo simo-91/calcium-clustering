@@ -922,7 +922,6 @@ CTRLvsAKT1.8dpf_frequency.plt <- ggplot(data_8dpf_freq, aes(x = Condition, y = F
 
 ```
 
-```{r comparisons background code, include=FALSE}
 # Comparisons -----
 
 CTRLvsAKT1_mean_Ca.plt <- ggarrange(CTRLvsAKT1.4dpf_mean_Ca.plt, CTRLvsAKT1.5dpf_mean_Ca.plt,
@@ -1096,29 +1095,29 @@ na_vec_6dpf <- rep(NA, 17)
 na_vec_8dpf <- rep(NA, 17)
 
 # Fill the 4dpf column
-dpf_4_hrasv12 <- c(mean(ID0222_mean_Ca), mean(ID0223_mean_Ca), mean(ID0224_mean_Ca), mean(ID0225_mean_Ca), 
+dpf_4_hrasv12_mean_Ca <- c(mean(ID0222_mean_Ca), mean(ID0223_mean_Ca), mean(ID0224_mean_Ca), mean(ID0225_mean_Ca), 
                    mean(ID0226_mean_Ca), mean(ID0227_mean_Ca), mean(ID0228_mean_Ca), mean(ID0229_mean_Ca), 
                    mean(ID0230_mean_Ca), mean(ID0231_mean_Ca), mean(ID0247_mean_Ca), mean(ID0248_mean_Ca), 
                    mean(ID0249_mean_Ca), mean(ID0250_mean_Ca), mean(ID0251_mean_Ca), mean(ID0252_mean_Ca), 
                    mean(ID0253_mean_Ca))
-na_vec_4dpf[1:17] <- dpf_4_hrasv12
+na_vec_4dpf[1:17] <- dpf_4_hrasv12_mean_Ca
 
 # Fill the 5dpf column
-dpf_5_hrasv12 <- c(mean(ID0232_mean_Ca), mean(ID0233_mean_Ca), NA, mean(ID0234_mean_Ca), mean(ID0235_mean_Ca), 
+dpf_5_hrasv12_mean_Ca <- c(mean(ID0232_mean_Ca), mean(ID0233_mean_Ca), NA, mean(ID0234_mean_Ca), mean(ID0235_mean_Ca), 
                    mean(ID0236_mean_Ca), NA, NA, mean(ID0237_mean_Ca), mean(ID0238_mean_Ca), NA, mean(ID0254_mean_Ca), 
                    mean(ID0255_mean_Ca), NA, mean(ID0256_mean_Ca), mean(ID0257_mean_Ca), mean(ID0258_mean_Ca))
-na_vec_5dpf[1:17] <- dpf_5_hrasv12
+na_vec_5dpf[1:17] <- dpf_5_hrasv12_mean_Ca
 
 # Fill the 6dpf column
-dpf_6_hrasv12 <- c(mean(ID0239_mean_Ca), NA, NA, mean(ID0240_mean_Ca), mean(ID0241_mean_Ca), NA, NA, NA, 
+dpf_6_hrasv12_mean_Ca <- c(mean(ID0239_mean_Ca), NA, NA, mean(ID0240_mean_Ca), mean(ID0241_mean_Ca), NA, NA, NA, 
                    mean(ID0242_mean_Ca), mean(ID0243_mean_Ca), NA, mean(ID0259_mean_Ca), mean(ID0260_mean_Ca), NA, 
                    NA, mean(ID0261_mean_Ca), mean(ID0262_mean_Ca))
-na_vec_6dpf[1:17] <- dpf_6_hrasv12
+na_vec_6dpf[1:17] <- dpf_6_hrasv12_mean_Ca
 
 # Fill the 8dpf column
-dpf_8_hrasv12 <- c(mean(ID0244_mean_Ca), NA, NA, mean(ID0245_mean_Ca), mean(ID0246_mean_Ca), NA, NA, NA, NA, NA, 
+dpf_8_hrasv12_mean_Ca <- c(mean(ID0244_mean_Ca), NA, NA, mean(ID0245_mean_Ca), mean(ID0246_mean_Ca), NA, NA, NA, NA, NA, 
                    NA, mean(ID0263_mean_Ca), mean(ID0264_mean_Ca), NA, NA, NA, mean(ID0265_mean_Ca))
-na_vec_8dpf[1:17] <- dpf_8_hrasv12
+na_vec_8dpf[1:17] <- dpf_8_hrasv12_mean_Ca
 
 # Combine into a dataframe
 tracked.HRASV12_mean_Ca <- data.frame(
@@ -1131,3 +1130,266 @@ tracked.HRASV12_mean_Ca <- data.frame(
 
 # Correct the column names if necessary
 colnames(tracked.HRASV12_mean_Ca) <- c("fish no", "4dpf", "5dpf", "6dpf", "8dpf")
+
+
+# HRASV12 frequency ----
+
+# Fill the 4dpf column
+dpf_4_hrasv12_frequency <- c(ID0222_frequency, ID0223_frequency, ID0224_frequency, ID0225_frequency, 
+                           ID0226_frequency, ID0227_frequency, ID0228_frequency, ID0229_frequency, 
+                           ID0230_frequency, ID0231_frequency, ID0247_frequency, ID0248_frequency, 
+                           ID0249_frequency, ID0250_frequency, ID0251_frequency, ID0252_frequency, 
+                           ID0253_frequency)
+na_vec_4dpf[1:17] <- dpf_4_hrasv12_frequency
+
+# Fill the 5dpf column
+dpf_5_hrasv12_frequency <- c(ID0232_frequency, ID0233_frequency, NA, ID0234_frequency, ID0235_frequency, 
+                           ID0236_frequency, NA, NA, ID0237_frequency, ID0238_frequency, NA, ID0254_frequency, 
+                           ID0255_frequency, NA, ID0256_frequency, ID0257_frequency, ID0258_frequency)
+na_vec_5dpf[1:17] <- dpf_5_hrasv12_frequency
+
+# Fill the 6dpf column
+dpf_6_hrasv12_frequency <- c(ID0239_frequency, NA, NA, ID0240_frequency, ID0241_frequency, NA, NA, NA, 
+                           ID0242_frequency, ID0243_frequency, NA, ID0259_frequency, ID0260_frequency, NA, 
+                           NA, ID0261_frequency, ID0262_frequency)
+na_vec_6dpf[1:17] <- dpf_6_hrasv12_frequency
+
+# Fill the 8dpf column
+dpf_8_hrasv12_frequency <- c(ID0244_frequency, NA, NA, ID0245_frequency, ID0246_frequency, NA, NA, NA, NA, NA, 
+                           NA, ID0263_frequency, ID0264_frequency, NA, NA, NA, ID0265_frequency)
+na_vec_8dpf[1:17] <- dpf_8_hrasv12_frequency
+
+# Combine into a dataframe
+tracked.HRASV12_frequency <- data.frame(
+  "fish no" = fish_names_hrasv12,
+  "4dpf" = na_vec_4dpf,
+  "5dpf" = na_vec_5dpf,
+  "6dpf" = na_vec_6dpf,
+  "8dpf" = na_vec_8dpf
+)
+
+# Correct the column names if necessary
+colnames(tracked.HRASV12_frequency) <- c("fish no", "4dpf", "5dpf", "6dpf", "8dpf")
+
+# HRASV12 Clustering Coefficient ----
+
+# Fill the 4dpf column
+dpf_4_hrasv12.clustcoeff <- c(ID0222.clustcoeff, ID0223.clustcoeff, ID0224.clustcoeff, ID0225.clustcoeff, 
+                             ID0226.clustcoeff, ID0227.clustcoeff, ID0228.clustcoeff, ID0229.clustcoeff, 
+                             ID0230.clustcoeff, ID0231.clustcoeff, ID0247.clustcoeff, ID0248.clustcoeff, 
+                             ID0249.clustcoeff, ID0250.clustcoeff, ID0251.clustcoeff, ID0252.clustcoeff, 
+                             ID0253.clustcoeff)
+na_vec_4dpf[1:17] <- dpf_4_hrasv12.clustcoeff
+
+# Fill the 5dpf column
+dpf_5_hrasv12.clustcoeff <- c(ID0232.clustcoeff, ID0233.clustcoeff, NA, ID0234.clustcoeff, ID0235.clustcoeff, 
+                             ID0236.clustcoeff, NA, NA, ID0237.clustcoeff, ID0238.clustcoeff, NA, ID0254.clustcoeff, 
+                             ID0255.clustcoeff, NA, ID0256.clustcoeff, ID0257.clustcoeff, ID0258.clustcoeff)
+na_vec_5dpf[1:17] <- dpf_5_hrasv12.clustcoeff
+
+# Fill the 6dpf column
+dpf_6_hrasv12.clustcoeff <- c(ID0239.clustcoeff, NA, NA, ID0240.clustcoeff, ID0241.clustcoeff, NA, NA, NA, 
+                             ID0242.clustcoeff, ID0243.clustcoeff, NA, ID0259.clustcoeff, ID0260.clustcoeff, NA, 
+                             NA, ID0261.clustcoeff, ID0262.clustcoeff)
+na_vec_6dpf[1:17] <- dpf_6_hrasv12.clustcoeff
+
+# Fill the 8dpf column
+dpf_8_hrasv12.clustcoeff <- c(ID0244.clustcoeff, NA, NA, ID0245.clustcoeff, ID0246.clustcoeff, NA, NA, NA, NA, NA, 
+                             NA, ID0263.clustcoeff, ID0264.clustcoeff, NA, NA, NA, ID0265.clustcoeff)
+na_vec_8dpf[1:17] <- dpf_8_hrasv12.clustcoeff
+
+# Combine into a dataframe
+tracked.HRASV12.clustcoeff <- data.frame(
+  "fish no" = fish_names_hrasv12,
+  "4dpf" = na_vec_4dpf,
+  "5dpf" = na_vec_5dpf,
+  "6dpf" = na_vec_6dpf,
+  "8dpf" = na_vec_8dpf
+)
+
+# Correct the column names if necessary
+colnames(tracked.HRASV12.clustcoeff) <- c("fish no", "4dpf", "5dpf", "6dpf", "8dpf")
+
+# HRASV12 Global Efficiency ----
+# Fill the 4dpf column
+dpf_4_hrasv12.globaleff <- c(ID0222.globaleff, ID0223.globaleff, ID0224.globaleff, ID0225.globaleff, 
+                              ID0226.globaleff, ID0227.globaleff, ID0228.globaleff, ID0229.globaleff, 
+                              ID0230.globaleff, ID0231.globaleff, ID0247.globaleff, ID0248.globaleff, 
+                              ID0249.globaleff, ID0250.globaleff, ID0251.globaleff, ID0252.globaleff, 
+                              ID0253.globaleff)
+na_vec_4dpf[1:17] <- dpf_4_hrasv12.globaleff
+
+# Fill the 5dpf column
+dpf_5_hrasv12.globaleff <- c(ID0232.globaleff, ID0233.globaleff, NA, ID0234.globaleff, ID0235.globaleff, 
+                              ID0236.globaleff, NA, NA, ID0237.globaleff, ID0238.globaleff, NA, ID0254.globaleff, 
+                              ID0255.globaleff, NA, ID0256.globaleff, ID0257.globaleff, ID0258.globaleff)
+na_vec_5dpf[1:17] <- dpf_5_hrasv12.globaleff
+
+# Fill the 6dpf column
+dpf_6_hrasv12.globaleff <- c(ID0239.globaleff, NA, NA, ID0240.globaleff, ID0241.globaleff, NA, NA, NA, 
+                              ID0242.globaleff, ID0243.globaleff, NA, ID0259.globaleff, ID0260.globaleff, NA, 
+                              NA, ID0261.globaleff, ID0262.globaleff)
+na_vec_6dpf[1:17] <- dpf_6_hrasv12.globaleff
+
+# Fill the 8dpf column
+dpf_8_hrasv12.globaleff <- c(ID0244.globaleff, NA, NA, ID0245.globaleff, ID0246.globaleff, NA, NA, NA, NA, NA, 
+                              NA, ID0263.globaleff, ID0264.globaleff, NA, NA, NA, ID0265.globaleff)
+na_vec_8dpf[1:17] <- dpf_8_hrasv12.globaleff
+
+# Combine into a dataframe
+tracked.HRASV12.globaleff <- data.frame(
+  "fish no" = fish_names_hrasv12,
+  "4dpf" = na_vec_4dpf,
+  "5dpf" = na_vec_5dpf,
+  "6dpf" = na_vec_6dpf,
+  "8dpf" = na_vec_8dpf
+)
+
+# Correct the column names if necessary
+colnames(tracked.HRASV12.globaleff) <- c("fish no", "4dpf", "5dpf", "6dpf", "8dpf")
+
+
+# Data viz for HRASV12 ----
+# Mean_Ca
+# Convert the dataframe from wide to long format
+tracked.HRASV12_mean_Ca_long <- tracked.HRASV12_mean_Ca %>% 
+  gather(key = "Age", value = "Mean_Ca", - "fish no")
+
+# Create the boxplot
+HRASV12_mean_Ca_over_days.plt <- ggboxplot(data = tracked.HRASV12_mean_Ca_long, x = "Age", y = "Mean_Ca", 
+                                           fill = "purple", # Change the fill color
+                                           palette = "jco",    # Use a predefined color palette
+                                           add = c("mean_bar", "jitter"),    # Add mean and standard deviation
+                                           title = "HRASV12 Mean Ca by Age",  # Add a title
+                                           xlab = "Age",       # Label for the x-axis
+                                           ylab = "Mean Ca") +
+                                            theme_pubr()
+
+# Frequency
+# Convert the frequency dataframe from wide to long format
+tracked.HRASV12_frequency_long <- tracked.HRASV12_frequency %>% 
+  gather(key = "Age", value = "Frequency", - "fish no")
+
+# Create the boxplot for Frequency
+HRASV12_frequency_over_days.plt <- ggboxplot(data = tracked.HRASV12_frequency_long, x = "Age", y = "Frequency", 
+                                             fill = "purple", # Change the fill color
+                                             palette = "jco",    # Use a predefined color palette
+                                             add = c("mean_bar", "jitter"),    # Add mean and standard deviation
+                                             title = "HRASV12 Events/min by Age",  # Add a title
+                                             xlab = "Age",       # Label for the x-axis
+                                             ylab = "Events/min") +
+                                           theme_pubr()
+
+# Clustering Coefficient FOR HRASV12
+# Convert the clustcoeff dataframe from wide to long format
+tracked.HRASV12.clustcoeff_long <- tracked.HRASV12.clustcoeff %>% 
+  gather(key = "Age", value = "ClustCoeff", - "fish no")
+
+# Create the boxplot for .clustcoeff
+HRASV12.clustcoeff_over_days.plt <- ggboxplot(data = tracked.HRASV12.clustcoeff_long, x = "Age", y = "ClustCoeff", 
+                                              fill = "lightblue", # Change the fill color
+                                              palette = "jco",    # Use a predefined color palette
+                                              add = c("mean_bar", "jitter"),    # Add mean and standard deviation
+                                              title = "HRASV12 Clustering Coefficient by Age",  # Add a title
+                                              xlab = "Age",       # Label for the x-axis
+                                              ylab = "C(g)") +
+                                            theme_pubr()
+
+# Global Efficiency for HRASV12
+tracked.HRASV12.globaleff_long <- tracked.HRASV12.globaleff %>% 
+  gather(key = "Age", value = "GlobalEff", - "fish no")
+
+# Create the boxplot for .clustcoeff
+HRASV12.globaleff_over_days.plt <- ggboxplot(data = tracked.HRASV12.globaleff_long, x = "Age", y = "GlobalEff", 
+                                             fill = "lightblue", # Change the fill color
+                                             palette = "jco",    # Use a predefined color palette
+                                             add = c("mean_bar", "jitter"),    # Add mean and standard deviation
+                                             title = "HRASV12 Global Efficiency by Age",  # Add a title
+                                             xlab = "Age",       # Label for the x-axis
+                                             ylab = "G(g)") +
+                                            theme_pubr()
+
+# Comparisons CTRL vs AKT1 vs HRASV12 ----
+# Frequency comparison
+# Merge the three dataframes for FREQUENCY
+CTRL_AKT1_HRASV12_frequency_merged_data.df <- rbind(
+  data.frame(Group = "CTRL", tracked.CTRL_frequency_long2),
+  data.frame(Group = "AKT1", tracked.AKT1_frequency_long2),
+  data.frame(Group = "HRASV12", tracked.HRASV12_frequency_long)
+)
+CTRL_AKT1_HRASV12_frequency_merged_data.df <- na.omit(CTRL_AKT1_HRASV12_frequency_merged_data.df)
+# Create the combined plot with overlapping data
+CTRL_AKT1_HRASV12_frequency_merged_data.df.plt <- ggboxplot(CTRL_AKT1_HRASV12_frequency_merged_data.df, x = "Age", y = "Frequency",
+                                            fill = "Group",
+                                            palette = c("CTRL" = "blue", "AKT1" = "red", "HRASV12" = "purple"),
+                                            add = "boxplot",
+                                            title = "Frequency Comparison: CTRL vs AKT1 vs HRASV12",
+                                            xlab = "Age",
+                                            ylab = "Events/min")+
+                                            theme_pubr()+
+                                            theme(axis.title.x = element_blank())+
+                                            ylim(0, 1.25)
+
+# Mean Calcium comparison
+# Merge the three dataframes for Mean Calcium
+CTRL_AKT1_HRASV12_mean_Ca_merged_data.df <- rbind(
+  data.frame(Group = "CTRL", tracked.CTRL_mean_Ca_long),
+  data.frame(Group = "AKT1", tracked.AKT1_mean_Ca_long),
+  data.frame(Group = "HRASV12", tracked.HRASV12_mean_Ca_long)
+)
+
+CTRL_AKT1_HRASV12_mean_Ca_merged_data.df <- na.omit(CTRL_AKT1_HRASV12_mean_Ca_merged_data.df)
+
+# Create the combined plot with overlapping data
+CTRL_AKT1_HRASV12_mean_Ca_merged_data.df.plt <- ggboxplot(CTRL_AKT1_HRASV12_mean_Ca_merged_data.df, x = "Age", y = "Mean Ca",
+                                                            fill = "Group",
+                                                            palette = c("CTRL" = "blue", "AKT1" = "red", "HRASV12" = "purple"),
+                                                            add = "boxplot",
+                                                            title = "Calcium levels Comparison: CTRL vs AKT1 vs HRASV12",
+                                                            xlab = "Age",
+                                                            ylab = "Ca2+")+
+                                                        theme_pubr()+
+                                                        theme(axis.title.x = element_blank())+
+                                                        ylim(0.035, 0.11)
+
+# Merge the three dataframes for clustering coefficient C(g)
+CTRL_AKT1_HRASV12.clustcoeff_merged_data.df <- rbind(
+  data.frame(Group = "CTRL", tracked.CTRL_clustcoeff_long),
+  data.frame(Group = "AKT1", tracked.AKT1.clustcoeff_long),
+  data.frame(Group = "HRASV12", tracked.HRASV12.clustcoeff_long)
+)
+
+CTRL_AKT1_HRASV12.clustcoeff_merged_data.df <- na.omit(CTRL_AKT1_HRASV12.clustcoeff_merged_data.df)
+
+# Create the combined plot with overlapping data
+CTRL_AKT1_HRASV12.clustcoeff_merged_data.df.plt <- ggboxplot(CTRL_AKT1_HRASV12.clustcoeff_merged_data.df, x = "Age", y = "ClustCoeff",
+                                                          fill = "Group",
+                                                          palette = c("CTRL" = "blue", "AKT1" = "red", "HRASV12" = "purple"),
+                                                          add = "boxplot",
+                                                          title = "Clustering Coefficient Comparison: CTRL vs AKT1 vs HRASV12",
+                                                          xlab = "Age",
+                                                          ylab = "C(g)")+
+  theme_pubr()+
+  theme(axis.title.x = element_blank())
+
+
+# Merge the three dataframes for Global Efficiency G(g)
+CTRL_AKT1_HRASV12.globaleff_merged_data.df <- rbind(
+  data.frame(Group = "CTRL", tracked.CTRL_globaleff_long),
+  data.frame(Group = "AKT1", tracked.AKT1.globaleff_long),
+  data.frame(Group = "HRASV12", tracked.HRASV12.globaleff_long)
+)
+
+CTRL_AKT1_HRASV12.globaleff_merged_data.df <- na.omit(CTRL_AKT1_HRASV12.globaleff_merged_data.df)
+
+# Create the combined plot with overlapping data
+CTRL_AKT1_HRASV12.globaleff_merged_data.df.plt <- ggboxplot(CTRL_AKT1_HRASV12.globaleff_merged_data.df, x = "Age", y = "GlobalEff",
+                                                             fill = "Group",
+                                                             palette = c("CTRL" = "blue", "AKT1" = "red", "HRASV12" = "purple"),
+                                                             add = "boxplot",
+                                                             title = "Global Efficiency Comparison: CTRL vs AKT1 vs HRASV12",
+                                                             xlab = "Age",
+                                                             ylab = "G(g)")+
+  theme_pubr()+
+  theme(axis.title.x = element_blank())+
+  ylim(0,1.0)
