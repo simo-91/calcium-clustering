@@ -251,6 +251,8 @@ for (fish in unique_fish) {
   print(combined_plot)
 }
 
+
+
 # CTRL tracked
   # Create a list of fish names
   fish_names <- paste0("fish", 1:10)
@@ -276,10 +278,10 @@ tracked.CTRL_mean_Ca <- data.frame(
   "6dpf" = dpf_6,
   "8dpf" = dpf_8
 )
-colnames(tracked.CTRL_frequency) <- c("fish no", "4dpf", "5dpf", "6dpf", "8dpf")
+colnames(tracked.CTRL_mean_Ca) <- c("fish no", "4dpf", "5dpf", "6dpf", "8dpf")
 
 # Reshape the data to long format
-tracked.CTRL_mean_Ca_long <- pivot_longer(tracked.CTRL_mean_Ca, 
+tracked.CTRL_mean_Ca <- pivot_longer(tracked.CTRL_mean_Ca, 
                                           cols = c("4dpf", "5dpf", "6dpf", "8dpf"), 
                                           names_to = "Age", 
                                           values_to = "Mean Ca")
@@ -372,16 +374,31 @@ tracked.CTRL_clustcoeff_long <- pivot_longer(tracked.CTRL_clustcoeff,
                                              names_to = "Age", 
                                              values_to = "ClustCoeff")
 
-ggline(tracked.CTRL_clustcoeff_long, 
+ggboxplot(tracked.CTRL_clustcoeff_long, 
        x = "Age", 
-       y = "ClustCoeff", 
-       group = "fish no", 
-       color = "fish no") +
+       y = "ClustCoeff",
+       fill = "cyan") +
   theme_minimal() +
-  labs(title = "Control Clustering Coefficienc C",
+  labs(title = "Clustering Coefficienc CTRL",
        x = "Age (dpf)",
        y = "ClustCoeff") +
   theme(legend.position = "none")
+
+
+means <- aggregate(ClustCoeff ~ Age, data = tracked.CTRL_clustcoeff_long, mean)
+
+# Create the boxplot and line plot
+tracked.CTRL_clustcoeff_long.plt <- ggplot(tracked.CTRL_clustcoeff_long, aes(x = Age, y = ClustCoeff, group = Age)) +
+  geom_boxplot(aes(fill = "blue")) +
+  geom_line(data = means, aes(y = ClustCoeff, group = 1), color = "black") +
+  geom_point(data = means, aes(y = ClustCoeff), color = "black", size = 3) +
+  scale_fill_identity() +
+  theme_pubr() +
+  labs(title = "Clustering Coefficient CTRL",
+       x = "Age (dpf)",
+       y = "Clustering Coefficient") +
+  theme(legend.position = "none")
+
 
 
 #  Global efficiency
@@ -1393,3 +1410,43 @@ CTRL_AKT1_HRASV12.globaleff_merged_data.df.plt <- ggboxplot(CTRL_AKT1_HRASV12.gl
   theme_pubr()+
   theme(axis.title.x = element_blank())+
   ylim(0,1.0)
+
+
+#  RFP comparisons ------
+# Mean Calcium all vs RFP
+ctrl_data <- CTRL_AKT1_HRASV12_mean_Ca.RFP.df[CTRL_AKT1_HRASV12_mean_Ca.RFP.df$Condition == "CTRL", ]
+
+CTRL_mean_Ca.RFP_comparison <- ggplot(ctrl_data, aes(x = Age, y = Mean_Ca, fill = RFP)) +
+  geom_boxplot()+
+  scale_fill_manual(values = c("TRUE" = "red", "FALSE" = "blue")) +
+  labs(x = "Age", y = "Mean Ca", title = "Mean Calcium for CTRL") +
+  theme_pubr()
+
+# AKT1
+akt1_data <- CTRL_AKT1_HRASV12_mean_Ca.RFP.df[CTRL_AKT1_HRASV12_mean_Ca.RFP.df$Condition == "AKT1", ]
+
+AKT1_mean_Ca.RFP_comparison <- ggplot(akt1_data, aes(x = Age, y = Mean_Ca, fill = RFP)) +
+  geom_boxplot()+
+  scale_fill_manual(values = c("TRUE" = "red", "FALSE" = "blue")) +
+  labs(x = "Age", y = "Mean Ca", title = "Mean Calcium for AKT1") +
+  theme_pubr()
+
+# HRASV12
+hrasv12_data <- CTRL_AKT1_HRASV12_mean_Ca.RFP.df[CTRL_AKT1_HRASV12_mean_Ca.RFP.df$Condition == "HRASV12", ]
+
+HRASV12_mean_Ca.RFP_comparison <- ggplot(hrasv12_data, aes(x = Age, y = Mean_Ca, fill = RFP)) +
+  geom_boxplot()+
+  scale_fill_manual(values = c("TRUE" = "red", "FALSE" = "blue")) +
+  labs(x = "Age", y = "Mean Ca", title = "Mean Calcium for HRASV12") +
+  theme_pubr()
+
+# overall 3 conditions
+CTRL_AKT1_HRASV12_mean_Ca.RFP.plt <- ggboxplot(mean_Ca.RFP.df, x = "Age", y = "Mean_Ca", 
+                                               fill = "Condition", 
+                                               palette = c("CTRL" = "blue", "AKT1" = "red", "HRASV12" = "purple"),
+                                               add = "jitter", shape = "Condition",
+                                               xlab = "Age", ylab = "Mean Ca", title = "Mean Calcium in RFP cells") +
+  theme_pubr()
+
+# Clustering Coefficient
+
