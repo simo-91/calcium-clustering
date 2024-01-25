@@ -2,57 +2,75 @@
 title: "Clustering Coefficient across conditions"
 author: "Simo"
 date: "`r Sys.Date()`"
-output: html_document
-header-includes:
-  - \usepackage{tcolorbox}
+output:
+  html_document: default
+  pdf_document: default
+header-includes: \usepackage{tcolorbox}
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
-# load(file = "~/calcium-clustering/14012024.RData")
 library(pacman)
 p_load(utils, dplyr, tidyverse, ggplot2, plotly, tidyr, reshape2, factoextra, ggdendro,
        grid, RcppCNPy, cowplot, ggpubr, mmand, rstudioapi, reticulate, tcltk, ggfortify,
-       ggpubr, factoextra, parallel, ggpattern, ggsignif, car, gtools, ggpattern)
+       ggpubr, factoextra, parallel, ggpattern, ggsignif, car, gtools, ggpattern, kableExtra)
 load(file = "25Jan2024.RData")
 ```
 # Clustering Coefficient of a network
-![](clustcoeff.png)
+<img src="clustcoeff.png" width="500" height="150" alt="Clustering coefficient example">
 
-# Evolution of Clustering Coefficient in CTRL
-```{r CTRL over time, echo=FALSE, warning=FALSE}
-tracked.CTRL_clustcoeff.RFP_comparison.df.plt
+# Clustering Coefficients across conditions
+```{r try with ggarrange, echo=FALSE, warning=FALSE}
+ggarrange(tracked.CTRL_clustcoeff.RFP_comparison.df.plt, tracked.HRASV12.clustcoeff.RFP_comparison.df.plt, tracked.AKT1.clustcoeff.RFP_comparison.df.plt)
 ```
-
-# Evolution of Clustering Coefficient in HRASV12
-```{r HRASV12 over time, echo=FALSE, warning=FALSE}
-tracked.HRASV12.clustcoeff.RFP_comparison.df.plt
-```
-
-
-\begin{center}
-\begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Discussion]
-**in both CTRL and HRASV12, C(g) decreases over time**
-\end{tcolorbox}
-\end{center}
-
-
-# Evolution of Clustering Coefficient in AKT1
-```{r AKT1 over time, echo=FALSE, warning=FALSE}
-tracked.AKT1.clustcoeff.RFP_comparison.df.plt
-```
-**AKT1 cells show developing(?) Clustering coefficient**
 
 # Comparison across conditions in the general population
 ```{r comparison across conditions in general population, echo=FALSE, warning=FALSE}
 CTRL_AKT1_HRASV12.clustcoeff_merged_data.df.plt
 ```
 
-```{r try with ggarrange, echo=FALSE, warning=FALSE}
-ggarrange(tracked.CTRL_clustcoeff.RFP_comparison.df.plt, tracked.HRASV12.clustcoeff.RFP_comparison.df.plt, tracked.AKT1.clustcoeff.RFP_comparison.df.plt)
-```
-
 # Comparison across conditions in RFP-only cells
 ```{r comparison RFP-only, echo=FALSE, warning=FALSE}
 CTRL_AKT1_HRASV12.clustcoeff.RFP.df.plt
+```
+
+```{r, results='asis', echo=FALSE}
+htmltools::tags$div(
+  style = "text-align: center;",
+  htmltools::tags$div(
+    style = "background-color: #f0f8ff; border: 2px solid #1e90ff; padding: 10px;",
+    htmltools::tags$h3(style = "color: #1e90ff;", "Discussion"),
+    htmltools::tags$ul(
+      htmltools::tags$li("In both CTRL and HRASV12, C(g) decreases over time"),
+      htmltools::tags$li("AKT1 cells show developing(?) Clustering coefficient")
+    )
+  )
+)
+```
+
+----------------------------
+
+# The numbers
+```{r tables}
+tracked.CTRL.clustcoeff.RFP %>%
+  kable("html", booktabs = TRUE, caption = "CTRL RFP only") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), 
+                full_width = F, 
+                position = "left",
+                font_size = 12) 
+
+tracked.AKT1.clustcoeff.RFP %>%
+  kable("html", booktabs = TRUE, caption = "AKT1 RFP only") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), 
+                full_width = F, 
+                position = "left",
+                font_size = 12) 
+
+tracked.HRASV12.clustcoeff.RFP %>%
+  kable("html", booktabs = TRUE, caption = "HRASV12 RFP only") %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), 
+                full_width = F, 
+                position = "left",
+                font_size = 12) 
+
 ```

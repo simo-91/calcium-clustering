@@ -95,14 +95,14 @@ for (subdir in subdirs_stat) {
   mean_perc_active_cells <- mean(spksSUM$spksSUM)
   assign(paste0(id_str, "_mean_perc_active_cells"), frequency)
   
-  ## Frequency -cell thresholded events divided by 60 sec -----
+  ## Frequency -cell thresholded events divided by 120 sec -----
   posXY$frequency <- rowSums(spksthresholded)/120 #events per minute
   frequency <- mean(rowSums(spksthresholded)/120)
   saveRDS(frequency, file = paste0("~/calcium-clustering/data/", id_str, "_mean_frequency.rds"))
   write.csv(frequency, file = paste0("~/calcium-clustering/data/", id_str, "_mean_frequency.csv"))
   
   assign(paste0(id_str, "_frequency"), frequency)
-  ### Compare number of events/min across samples?
+
   
   ## Plot total calcium activity/time --------------------------------------
   spksSUM2 <- colSums(spks)
