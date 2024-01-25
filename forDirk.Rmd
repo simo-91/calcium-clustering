@@ -1,0 +1,58 @@
+---
+title: "Clustering Coefficient across conditions"
+author: "Simo"
+date: "`r Sys.Date()`"
+output: html_document
+header-includes:
+  - \usepackage{tcolorbox}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+# load(file = "~/calcium-clustering/14012024.RData")
+library(pacman)
+p_load(utils, dplyr, tidyverse, ggplot2, plotly, tidyr, reshape2, factoextra, ggdendro,
+       grid, RcppCNPy, cowplot, ggpubr, mmand, rstudioapi, reticulate, tcltk, ggfortify,
+       ggpubr, factoextra, parallel, ggpattern, ggsignif, car, gtools, ggpattern)
+load(file = "25Jan2024.RData")
+```
+# Clustering Coefficient of a network
+![](clustcoeff.png)
+
+# Evolution of Clustering Coefficient in CTRL
+```{r CTRL over time, echo=FALSE, warning=FALSE}
+tracked.CTRL_clustcoeff.RFP_comparison.df.plt
+```
+
+# Evolution of Clustering Coefficient in HRASV12
+```{r HRASV12 over time, echo=FALSE, warning=FALSE}
+tracked.HRASV12.clustcoeff.RFP_comparison.df.plt
+```
+
+
+\begin{center}
+\begin{tcolorbox}[colback=blue!5!white,colframe=blue!75!black,title=Discussion]
+**in both CTRL and HRASV12, C(g) decreases over time**
+\end{tcolorbox}
+\end{center}
+
+
+# Evolution of Clustering Coefficient in AKT1
+```{r AKT1 over time, echo=FALSE, warning=FALSE}
+tracked.AKT1.clustcoeff.RFP_comparison.df.plt
+```
+**AKT1 cells show developing(?) Clustering coefficient**
+
+# Comparison across conditions in the general population
+```{r comparison across conditions in general population, echo=FALSE, warning=FALSE}
+CTRL_AKT1_HRASV12.clustcoeff_merged_data.df.plt
+```
+
+```{r try with ggarrange, echo=FALSE, warning=FALSE}
+ggarrange(tracked.CTRL_clustcoeff.RFP_comparison.df.plt, tracked.HRASV12.clustcoeff.RFP_comparison.df.plt, tracked.AKT1.clustcoeff.RFP_comparison.df.plt)
+```
+
+# Comparison across conditions in RFP-only cells
+```{r comparison RFP-only, echo=FALSE, warning=FALSE}
+CTRL_AKT1_HRASV12.clustcoeff.RFP.df.plt
+```
