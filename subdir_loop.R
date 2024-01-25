@@ -1,7 +1,7 @@
 library(pacman)
 p_load(utils, dplyr, tidyverse, ggplot2, plotly, tidyr, reshape2, factoextra, ggdendro,
        grid, RcppCNPy, cowplot, ggpubr, mmand, rstudioapi, reticulate, tcltk, ggfortify,
-       ggpubr, factoextra, parallel, ggpattern, ggsignif, car, gtools)
+       ggpubr, factoextra, parallel, ggpattern, ggsignif, car, gtools, igraph)
 
 # Function to choose a directory with platform-independent GUI
 choose_directory = function(caption = 'Select data directory') {
@@ -21,7 +21,7 @@ subdirs_stat <- subdirs[grep("stat.npy", subdirs)]
 subdirs_stat <- mixedsort(subdirs_stat)
 
 
-id_num <- 0243 #starting ID number minus 1
+id_num <- 0262 #starting ID number minus 1
 
 for (subdir in subdirs_stat) {
   id_num <- id_num + 1
@@ -205,8 +205,8 @@ for (subdir in subdirs_stat) {
     subset(redcell==1)
   
   # Frequency -cell thresholded events divided by 60 sec -----
-  posXY.RFP$frequency <- rowSums(RFPt)/60 #events per minute
-  frequency.RFP <- mean(rowSums(RFPt)/60)
+  posXY.RFP$frequency <- rowSums(RFPt)/120 #events per minute
+  frequency.RFP <- mean(rowSums(RFPt)/120)
   saveRDS(posXY.RFP, file = paste0("~/calcium-clustering/data/", id_str, "_dataposXY.RFP.rds"))
   write.csv(posXY.RFP, file = paste0("~/calcium-clustering/data/", id_str, "_dataposXY.RFP.csv"))
   
@@ -526,6 +526,9 @@ for (subdir in subdirs_stat) {
   ## Threshold correlation degree. An interval is chosen because the Pearson correlation coeff goes -1 to 1, BUT -1 means anti-correlation.. so one neuron is active when the other isn't)
   ## Set weight threshold (set to 0.30 as per literature: Avitan et al., 2017 http://dx.doi.org/10.1016/j.cub.2017.06.056)
   graph.RFP <- delete.edges(graph.RFP, which(E(graph.RFP)$weight <0.30))
+  
+  id_str.graph.RFP <- paste0(id_str, ".graph.RFP")
+  assign(id_str.graph, graph.RFP)
   
   ## Robustness
   ## cohesion <- cohesion(graph.RFP)
