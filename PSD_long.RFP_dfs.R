@@ -1,4 +1,5 @@
-# PSD in ggplot objects 
+# PSD in RFP cells only
+
 #  CTRL 4dpf ----
 # Step 1: Extract the Frequency column from one of the data frames
 frequency_column <- ID0186.psd.mean$frequency
@@ -9,7 +10,7 @@ psd_means_list <- list()
 # Loop through the IDs and extract the PSD mean column for each
 for (ID in 186:195) {
   # Construct the variable name for each ID
-  var_name <- paste0("ID", sprintf("%04d", ID), ".psd.mean")
+  var_name <- paste0("ID", sprintf("%04d", ID), ".psd.RFP.mean")
   
   # Evaluate the variable name to get the actual variable
   psd_data <- eval(parse(text = var_name))
@@ -27,7 +28,7 @@ psd_means_df <- do.call(cbind, psd_means_list)
 row_wise_mean <- rowMeans(psd_means_df, na.rm = TRUE)
 
 # Combine the Frequency column, PSD means, and Row Mean into a final dataframe
-CTRL_4dpf_PSD.df <- data.frame(Frequency = frequency_column, Row_Mean = row_wise_mean)
+CTRL_4dpf_PSD.RFP.df <- data.frame(Frequency = frequency_column, Row_Mean = row_wise_mean)
 
 
 #  CTRL 5dpf ----
@@ -37,7 +38,7 @@ psd_means_list <- list()
 # Loop through the IDs and extract the PSD mean column for each
 for (ID in 196:205) {
   # Construct the variable name for each ID
-  var_name <- paste0("ID", sprintf("%04d", ID), ".psd.mean")
+  var_name <- paste0("ID", sprintf("%04d", ID), ".psd.RFP.mean")
   
   # Evaluate the variable name to get the actual variable
   psd_data <- eval(parse(text = var_name))
@@ -55,7 +56,7 @@ psd_means_df <- do.call(cbind, psd_means_list)
 row_wise_mean <- rowMeans(psd_means_df, na.rm = TRUE)
 
 # Combine the Frequency column, PSD means, and Row Mean into a final dataframe
-CTRL_5dpf_PSD.df <- data.frame(Frequency = frequency_column, Row_Mean = row_wise_mean)
+CTRL_5dpf_PSD.RFP.df <- data.frame(Frequency = frequency_column, Row_Mean = row_wise_mean)
 
 
 #  CTRL 6dpf ----
@@ -65,7 +66,7 @@ psd_means_list <- list()
 # Loop through the IDs and extract the PSD mean column for each
 for (ID in 206:214) {
   # Construct the variable name for each ID
-  var_name <- paste0("ID", sprintf("%04d", ID), ".psd.mean")
+  var_name <- paste0("ID", sprintf("%04d", ID), ".psd.RFP.mean")
   
   # Evaluate the variable name to get the actual variable
   psd_data <- eval(parse(text = var_name))
@@ -83,7 +84,7 @@ psd_means_df <- do.call(cbind, psd_means_list)
 row_wise_mean <- rowMeans(psd_means_df, na.rm = TRUE)
 
 # Combine the Frequency column, PSD means, and Row Mean into a final dataframe
-CTRL_6dpf_PSD.df <- data.frame(Frequency = frequency_column, Row_Mean = row_wise_mean)
+CTRL_6dpf_PSD.RFP.df <- data.frame(Frequency = frequency_column, Row_Mean = row_wise_mean)
 
 
 
@@ -94,7 +95,7 @@ psd_means_list <- list()
 # Loop through the IDs and extract the PSD mean column for each
 for (ID in 215:221) {
   # Construct the variable name for each ID
-  var_name <- paste0("ID", sprintf("%04d", ID), ".psd.mean")
+  var_name <- paste0("ID", sprintf("%04d", ID), ".psd.RFP.mean")
   
   # Evaluate the variable name to get the actual variable
   psd_data <- eval(parse(text = var_name))
@@ -112,7 +113,7 @@ psd_means_df <- do.call(cbind, psd_means_list)
 row_wise_mean <- rowMeans(psd_means_df, na.rm = TRUE)
 
 # Combine the Frequency column, PSD means, and Row Mean into a final dataframe
-CTRL_8dpf_PSD.df <- data.frame(Frequency = frequency_column, Row_Mean = row_wise_mean)
+CTRL_8dpf_PSD.RFP.df <- data.frame(Frequency = frequency_column, Row_Mean = row_wise_mean)
 
 
 # HRASV12 4dpf ----
@@ -125,7 +126,7 @@ psd_means_list <- list()
 # Loop through the combined IDs and extract the PSD mean column for each
 for (ID in ids) {
   # Construct the variable name for each ID
-  var_name <- paste0("ID", sprintf("%04d", ID), ".psd.mean")
+  var_name <- paste0("ID", sprintf("%04d", ID), ".psd.RFP.mean")
   
   # Evaluate the variable name to get the actual variable
   psd_data <- eval(parse(text = var_name))
@@ -141,7 +142,7 @@ psd_means_df <- do.call(cbind, psd_means_list)
 row_wise_mean <- rowMeans(psd_means_df, na.rm = TRUE)
 
 # Combine the Frequency column, PSD means, and Row Mean into a final dataframe
-HRASV12_4dpf_PSD.df <- data.frame(Frequency = frequency_column, PSD_Means = psd_means_df, Row_Mean = row_wise_mean)
+HRASV12_4dpf_PSD.RFP.df <- data.frame(Frequency = frequency_column, PSD_Means = psd_means_df, Row_Mean = row_wise_mean)
 
 
 # HRASV12 5pf ----
@@ -154,7 +155,7 @@ psd_means_list <- list()
 # Loop through the combined IDs and extract the PSD mean column for each
 for (ID in ids) {
   # Construct the variable name for each ID
-  var_name <- paste0("ID", sprintf("%04d", ID), ".psd.mean")
+  var_name <- paste0("ID", sprintf("%04d", ID), ".psd.RFP.mean")
   
   # Evaluate the variable name to get the actual variable
   psd_data <- eval(parse(text = var_name))
@@ -170,7 +171,7 @@ psd_means_df <- do.call(cbind, psd_means_list)
 row_wise_mean <- rowMeans(psd_means_df, na.rm = TRUE)
 
 # Combine the Frequency column, PSD means, and Row Mean into a final dataframe
-HRASV12_5dpf_PSD.df <- data.frame(Frequency = frequency_column, PSD_Means = psd_means_df, Row_Mean = row_wise_mean)
+HRASV12_5dpf_PSD.RFP.df <- data.frame(Frequency = frequency_column, PSD_Means = psd_means_df, Row_Mean = row_wise_mean)
 
 
 # HRASV12 6dpf ----
@@ -183,7 +184,7 @@ psd_means_list <- list()
 # Loop through the combined IDs and extract the PSD mean column for each
 for (ID in ids) {
   # Construct the variable name for each ID
-  var_name <- paste0("ID", sprintf("%04d", ID), ".psd.mean")
+  var_name <- paste0("ID", sprintf("%04d", ID), ".psd.RFP.mean")
   
   # Evaluate the variable name to get the actual variable
   psd_data <- eval(parse(text = var_name))
@@ -199,7 +200,7 @@ psd_means_df <- do.call(cbind, psd_means_list)
 row_wise_mean <- rowMeans(psd_means_df, na.rm = TRUE)
 
 # Combine the Frequency column, PSD means, and Row Mean into a final dataframe
-HRASV12_6dpf_PSD.df <- data.frame(Frequency = frequency_column, PSD_Means = psd_means_df, Row_Mean = row_wise_mean)
+HRASV12_6dpf_PSD.RFP.df <- data.frame(Frequency = frequency_column, PSD_Means = psd_means_df, Row_Mean = row_wise_mean)
 
 
 # HRASV12 8dpf ----
@@ -212,7 +213,7 @@ psd_means_list <- list()
 # Loop through the combined IDs and extract the PSD mean column for each
 for (ID in ids) {
   # Construct the variable name for each ID
-  var_name <- paste0("ID", sprintf("%04d", ID), ".psd.mean")
+  var_name <- paste0("ID", sprintf("%04d", ID), ".psd.RFP.mean")
   
   # Evaluate the variable name to get the actual variable
   psd_data <- eval(parse(text = var_name))
@@ -228,7 +229,7 @@ psd_means_df <- do.call(cbind, psd_means_list)
 row_wise_mean <- rowMeans(psd_means_df, na.rm = TRUE)
 
 # Combine the Frequency column, PSD means, and Row Mean into a final dataframe
-HRASV12_8dpf_PSD.df <- data.frame(Frequency = frequency_column, PSD_Means = psd_means_df, Row_Mean = row_wise_mean)
+HRASV12_8dpf_PSD.RFP.df <- data.frame(Frequency = frequency_column, PSD_Means = psd_means_df, Row_Mean = row_wise_mean)
 
 
 # AKT1 4dpf ----
@@ -236,26 +237,26 @@ ids_4dpf <- 152:160
 
 psd_means_list_4dpf <- list()
 for (ID in ids_4dpf) {
-  var_name <- paste0("ID", sprintf("%04d", ID), ".psd.mean")
+  var_name <- paste0("ID", sprintf("%04d", ID), ".psd.RFP.mean")
   psd_data <- eval(parse(text = var_name))
   psd_means_list_4dpf[[length(psd_means_list_4dpf) + 1]] <- psd_data$`PSD mean`
 }
 psd_means_df_4dpf <- do.call(cbind, psd_means_list_4dpf)
 row_wise_mean_4dpf <- rowMeans(psd_means_df_4dpf, na.rm = TRUE)
-AKT1_4dpf_PSD.df <- data.frame(Frequency = frequency_column, PSD_Means = psd_means_df_4dpf, Row_Mean = row_wise_mean_4dpf)
+AKT1_4dpf_PSD.RFP.df <- data.frame(Frequency = frequency_column, PSD_Means = psd_means_df_4dpf, Row_Mean = row_wise_mean_4dpf)
 
 # AKT1 5dpf ----
 ids_5dpf <- 161:169
 
 psd_means_list_5dpf <- list()
 for (ID in ids_5dpf) {
-  var_name <- paste0("ID", sprintf("%04d", ID), ".psd.mean")
+  var_name <- paste0("ID", sprintf("%04d", ID), ".psd.RFP.mean")
   psd_data <- eval(parse(text = var_name))
   psd_means_list_5dpf[[length(psd_means_list_5dpf) + 1]] <- psd_data$`PSD mean`
 }
 psd_means_df_5dpf <- do.call(cbind, psd_means_list_5dpf)
 row_wise_mean_5dpf <- rowMeans(psd_means_df_5dpf, na.rm = TRUE)
-AKT1_5dpf_PSD.df <- data.frame(Frequency = frequency_column, PSD_Means = psd_means_df_5dpf, Row_Mean = row_wise_mean_5dpf)
+AKT1_5dpf_PSD.RFP.df <- data.frame(Frequency = frequency_column, PSD_Means = psd_means_df_5dpf, Row_Mean = row_wise_mean_5dpf)
 
 
 # AKT1 6dpf ----
@@ -263,77 +264,76 @@ ids_6dpf <- 170:177
 
 psd_means_list_6dpf <- list()
 for (ID in ids_6dpf) {
-  var_name <- paste0("ID", sprintf("%04d", ID), ".psd.mean")
+  var_name <- paste0("ID", sprintf("%04d", ID), ".psd.RFP.mean")
   psd_data <- eval(parse(text = var_name))
   psd_means_list_6dpf[[length(psd_means_list_6dpf) + 1]] <- psd_data$`PSD mean`
 }
 psd_means_df_6dpf <- do.call(cbind, psd_means_list_6dpf)
 row_wise_mean_6dpf <- rowMeans(psd_means_df_6dpf, na.rm = TRUE)
-AKT1_6dpf_PSD.df <- data.frame(Frequency = frequency_column, PSD_Means = psd_means_df_6dpf, Row_Mean = row_wise_mean_6dpf)
+AKT1_6dpf_PSD.RFP.df <- data.frame(Frequency = frequency_column, PSD_Means = psd_means_df_6dpf, Row_Mean = row_wise_mean_6dpf)
 
 # AKT1 8dpf ----
 ids_8dpf <- c(178,179,181:185)
 
 psd_means_list_8dpf <- list()
 for (ID in ids_8dpf) {
-  var_name <- paste0("ID", sprintf("%04d", ID), ".psd.mean")
+  var_name <- paste0("ID", sprintf("%04d", ID), ".psd.RFP.mean")
   psd_data <- eval(parse(text = var_name))
   psd_means_list_8dpf[[length(psd_means_list_8dpf) + 1]] <- psd_data$`PSD mean`
 }
 psd_means_df_8dpf <- do.call(cbind, psd_means_list_8dpf)
 row_wise_mean_8dpf <- rowMeans(psd_means_df_8dpf, na.rm = TRUE)
-AKT1_8dpf_PSD.df <- data.frame(Frequency = frequency_column, PSD_Means = psd_means_df_8dpf, Row_Mean = row_wise_mean_8dpf)
+AKT1_8dpf_PSD.RFP.df <- data.frame(Frequency = frequency_column, PSD_Means = psd_means_df_8dpf, Row_Mean = row_wise_mean_8dpf)
 
 
 # Create a new dataframe with the Frequency column
-combined_PSD_df <- data.frame(Frequency = CTRL_4dpf_PSD.df$Frequency)
+combined_PSD.RFP_df <- data.frame(Frequency = CTRL_4dpf_PSD.RFP.df$Frequency)
 
 # Add the Row_Mean columns from each dataframe
-combined_PSD_df$CTRL_4dpf <- CTRL_4dpf_PSD.df$Row_Mean
-combined_PSD_df$CTRL_5dpf <- CTRL_5dpf_PSD.df$Row_Mean
-combined_PSD_df$CTRL_6dpf <- CTRL_6dpf_PSD.df$Row_Mean
-combined_PSD_df$CTRL_8dpf <- CTRL_8dpf_PSD.df$Row_Mean
+combined_PSD.RFP_df$CTRL_4dpf <- CTRL_4dpf_PSD.RFP.df$Row_Mean
+combined_PSD.RFP_df$CTRL_5dpf <- CTRL_5dpf_PSD.RFP.df$Row_Mean
+combined_PSD.RFP_df$CTRL_6dpf <- CTRL_6dpf_PSD.RFP.df$Row_Mean
+combined_PSD.RFP_df$CTRL_8dpf <- CTRL_8dpf_PSD.RFP.df$Row_Mean
 
-combined_PSD_df$AKT1_4dpf <- AKT1_4dpf_PSD.df$Row_Mean
-combined_PSD_df$AKT1_5dpf <- AKT1_5dpf_PSD.df$Row_Mean
-combined_PSD_df$AKT1_6dpf <- AKT1_6dpf_PSD.df$Row_Mean
-combined_PSD_df$AKT1_8dpf <- AKT1_8dpf_PSD.df$Row_Mean
+combined_PSD.RFP_df$AKT1_4dpf <- AKT1_4dpf_PSD.RFP.df$Row_Mean
+combined_PSD.RFP_df$AKT1_5dpf <- AKT1_5dpf_PSD.RFP.df$Row_Mean
+combined_PSD.RFP_df$AKT1_6dpf <- AKT1_6dpf_PSD.RFP.df$Row_Mean
+combined_PSD.RFP_df$AKT1_8dpf <- AKT1_8dpf_PSD.RFP.df$Row_Mean
 
-combined_PSD_df$HRASV12_4dpf <- HRASV12_4dpf_PSD.df$Row_Mean
-combined_PSD_df$HRASV12_5dpf <- HRASV12_5dpf_PSD.df$Row_Mean
-combined_PSD_df$HRASV12_6dpf <- HRASV12_6dpf_PSD.df$Row_Mean
-combined_PSD_df$HRASV12_8dpf <- HRASV12_8dpf_PSD.df$Row_Mean
+combined_PSD.RFP_df$HRASV12_4dpf <- HRASV12_4dpf_PSD.RFP.df$Row_Mean
+combined_PSD.RFP_df$HRASV12_5dpf <- HRASV12_5dpf_PSD.RFP.df$Row_Mean
+combined_PSD.RFP_df$HRASV12_6dpf <- HRASV12_6dpf_PSD.RFP.df$Row_Mean
+combined_PSD.RFP_df$HRASV12_8dpf <- HRASV12_8dpf_PSD.RFP.df$Row_Mean
 
 
 # CTRL comparisons across age ----
 # Convert from wide to long format
-psd_long <- pivot_longer(combined_PSD_df, 
+psd_long.RFP <- pivot_longer(combined_PSD.RFP_df, 
                          cols = starts_with("CTRL"), 
                          names_to = "Age", 
                          values_to = "PSD",
                          names_prefix = "CTRL_")
 
 # Now, plotting with ggplot2
-ggplot(data = psd_long, aes(x = Frequency, y = PSD, color = Age)) +
+g1 <- ggplot(data = psd_long.RFP, aes(x = Frequency, y = PSD, color = Age)) +
   geom_line() +
-  labs(title = "PSD values across different ages for CTRL",
+  labs(title = "PSD values across different ages for CTRL RFP only",
        x = "Frequency", 
        y = "PSD") +
   theme_minimal() +
   scale_color_manual(values = c("4dpf" = "blue", "5dpf" = "red", "6dpf" = "green", "8dpf" = "purple"))
 
 
-
 # HRASV12 comparisons across age ----
 # Convert from wide to long format
-psd_long <- pivot_longer(combined_PSD_df, 
+psd_long.RFP <- pivot_longer(combined_PSD.RFP_df, 
                          cols = starts_with("HRASV12"), 
                          names_to = "Age", 
                          values_to = "PSD",
                          names_prefix = "HRASV12_")
 
 # Now, plotting with ggplot2
-ggplot(data = psd_long, aes(x = Frequency, y = PSD, color = Age)) +
+ggplot(data = psd_long.RFP, aes(x = Frequency, y = PSD, color = Age)) +
   geom_line() +
   labs(title = "PSD values across different ages for HRASV12",
        x = "Frequency", 
@@ -344,14 +344,14 @@ ggplot(data = psd_long, aes(x = Frequency, y = PSD, color = Age)) +
 
 # AKT1 comparisons across age ----
 # Convert from wide to long format
-psd_long <- pivot_longer(combined_PSD_df, 
+psd_long.RFP <- pivot_longer(combined_PSD.RFP_df, 
                          cols = starts_with("AKT1"), 
                          names_to = "Age", 
                          values_to = "PSD",
                          names_prefix = "AKT1_")
 
 # Now, plotting with ggplot2
-ggplot(data = psd_long, aes(x = Frequency, y = PSD, color = Age)) +
+ggplot(data = psd_long.RFP, aes(x = Frequency, y = PSD, color = Age)) +
   geom_line() +
   labs(title = "PSD values across different ages for AKT1",
        x = "Frequency", 
@@ -362,14 +362,14 @@ ggplot(data = psd_long, aes(x = Frequency, y = PSD, color = Age)) +
 
 # PSD across conditions at 4dpf ----
 # Combine the data frames for each condition and add a 'Condition' column
-PSD_4dpf_df <- data.frame(
-  "Frequency" = combined_PSD_df$Frequency,
-  "CTRL" = combined_PSD_df$CTRL_4dpf,
-  "HRASV12" = combined_PSD_df$HRASV12_4dpf,
-  "AKT1" = combined_PSD_df$AKT1_4dpf
+PSD_4dpf.RFP_df <- data.frame(
+  "Frequency" = combined_PSD.RFP_df$Frequency,
+  "CTRL" = combined_PSD.RFP_df$CTRL_4dpf,
+  "HRASV12" = combined_PSD.RFP_df$HRASV12_4dpf,
+  "AKT1" = combined_PSD.RFP_df$AKT1_4dpf
 )
 
-PSD_4dpf_long <- PSD_4dpf_df %>% 
+PSD_4dpf_long.RFP <- PSD_4dpf.RFP_df %>% 
   pivot_longer(
     cols = -Frequency, 
     names_to = "Condition", 
@@ -379,9 +379,9 @@ PSD_4dpf_long <- PSD_4dpf_df %>%
   mutate(Condition = factor(Condition, levels = c("CTRL", "HRASV12", "AKT1")))
 
 # Now, plotting with ggplot2
-PSD_all_conditions_4dpf.plt <- ggplot(PSD_4dpf_long, aes(x = Frequency, y = PSD, color = Condition)) +
+PSD_all_conditions.RFP_4dpf.plt <- ggplot(PSD_4dpf_long.RFP, aes(x = Frequency, y = PSD, color = Condition)) +
   geom_line() +
-  labs(title = "PSD across Conditions at 4dpf",
+  labs(title = "PSD across Conditions at 4dpf RFP only",
        x = "Frequency",
        y = "PSD",
        color = "Condition") +
@@ -389,14 +389,14 @@ PSD_all_conditions_4dpf.plt <- ggplot(PSD_4dpf_long, aes(x = Frequency, y = PSD,
 
 # PSD across conditions at 5dpf ----
 # Combine the data frames for each condition and add a 'Condition' column
-PSD_5dpf_df <- data.frame(
-  "Frequency" = combined_PSD_df$Frequency,
-  "CTRL" = combined_PSD_df$CTRL_5dpf,
-  "HRASV12" = combined_PSD_df$HRASV12_5dpf,
-  "AKT1" = combined_PSD_df$AKT1_5dpf
+PSD_5dpf.RFP_df <- data.frame(
+  "Frequency" = combined_PSD.RFP_df$Frequency,
+  "CTRL" = combined_PSD.RFP_df$CTRL_5dpf,
+  "HRASV12" = combined_PSD.RFP_df$HRASV12_5dpf,
+  "AKT1" = combined_PSD.RFP_df$AKT1_5dpf
 )
 
-PSD_5dpf_long <- PSD_5dpf_df %>% 
+PSD_5dpf_long.RFP <- PSD_5dpf.RFP_df %>% 
   pivot_longer(
     cols = -Frequency, 
     names_to = "Condition", 
@@ -406,9 +406,9 @@ PSD_5dpf_long <- PSD_5dpf_df %>%
   mutate(Condition = factor(Condition, levels = c("CTRL", "HRASV12", "AKT1")))
 
 # Now, plotting with ggplot2
-PSD_all_conditions_5dpf.plt <- ggplot(PSD_5dpf_long, aes(x = Frequency, y = PSD, color = Condition)) +
+PSD_all_conditions.RFP_5dpf.plt <- ggplot(PSD_5dpf_long.RFP, aes(x = Frequency, y = PSD, color = Condition)) +
   geom_line() +
-  labs(title = "PSD across Conditions at 5dpf",
+  labs(title = "PSD across Conditions at 5dpf RFP-only",
        x = "Frequency",
        y = "PSD",
        color = "Condition") +
@@ -417,14 +417,14 @@ PSD_all_conditions_5dpf.plt <- ggplot(PSD_5dpf_long, aes(x = Frequency, y = PSD,
 
 # PSD across conditions at 6dpf ----
 # Combine the data frames for each condition and add a 'Condition' column
-PSD_6dpf_df <- data.frame(
-  "Frequency" = combined_PSD_df$Frequency,
-  "CTRL" = combined_PSD_df$CTRL_6dpf,
-  "HRASV12" = combined_PSD_df$HRASV12_6dpf,
-  "AKT1" = combined_PSD_df$AKT1_6dpf
+PSD_6dpf.RFP_df <- data.frame(
+  "Frequency" = combined_PSD.RFP_df$Frequency,
+  "CTRL" = combined_PSD.RFP_df$CTRL_6dpf,
+  "HRASV12" = combined_PSD.RFP_df$HRASV12_6dpf,
+  "AKT1" = combined_PSD.RFP_df$AKT1_6dpf
 )
 
-PSD_6dpf_long <- PSD_6dpf_df %>% 
+PSD_6dpf_long.RFP <- PSD_6dpf.RFP_df %>% 
   pivot_longer(
     cols = -Frequency, 
     names_to = "Condition", 
@@ -434,9 +434,9 @@ PSD_6dpf_long <- PSD_6dpf_df %>%
   mutate(Condition = factor(Condition, levels = c("CTRL", "HRASV12", "AKT1")))
 
 # Now, plotting with ggplot2
-PSD_all_conditions_6dpf.plt <- ggplot(PSD_6dpf_long, aes(x = Frequency, y = PSD, color = Condition)) +
+PSD_all_conditions.RFP_6dpf.plt <- ggplot(PSD_6dpf_long.RFP, aes(x = Frequency, y = PSD, color = Condition)) +
   geom_line() +
-  labs(title = "PSD across Conditions at 6dpf",
+  labs(title = "PSD across Conditions at 6dpf RFP only",
        x = "Frequency",
        y = "PSD",
        color = "Condition") +
@@ -445,14 +445,14 @@ PSD_all_conditions_6dpf.plt <- ggplot(PSD_6dpf_long, aes(x = Frequency, y = PSD,
 
 # PSD across conditions at 8dpf ----
 # Combine the data frames for each condition and add a 'Condition' column
-PSD_8dpf_df <- data.frame(
-  "Frequency" = combined_PSD_df$Frequency,
-  "CTRL" = combined_PSD_df$CTRL_8dpf,
-  "HRASV12" = combined_PSD_df$HRASV12_8dpf,
-  "AKT1" = combined_PSD_df$AKT1_8dpf
+PSD_8dpf.RFP_df <- data.frame(
+  "Frequency" = combined_PSD.RFP_df$Frequency,
+  "CTRL" = combined_PSD.RFP_df$CTRL_8dpf,
+  "HRASV12" = combined_PSD.RFP_df$HRASV12_8dpf,
+  "AKT1" = combined_PSD.RFP_df$AKT1_8dpf
 )
 
-PSD_8dpf_long <- PSD_8dpf_df %>% 
+PSD_8dpf_long.RFP <- PSD_8dpf.RFP_df %>% 
   pivot_longer(
     cols = -Frequency, 
     names_to = "Condition", 
@@ -462,10 +462,35 @@ PSD_8dpf_long <- PSD_8dpf_df %>%
   mutate(Condition = factor(Condition, levels = c("CTRL", "HRASV12", "AKT1")))
 
 # Now, plotting with ggplot2
-PSD_all_conditions_8dpf.plt <- ggplot(PSD_8dpf_long2, aes(x = Frequency, y = PSD, color = Condition)) +
+PSD_all_conditions.RFP_8dpf.plt <- ggplot(PSD_8dpf_long.RFP, aes(x = Frequency, y = PSD, color = Condition)) +
   geom_line() +
-  labs(title = "PSD across Conditions at 8dpf",
+  labs(title = "PSD across Conditions at 8dpf RFP-only",
        x = "mHz",
        y = "PSD",
        color = "Condition") +
-  theme_minimal()
+  theme_minimal()+
+  ylim(0, 0.05)
+
+
+# Convert ggplot objects to plotly objects if not already done
+PSD_all_conditions_4dpf_plt <- ggplotly(PSD_all_conditions_4dpf.plt)
+PSD_all_conditions_RFP_4dpf_plt <- ggplotly(PSD_all_conditions.RFP_4dpf.plt)
+PSD_all_conditions_5dpf_plt <- ggplotly(PSD_all_conditions_5dpf.plt)
+PSD_all_conditions_RFP_5dpf_plt <- ggplotly(PSD_all_conditions.RFP_5dpf.plt)
+PSD_all_conditions_6dpf_plt <- ggplotly(PSD_all_conditions_6dpf.plt)
+PSD_all_conditions_RFP_6dpf_plt <- ggplotly(PSD_all_conditions.RFP_6dpf.plt)
+PSD_all_conditions_8dpf_plt <- ggplotly(PSD_all_conditions_8dpf.plt)
+PSD_all_conditions_RFP_8dpf_plt <- ggplotly(PSD_all_conditions.RFP_8dpf.plt)
+
+# Combine plots into subplots, 2 per page
+subplot1 <- subplot(PSD_all_conditions_4dpf_plt, PSD_all_conditions_RFP_4dpf_plt, nrows = 2)
+subplot2 <- subplot(PSD_all_conditions_5dpf_plt, PSD_all_conditions_RFP_5dpf_plt, nrows = 2)
+subplot3 <- subplot(PSD_all_conditions_6dpf_plt, PSD_all_conditions_RFP_6dpf_plt, nrows = 2)
+subplot4 <- subplot(PSD_all_conditions_8dpf_plt, PSD_all_conditions_RFP_8dpf_plt, nrows = 2)
+
+# Display subplots
+subplot1
+subplot2
+subplot3
+subplot4
+

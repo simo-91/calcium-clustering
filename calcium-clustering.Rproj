@@ -12,6 +12,6 @@ Encoding: UTF-8
 RnwWeave: Sweave
 LaTeX: pdfLaTeX
 
-PythonType: conda
-PythonVersion: 3.8.16
-PythonPath: ~/anaconda3/envs/suite2p/bin/python3.8
+PythonType: system
+PythonVersion: 3.9.17
+PythonPath: /opt/homebrew/bin/python3.9
