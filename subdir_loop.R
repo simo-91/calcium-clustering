@@ -21,7 +21,7 @@ subdirs_stat <- subdirs[grep("stat.npy", subdirs)]
 subdirs_stat <- mixedsort(subdirs_stat)
 
 
-id_num <- 0262 #starting ID number minus 1
+id_num <- 290 #starting ID number minus 1
 
 for (subdir in subdirs_stat) {
   id_num <- id_num + 1
@@ -204,7 +204,7 @@ for (subdir in subdirs_stat) {
   posXY.RFP <- posXY %>%
     subset(redcell==1)
   
-  # Frequency -cell thresholded events divided by 60 sec -----
+  # Frequency -cell thresholded events divided by 120 sec (2sec per volume) -----
   posXY.RFP$frequency <- rowSums(RFPt)/120 #events per minute
   frequency.RFP <- mean(rowSums(RFPt)/120)
   saveRDS(posXY.RFP, file = paste0("~/calcium-clustering/data/", id_str, "_dataposXY.RFP.rds"))
@@ -400,6 +400,10 @@ for (subdir in subdirs_stat) {
   stopCluster(cl)
   close(pb)
   
+  # Label cells back with their actual numbers
+  rownames(cmat.allcellst) <- rownames(spksthresholded)
+  colnames(cmat.allcellst) <- rownames(spksthresholded)
+  
   # General graph ----------------------------
   p_load("ggplot2", "igraph", "ggraph", "visNetwork", "tidyverse", "tidygraph",
          "ggiraph", "ggnewscale", "grid", "gridExtra", "RColorBrewer", "pals")
@@ -433,6 +437,18 @@ for (subdir in subdirs_stat) {
   number_of_big_communities <- length(big_communities)
   id_str.big_communities <- paste0(id_str, ".big_communities")
   assign(id_str.big_communities, number_of_big_communities)
+  
+  # Extract big communities
+  big_communities <- as.numeric(names(big_communities))
+  posXY.big_communities <- posXY %>% filter(Community %in% big_communities)
+  id_str.posXY.big_communities <- paste0(id_str, ".posXY.big_communities")
+  assign(id_str.posXY.big_communities, posXY.big_communities)
+  
+  
+  # Proportion of redcells involved in big communities
+  redcells_in_big_communities <- sum(posXY.big_communities$redcell)/nrow(posXY.big_communities)
+  id_str.redcells_in_big_communities <- paste0(id_str, ".redcells_in_big_communities")
+  assign(id_str.redcells_in_big_communities, redcells_in_big_communities)
   
   
   # Clustering coefficient
@@ -519,7 +535,9 @@ for (subdir in subdirs_stat) {
   close(pb)
   ##
   
-
+  # Label cells back with their actual numbers
+  rownames(cmat.RFPt) <- rownames(RFPt)
+  colnames(cmat.RFPt) <- rownames(RFPt)
   
   graph.RFP <- graph.adjacency(as.matrix(cmat.RFPt), mode = "undirected", weighted = TRUE, diag = FALSE) # using thresholded values
   
@@ -575,17 +593,17 @@ for (subdir in subdirs_stat) {
                              guide = guide_colourbar(available_aes = "edge_colour")
     )+
     # Calcium levels and degrees
-    geom_node_point(aes(fill = ordered(cluster_leading_eigen(graph.RFP)$membership),
+    geom_node_point(aes(fill = ordered(leading.eigenvector.community(graph.RFP, options = list(maxiter = 100000000))$membership),
                         size = degree(graph.RFP)),
                     shape = 21)+
     # geom_node_text(aes(label = posXY.RFP$Cell), 
     #                colour = "red",
     #               ID0040   repel = TRUE,
     #                size = 2.5)+
-    geom_node_text(aes(label = ordered(cluster_leading_eigen(graph.RFP)$membership)),
-                   colour = "black",
-                   fontface = 1,
-                   size = 3)+
+    geom_node_text(aes(label = ordered(leading.eigenvector.community(graph.RFP, options = list(maxiter = 100000000))$membership)),
+                    colour = "black",
+                    fontface = 1,
+                    size = 3)+
     scale_fill_manual(values = colorz,
                       guide = "none")+
     scale_size_continuous(range = c(5, 12),
