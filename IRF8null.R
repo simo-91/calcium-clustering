@@ -1,6 +1,5 @@
 # IRF8null
-# Frequency
-# CTRL_IRF8null Frequency
+# CTRL_IRF8null Frequency ----
 # Step 1: Define frequency variables for each dpf and fish number, including NAs for missing data
 
 # Correcting for 6dpf and 8dpf by adding NA for missing fish numbers
@@ -43,8 +42,49 @@ ggplot(tracked.CTRL_IRF8null_frequency_long, aes(x = Age, y = Frequency, group =
   theme(legend.position = "none")
 
 
+# CTRL_IRF8null.RFP redcell only frequency----
+# Correcting for 6dpf and 8dpf by adding NA for missing fish numbers
+dpf_4_freq_CTRL_IRF8null.RFP <- c(`ID0266_frequency-RFP`, `ID0267_frequency-RFP`, `ID0268_frequency-RFP`, `ID0269_frequency-RFP`, 
+                              `ID0270_frequency-RFP`, `ID0271_frequency-RFP`, `ID0272_frequency-RFP`, `ID0273_frequency-RFP`, `ID0274_frequency-RFP`)
 
-# CTRL_IRF8null Mean Calcium
+dpf_5_freq_CTRL_IRF8null.RFP <- c(`ID0275_frequency-RFP`, `ID0276_frequency-RFP`, `ID0277_frequency-RFP`, `ID0278_frequency-RFP`, 
+                              `ID0279_frequency-RFP`, `ID0280_frequency-RFP`, `ID0281_frequency-RFP`, `ID0282_frequency-RFP`, `ID0283_frequency-RFP`)
+
+dpf_6_freq_CTRL_IRF8null.RFP <- c(`ID0284_frequency-RFP`, `ID0285_frequency-RFP`, `ID0286_frequency-RFP`, `ID0287_frequency-RFP`, 
+                              `ID0288_frequency-RFP`, `ID0289_frequency-RFP`, `ID0290_frequency-RFP`, NA, NA) # Added NAs for missing fish numbers
+
+dpf_8_freq_CTRL_IRF8null.RFP <- c(`ID0291_frequency-RFP`, `ID0292_frequency-RFP`, `ID0293_frequency-RFP`, `ID0294_frequency-RFP`, 
+                              `ID0295_frequency-RFP`, `ID0296_frequency-RFP`, `ID0297_frequency-RFP`, NA, NA) # Added NAs for missing fish numbers
+
+# Step 2: Combine into a dataframe ensuring all vectors have the same length
+tracked.CTRL_IRF8null.RFP_frequency <- data.frame(
+  "fish no" = c("fish1", "fish2", "fish3", "fish4", "fish5", "fish6", "fish7", "fish8", "fish9"),
+  "4dpf" = dpf_4_freq_CTRL_IRF8null.RFP,
+  "5dpf" = dpf_5_freq_CTRL_IRF8null.RFP,
+  "6dpf" = dpf_6_freq_CTRL_IRF8null.RFP,
+  "8dpf" = dpf_8_freq_CTRL_IRF8null.RFP
+)
+
+colnames(tracked.CTRL_IRF8null.RFP_frequency) <- c("fish no", "4dpf", "5dpf", "6dpf", "8dpf")
+
+# Step 3: Reshape the data to long format for plotting or analysis
+tracked.CTRL_IRF8null.RFP_frequency_long <- pivot_longer(tracked.CTRL_IRF8null.RFP_frequency, 
+                                                     cols = c("4dpf", "5dpf", "6dpf", "8dpf"), 
+                                                     names_to = "Age", 
+                                                     values_to = "Frequency")
+
+# Step 4: Plotting
+ggplot(tracked.CTRL_IRF8null.RFP_frequency_long, aes(x = Age, y = Frequency, group = `fish no`, color = `fish no`)) +
+  geom_line() +
+  theme_minimal() +
+  labs(title = "CTRL_IRF8null.RFP Frequency by Age",
+       x = "Age (dpf)",
+       y = "Frequency") +
+  theme(legend.position = "none")
+
+
+
+# CTRL_IRF8null Mean Calcium ----
 # Create vectors for each day post-fertilization (dpf) with the corresponding mean calcium variable names
 dpf_4_mean_Ca_CTRL_IRF8null <- c(mean(ID0266_mean_Ca), mean(ID0267_mean_Ca), mean(ID0268_mean_Ca), mean(ID0269_mean_Ca), 
                                  mean(ID0270_mean_Ca), mean(ID0271_mean_Ca), mean(ID0272_mean_Ca), mean(ID0273_mean_Ca), mean(ID0274_mean_Ca))
@@ -174,8 +214,140 @@ ggplot(tracked.CTRL_IRF8null.globaleff_long, aes(x = Age, y = GlobalEff, group =
        y = "Global Efficiency") +
   theme(legend.position = "none")
 
-# Comparisons --------
-# Frequency comparison
+
+# AKT1_IRF8null Frequency ----
+# Step 1: Define frequency variables for each dpf and fish number, including NAs for missing data
+
+# Correcting for 6dpf and 8dpf by adding NA for missing fish numbers
+dpf_4_freq_AKT1_IRF8null <- c(ID0298_frequency, ID0299_frequency, ID0300_frequency, ID0301_frequency, 
+                              ID0302_frequency, ID0303_frequency, ID0304_frequency, ID0305_frequency, ID0306_frequency)
+
+dpf_5_freq_AKT1_IRF8null <- c(ID0307_frequency, ID0308_frequency, ID0309_frequency, ID0310_frequency, 
+                              ID0311_frequency, ID0312_frequency, ID0313_frequency, ID0314_frequency, ID0315_frequency)
+
+dpf_6_freq_AKT1_IRF8null <- c(ID0316_frequency, NA, NA, ID0317_frequency, ID0318_frequency, ID0319_frequency, NA,
+                              ID0320_frequency, ID0321_frequency) # Added NAs for missing fish numbers
+
+dpf_8_freq_AKT1_IRF8null <- c(ID0322_frequency, NA, NA, ID0323_frequency, NA, ID0324_frequency, NA, ID0325_frequency, 
+                              ID0326_frequency) # Added NAs for missing fish numbers
+
+# Step 2: Combine into a dataframe ensuring all vectors have the same length
+tracked.AKT1_IRF8null_frequency <- data.frame(
+  "fish no" = c("fish1", "fish2", "fish3", "fish4", "fish5", "fish6", "fish7", "fish8", "fish9"),
+  "4dpf" = dpf_4_freq_AKT1_IRF8null,
+  "5dpf" = dpf_5_freq_AKT1_IRF8null,
+  "6dpf" = dpf_6_freq_AKT1_IRF8null,
+  "8dpf" = dpf_8_freq_AKT1_IRF8null
+)
+
+colnames(tracked.AKT1_IRF8null_frequency) <- c("fish no", "4dpf", "5dpf", "6dpf", "8dpf")
+
+# Step 3: Reshape the data to long format for plotting or analysis
+tracked.AKT1_IRF8null_frequency_long <- pivot_longer(tracked.AKT1_IRF8null_frequency, 
+                                                     cols = c("4dpf", "5dpf", "6dpf", "8dpf"), 
+                                                     names_to = "Age", 
+                                                     values_to = "Frequency")
+
+# Step 4: Plotting
+ggplot(tracked.AKT1_IRF8null_frequency_long, aes(x = Age, y = Frequency, group = `fish no`, color = `fish no`)) +
+  geom_line() +
+  theme_minimal() +
+  labs(title = "AKT1_IRF8null Frequency by Age",
+       x = "Age (dpf)",
+       y = "Frequency") +
+  theme(legend.position = "none")
+
+
+# AKT1_IRF8null.RFP redcell only Frequency ----
+
+dpf_4_freq_AKT1_IRF8null.RFP <- c(`ID0298_frequency-RFP`, `ID0299_frequency-RFP`, `ID0300_frequency-RFP`, `ID0301_frequency-RFP`, 
+                              `ID0302_frequency-RFP`, `ID0303_frequency-RFP`, `ID0304_frequency-RFP`, `ID0305_frequency-RFP`, `ID0306_frequency-RFP`)
+
+dpf_5_freq_AKT1_IRF8null.RFP <- c(`ID0307_frequency-RFP`, `ID0308_frequency-RFP`, `ID0309_frequency-RFP`, `ID0310_frequency-RFP`, 
+                              `ID0311_frequency-RFP`, `ID0312_frequency-RFP`, `ID0313_frequency-RFP`, `ID0314_frequency-RFP`, `ID0315_frequency-RFP`)
+
+dpf_6_freq_AKT1_IRF8null.RFP <- c(`ID0316_frequency-RFP`, NA, NA, `ID0317_frequency-RFP`, `ID0318_frequency-RFP`, `ID0319_frequency-RFP`, NA,
+                              `ID0320_frequency-RFP`, `ID0321_frequency-RFP`) # Added NAs for missing fish numbers
+
+dpf_8_freq_AKT1_IRF8null.RFP <- c(`ID0322_frequency-RFP`, NA, NA, `ID0323_frequency-RFP`, NA, `ID0324_frequency-RFP`, NA, `ID0325_frequency-RFP`, 
+                              `ID0326_frequency-RFP`) # Added NAs for missing fish numbers
+
+# Step 2: Combine into a dataframe ensuring all vectors have the same length
+tracked.AKT1_IRF8null.RFP_frequency <- data.frame(
+  "fish no" = c("fish1", "fish2", "fish3", "fish4", "fish5", "fish6", "fish7", "fish8", "fish9"),
+  "4dpf" = dpf_4_freq_AKT1_IRF8null.RFP,
+  "5dpf" = dpf_5_freq_AKT1_IRF8null.RFP,
+  "6dpf" = dpf_6_freq_AKT1_IRF8null.RFP,
+  "8dpf" = dpf_8_freq_AKT1_IRF8null.RFP
+)
+
+colnames(tracked.AKT1_IRF8null.RFP_frequency) <- c("fish no", "4dpf", "5dpf", "6dpf", "8dpf")
+
+# Step 3: Reshape the data to long format for plotting or analysis
+tracked.AKT1_IRF8null.RFP_frequency_long <- pivot_longer(tracked.AKT1_IRF8null.RFP_frequency, 
+                                                     cols = c("4dpf", "5dpf", "6dpf", "8dpf"), 
+                                                     names_to = "Age", 
+                                                     values_to = "Frequency")
+
+# Step 4: Plotting
+ggplot(tracked.AKT1_IRF8null.RFP_frequency_long, aes(x = Age, y = Frequency, group = `fish no`, color = `fish no`)) +
+  geom_line() +
+  theme_minimal() +
+  labs(title = "AKT1_IRF8null RFP Frequency by Age",
+       x = "Age (dpf)",
+       y = "Frequency") +
+  theme(legend.position = "none")
+
+
+
+
+# AKT1_IRF8null Mean Calcium ----
+# Create vectors for each day post-fertilization (dpf) with the corresponding mean calcium variable names
+dpf_4_mean_Ca_AKT1_IRF8null <- c(mean(ID0298_mean_Ca), mean(ID0299_mean_Ca), mean(ID0300_mean_Ca), mean(ID0301_mean_Ca), 
+                                 mean(ID0302_mean_Ca), mean(ID0303_mean_Ca), mean(ID0304_mean_Ca), mean(ID0305_mean_Ca), mean(ID0306_mean_Ca))
+
+dpf_5_mean_Ca_AKT1_IRF8null <- c(mean(ID0307_mean_Ca), mean(ID0308_mean_Ca), mean(ID0309_mean_Ca), mean(ID0310_mean_Ca), 
+                                 mean(ID0311_mean_Ca), mean(ID0312_mean_Ca), mean(ID0313_mean_Ca), mean(ID0314_mean_Ca), mean(ID0315_mean_Ca))
+
+dpf_6_mean_Ca_AKT1_IRF8null <- c(mean(ID0316_mean_Ca), NA, NA, mean(ID0317_mean_Ca), mean(ID0318_mean_Ca), mean(ID0319_mean_Ca), NA,
+                                 mean(ID0320_mean_Ca), mean(ID0321_mean_Ca)) # Added NAs for missing fish numbers
+
+dpf_8_mean_Ca_AKT1_IRF8null <- c(mean(ID0322_mean_Ca), NA, NA, mean(ID0323_mean_Ca), NA, mean(ID0324_mean_Ca), NA, mean(ID0325_mean_Ca), 
+                                 mean(ID0326_mean_Ca)) # Added NAs for missing fish numbers
+
+
+# Combine into a dataframe
+tracked.AKT1_IRF8null_mean_Ca <- data.frame(
+  "fish no" = c("fish1", "fish2", "fish3", "fish4", "fish5", "fish6", "fish7", "fish8", "fish9"),
+  "4dpf" = dpf_4_mean_Ca_AKT1_IRF8null,
+  "5dpf" = dpf_5_mean_Ca_AKT1_IRF8null,
+  "6dpf" = dpf_6_mean_Ca_AKT1_IRF8null,
+  "8dpf" = dpf_8_mean_Ca_AKT1_IRF8null
+)
+
+# Set column names
+colnames(tracked.AKT1_IRF8null_mean_Ca) <- c("fish no", "4dpf", "5dpf", "6dpf", "8dpf")
+
+# Reshape the data to long format for plotting or analysis
+tracked.AKT1_IRF8null_mean_Ca_long <- pivot_longer(tracked.AKT1_IRF8null_mean_Ca, 
+                                                   cols = c("4dpf", "5dpf", "6dpf", "8dpf"), 
+                                                   names_to = "Age", 
+                                                   values_to = "Mean_Ca")
+
+# Plotting with ggplot2 (adjusted from ggline to ggplot due to previous use of ggline which might not be directly recognized)
+ggplot(tracked.AKT1_IRF8null_mean_Ca_long, aes(x = Age, y = Mean_Ca, group = `fish no`, color = `fish no`)) +
+  geom_line() +
+  theme_minimal() +
+  labs(title = "AKT1_IRF8null Mean Calcium Levels by Age",
+       x = "Age (dpf)",
+       y = "Mean Calcium Level") +
+  theme(legend.position = "none")
+
+
+
+
+# COMPARISONS --------
+# Frequency comparison ----
 # Merge the three dataframes for FREQUENCY
 CTRL_CTRLnull_frequency_merged_data.df <- rbind(
   data.frame(Group = "CTRL", tracked.CTRL_frequency_long2),
@@ -195,20 +367,85 @@ CTRL_CTRLnull_frequency_merged_data.df.plt <- ggboxplot(CTRL_CTRLnull_frequency_
   ylim(0, 0.4)
 
 
-# Clustering comparison
-# Merge the three dataframes for CLUSTCOEFF
-CTRL_CTRLnull_clustcoeff_merged_data.df <- rbind(
-  data.frame(Group = "CTRL", tracked.CTRL_clustcoeff_long),
-  data.frame(Group = "CTRL_IRF8null", tracked.CTRL_IRF8null.clustcoeff_long)
-)
-CTRL_CTRLnull_clustcoeff_merged_data.df <- na.omit(CTRL_CTRLnull_clustcoeff_merged_data.df)
 
-CTRL_CTRLnull_clustcoeff_merged_data.df.plt <- ggboxplot(CTRL_CTRLnull_clustcoeff_merged_data.df, x = "Age", y = "ClustCoeff",
+
+# AKT1 vs AKT1_IRF8null
+AKT1_AKT1null_frequency_merged_data.df <- rbind(
+  data.frame(Group = "AKT1", tracked.AKT1_frequency_long2),
+  data.frame(Group = "AKT1_IRF8null", tracked.AKT1_IRF8null_frequency_long)
+)
+
+results_AKT1_vs_AKT1_IRF8null <- AKT1_AKT1null_frequency_merged_data.df %>%
+  filter(Group %in% c("AKT1", "AKT1_IRF8null")) %>%
+  group_by(Age) %>%
+  summarise(p_value = t.test(Frequency[Group == "AKT1"], Frequency[Group == "AKT1_IRF8null"])$p.value) %>%
+  mutate(label = case_when(
+    p_value < 0.001 ~ "***",
+    p_value < 0.01  ~ "**",
+    p_value < 0.05  ~ "*",
+    TRUE            ~ ""
+  ),
+  ypos = 1.2)
+
+AKT1_AKT1null_frequency_merged_data.df.plt <- ggboxplot(AKT1_AKT1null_frequency_merged_data.df, x = "Age", y = "Frequency",
                                                         fill = "Group",
-                                                        palette = c("CTRL" = "blue", "CTRL_IRF8null" = "cyan"),
+                                                        palette = c("AKT1" = "red", "AKT1_IRF8null" = "orange"),
                                                         add = "boxplot",
-                                                        title = "Clustering Comparison: CTRL vs CTRL_IRF8mut",
+                                                        title = "Frequency Comparison: AKT1 vs AKT1 IRF8null",
                                                         xlab = "Age",
                                                         ylab = "Events/min")+
-  theme_pubr()+
-  theme(axis.title.x = element_blank())
+                                                        theme_pubr()+
+                                                        theme(axis.title.x = element_blank())+
+                                                        ylim(0,1.3)+
+                  geom_text(data = results_AKT1_vs_AKT1_IRF8null, aes(x = Age, y = ypos, label = label), inherit.aes = FALSE)
+
+
+
+# CTRL vs CTRL_IRF8null vs AKT1 vs AKT1_IRF8null frequency comparison ----
+CTRL_CTRLnull_AKT1_AKT1null_frequency_merged_data.df <- rbind(
+  data.frame(Group = "CTRL", tracked.CTRL_frequency_long2),
+  data.frame(Group = "CTRL_IRF8null", tracked.CTRL_IRF8null_frequency_long),
+  data.frame(Group = "AKT1", tracked.AKT1_frequency_long2),
+  data.frame(Group = "AKT1null", tracked.AKT1_IRF8null_frequency_long)
+)
+
+CTRL_CTRLnull_AKT1_AKT1null_frequency_merged_data.df.plt <- ggboxplot(CTRL_CTRLnull_AKT1_AKT1null_frequency_merged_data.df, x = "Age", y = "Frequency",
+                                                                      fill = "Group",
+                                                                      palette = c("CTRL" = "blue", "CTRL_IRF8null" = "cyan", "AKT1" = "red", "AKT1null" = "orange"),
+                                                                      add = "boxplot",
+                                                                      title = "Frequency Comparison: CTRL vs CTRL_IRF8null vs AKT1 vs AKT1null",
+                                                                      xlab = "Age",
+                                                                      ylab = "Events/min")+
+                                                                    theme_pubr()+
+                                                                    theme(axis.title.x = element_blank())+
+                                                                    ylim(0,1.3)
+
+
+
+
+
+
+# 
+# # Clustering comparison
+# # Merge the three dataframes for CLUSTCOEFF
+# CTRL_CTRLnull_clustcoeff_merged_data.df <- rbind(
+#   data.frame(Group = "CTRL", tracked.CTRL_clustcoeff_long),
+#   data.frame(Group = "CTRL_IRF8null", tracked.CTRL_IRF8null.clustcoeff_long)
+# )
+# CTRL_CTRLnull_clustcoeff_merged_data.df <- na.omit(CTRL_CTRLnull_clustcoeff_merged_data.df)
+# 
+# CTRL_CTRLnull_clustcoeff_merged_data.df.plt <- ggboxplot(CTRL_CTRLnull_clustcoeff_merged_data.df, x = "Age", y = "ClustCoeff",
+#                                                         fill = "Group",
+#                                                         palette = c("CTRL" = "blue", "CTRL_IRF8null" = "cyan"),
+#                                                         add = "boxplot",
+#                                                         title = "Clustering Comparison: CTRL vs CTRL_IRF8mut",
+#                                                         xlab = "Age",
+#                                                         ylab = "C(g)")+
+#   theme_pubr()+
+#   theme(axis.title.x = element_blank())
+#   
+
+
+
+
+
