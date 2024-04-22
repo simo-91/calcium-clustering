@@ -1336,18 +1336,32 @@ CTRL_AKT1_HRASV12_frequency_merged_data.df <- rbind(
 )
 CTRL_AKT1_HRASV12_frequency_merged_data.df <- na.omit(CTRL_AKT1_HRASV12_frequency_merged_data.df)
 # Create the combined plot with overlapping data
-CTRL_AKT1_HRASV12_frequency_merged_data.df.plt <- ggboxplot(CTRL_AKT1_HRASV12_frequency_merged_data.df, x = "Age", y = "Frequency",
-                                            fill = "Group",
-                                            palette = c("CTRL" = "blue", "AKT1" = "red", "HRASV12" = "purple"),
-                                            add = "boxplot",
-                                            title = "Frequency Comparison: CTRL vs AKT1 vs HRASV12",
-                                            xlab = "Age",
-                                            ylab = "Events/min")+
-                                            theme_pubr()+
-                                            theme(axis.title.x = element_blank())+
-                                            ylim(0, 1.25)
+results <- df %>%
+  filter(Group %in% c("CTRL", "AKT1")) %>%
+  group_by(Age) %>%
+  summarise(p_value = t.test(Frequency[Group == "CTRL"], Frequency[Group == "AKT1"])$p.value) %>%
+  mutate(label = case_when(
+    p_value < 0.001 ~ "***",
+    p_value < 0.01  ~ "**",
+    p_value < 0.05  ~ "*",
+    TRUE            ~ ""
+  ),
+  ypos = 1.2)
+CTRL_AKT1_HRASV12_frequency_merged_data.df.plt <- ggplot(df, aes(x = Age, y = Frequency, fill = Group)) +
+  geom_boxplot() +
+  scale_fill_manual(values = c("CTRL" = "blue", "AKT1" = "red", "HRASV12" = "purple")) +
+  theme_pubr() +
+  labs(title = "Frequency Comparison: CTRL vs AKT1 vs HRASV12",
+       x = "Age",
+       y = "Events/min")+
+  ylim(0,1.3)+
+  geom_text(data = results, aes(x = Age, y = ypos, label = label), inherit.aes = FALSE)
 
-# Mean Calcium comparison
+
+
+
+
+# Mean Calcium comparison ----
 # Merge the three dataframes for Mean Calcium
 CTRL_AKT1_HRASV12_mean_Ca_merged_data.df <- rbind(
   data.frame(Group = "CTRL", tracked.CTRL_mean_Ca_long),
@@ -1446,7 +1460,6 @@ CTRL_AKT1_HRASV12_mean_Ca.RFP.plt <- ggboxplot(mean_Ca.RFP.df, x = "Age", y = "M
                                                palette = c("CTRL" = "blue", "AKT1" = "red", "HRASV12" = "purple"),
                                                add = "jitter", shape = "Condition",
                                                xlab = "Age", ylab = "Mean Ca", title = "Mean Calcium in RFP cells") +
-  theme_pubr()
+                                            theme_pubr()
 
-# Clustering Coefficient
-
+# 

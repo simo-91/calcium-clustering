@@ -1,7 +1,7 @@
 library(pacman)
 p_load(utils, dplyr, tidyverse, ggplot2, plotly, tidyr, reshape2, factoextra, ggdendro,
        grid, RcppCNPy, cowplot, ggpubr, mmand, rstudioapi, reticulate, tcltk, ggfortify,
-       ggpubr, factoextra, parallel, ggpattern, ggsignif, car, gtools, igraph)
+       ggpubr, factoextra, parallel, ggpattern, ggsignif, car, gtools, igraph, ggraph)
 
 # Function to choose a directory with platform-independent GUI
 choose_directory = function(caption = 'Select data directory') {
@@ -21,7 +21,7 @@ subdirs_stat <- subdirs[grep("stat.npy", subdirs)]
 subdirs_stat <- mixedsort(subdirs_stat)
 
 
-id_num <- 290 #starting ID number minus 1
+id_num <- 321 #starting ID number minus 1
 
 for (subdir in subdirs_stat) {
   id_num <- id_num + 1
@@ -210,7 +210,7 @@ for (subdir in subdirs_stat) {
   saveRDS(posXY.RFP, file = paste0("~/calcium-clustering/data/", id_str, "_dataposXY.RFP.rds"))
   write.csv(posXY.RFP, file = paste0("~/calcium-clustering/data/", id_str, "_dataposXY.RFP.csv"))
   
-  assign(paste0(id_str, "_frequency-RFP"), frequency.RFP)
+  assign(paste0(id_str, "_frequency.RFP"), frequency.RFP)
   
   ## ggplot to show percentage of coactive RPF+ cells over time -----
   RFPsum <- as.data.frame(colSums(RFPt))
@@ -421,7 +421,7 @@ for (subdir in subdirs_stat) {
   
   ## Communities detection ---------------------------------------------------
   # greedy method (hierarchical, fast method)
-  graph.clusters = leading.eigenvector.community(graph, options = list(maxiter = 10000000))
+  graph.clusters = leading.eigenvector.community(graph, options = list(maxiter = 100000000))
   id_str.graph.clusters <- paste0(id_str, ".graph.clusters")
   assign(id_str.graph.clusters, graph.clusters)
   
@@ -490,14 +490,14 @@ for (subdir in subdirs_stat) {
                              guide = guide_colourbar(available_aes = "edge_colour")
     )+
     # Memberships and degrees
-    geom_node_point(aes(fill = ordered(leading.eigenvector.community(graph, options = list(maxiter = 10000000))$membership),
+    geom_node_point(aes(fill = ordered(leading.eigenvector.community(graph, options = list(maxiter = 100000000))$membership),
                         size = degree(graph)),
                     shape = 21)+
     # geom_node_text(aes(label = posXY$Cell), 
     #                colour = "red",
     #                 repel = TRUE,
     #                size = 2.5)+
-    geom_node_text(aes(label = ordered(leading.eigenvector.community(graph, options = list(maxiter = 10000000))$membership)),
+    geom_node_text(aes(label = ordered(leading.eigenvector.community(graph, options = list(maxiter = 100000000))$membership)),
                    colour = "black",
                    fontface = 1,
                    size = 3)+
@@ -593,14 +593,14 @@ for (subdir in subdirs_stat) {
                              guide = guide_colourbar(available_aes = "edge_colour")
     )+
     # Calcium levels and degrees
-    geom_node_point(aes(fill = ordered(leading.eigenvector.community(graph.RFP, options = list(maxiter = 100000000))$membership),
+    geom_node_point(aes(fill = ordered(leading.eigenvector.community(graph.RFP, options = list(maxiter = 1000000000))$membership),
                         size = degree(graph.RFP)),
                     shape = 21)+
     # geom_node_text(aes(label = posXY.RFP$Cell), 
     #                colour = "red",
     #               ID0040   repel = TRUE,
     #                size = 2.5)+
-    geom_node_text(aes(label = ordered(leading.eigenvector.community(graph.RFP, options = list(maxiter = 100000000))$membership)),
+    geom_node_text(aes(label = ordered(leading.eigenvector.community(graph.RFP, options = list(maxiter = 1000000000))$membership)),
                     colour = "black",
                     fontface = 1,
                     size = 3)+

@@ -1,0 +1,56 @@
+---
+title: "Frequency of events"
+author: "Simo"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+	echo = FALSE,
+	message = FALSE,
+	warning = FALSE
+)
+library(pacman)
+p_load(utils, dplyr, tidyverse, ggplot2, plotly, tidyr, reshape2, factoextra, ggdendro,
+       grid, RcppCNPy, cowplot, ggpubr, mmand, rstudioapi, reticulate, tcltk, ggfortify,
+       ggpubr, factoextra, parallel, ggpattern, ggsignif, car, gtools, ggpattern, kableExtra)
+load(file = "22Apr2024.RData")
+```
+
+## Main points
+- Neurons of AKT1 fish display higher frequency than CTRL fish
+- Preneoplastic cells of AKT1 fish show normal frequency
+- Removing microglia (IRF8-/- mutants) reduces neuron frequency in AKT1 to CTRL levels
+
+
+### Frequency (as events/min) in ALL GCaMP6+ cells (RFP included)
+
+```{r CTRL vs AKT1 vs HRASV12 Frequency of events/min all cells, echo=FALSE, message=FALSE, warning=FALSE, fig.cap='AKT1 fish hindbrains show higher frequency as events per minute'}
+CTRL_AKT1_HRASV12_frequency_merged_data.df.plt
+```
+
+
+### In RFP cells only, all conditions over time
+
+```{r all conditions over time RFP only, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="RFP cells show similar freq among groups"}
+CTRL_AKT1_HRASV12.frequency.RFP.df.plt
+```
+
+### IRF8 mutants, frequency in ALL GCaMP6+ cells (RFP included)
+```{r AKT1 vs AKT1_IRF8null frequency, echo=FALSE, message=FALSE, warning=FALSE, fig.cap="IRF8null fish in AKT1 conditions display frequency levels as low as CTRL"}
+AKT1_AKT1null_frequency_merged_data.df.plt
+```
+
+```{r CTRL vs CTRL_IRF8null vs AKT1_IRF8null, echo=FALSE, message=FALSE, warning=FALSE}
+ggboxplot(CTRL_CTRLnull_AKT1_AKT1null_frequency_merged_data.df, x = "Age", y = "Frequency",
+          fill = "Group",
+          palette = c("CTRL" = "blue", "CTRL_IRF8null" = "cyan", "AKT1" = "red", "AKT1null" = "orange"),
+          add = "boxplot",
+          title = "Frequency Comparison: CTRL vs CTRL_IRF8null vs AKT1 vs AKT1null",
+          xlab = "Age",
+          ylab = "Events/min")+
+    theme_pubr()+
+    theme(axis.title.x = element_blank())+
+    ylim(0,0.4)
+```
