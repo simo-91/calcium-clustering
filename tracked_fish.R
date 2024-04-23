@@ -1372,8 +1372,8 @@ CTRL_AKT1_HRASV12_mean_Ca_merged_data.df <- rbind(
 CTRL_AKT1_HRASV12_mean_Ca_merged_data.df <- na.omit(CTRL_AKT1_HRASV12_mean_Ca_merged_data.df)
 
 # Create the combined plot with overlapping data
-CTRL_AKT1_HRASV12_mean_Ca_merged_data.df.plt <- ggboxplot(CTRL_AKT1_HRASV12_mean_Ca_merged_data.df, x = "Age", y = "Mean Ca",
-                                                            fill = "Group",
+CTRL_AKT1_HRASV12_mean_Ca_merged_data.df.plt <- ggboxplot(CTRL_AKT1_HRASV12_mean_Ca_merged_data.df, x = "Age", y = "Mean_Ca",
+                                                            fill = "Condition",
                                                             palette = c("CTRL" = "blue", "AKT1" = "red", "HRASV12" = "purple"),
                                                             add = "boxplot",
                                                             title = "Calcium levels Comparison: CTRL vs AKT1 vs HRASV12",
@@ -1383,7 +1383,9 @@ CTRL_AKT1_HRASV12_mean_Ca_merged_data.df.plt <- ggboxplot(CTRL_AKT1_HRASV12_mean
                                                         theme(axis.title.x = element_blank())+
                                                         ylim(0.035, 0.11)
 
-# Merge the three dataframes for clustering coefficient C(g)
+
+
+# Merge the three dataframes for clustering coefficient C(g) ----
 CTRL_AKT1_HRASV12.clustcoeff_merged_data.df <- rbind(
   data.frame(Group = "CTRL", tracked.CTRL_clustcoeff_long),
   data.frame(Group = "AKT1", tracked.AKT1.clustcoeff_long),
@@ -1401,7 +1403,11 @@ CTRL_AKT1_HRASV12.clustcoeff_merged_data.df.plt <- ggboxplot(CTRL_AKT1_HRASV12.c
                                                           xlab = "Age",
                                                           ylab = "C(g)")+
   theme_pubr()+
-  theme(axis.title.x = element_blank())
+  theme(axis.title.x = element_blank())+
+  geom_segment(x = 3.70, xend = 4.30, y = 0.83, yend = 0.83, color = "black", size = 1.5) +
+  annotate("text", x = 4, y = 0.850, label = "p = 0.105", vjust = 0, size = 5, color = "black")
+  
+
 
 
 # Merge the three dataframes for Global Efficiency G(g)
