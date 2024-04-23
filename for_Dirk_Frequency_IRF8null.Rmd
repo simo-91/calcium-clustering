@@ -66,3 +66,6 @@ CTRL_AKT1_HRASV12.clustcoeff_merged_data.df.plt
 CTRL_AKT1_HRASV12.clustcoeff.RFP.df.plt
 ```
 #### IRF8-/- mutants
+```{r all genos clustcoeff with IRF8nulls, message=FALSE, warning=FALSE, fig.cap=""}
+
+```
