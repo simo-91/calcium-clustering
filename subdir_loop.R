@@ -2,7 +2,6 @@ library(pacman)
 p_load(utils, dplyr, tidyverse, ggplot2, plotly, tidyr, reshape2, factoextra, ggdendro,
        grid, RcppCNPy, cowplot, ggpubr, mmand, rstudioapi, reticulate, tcltk, ggfortify,
        ggpubr, factoextra, parallel, ggpattern, ggsignif, car, gtools, igraph, ggraph)
-
 # Function to choose a directory with platform-independent GUI
 choose_directory = function(caption = 'Select data directory') {
   if (exists('utils::choose.dir')) {

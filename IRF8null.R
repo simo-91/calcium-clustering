@@ -403,6 +403,9 @@ AKT1_AKT1null_frequency_merged_data.df.plt <- ggboxplot(AKT1_AKT1null_frequency_
 
 
 
+
+
+
 # CTRL vs CTRL_IRF8null vs AKT1 vs AKT1_IRF8null frequency comparison ----
 CTRL_CTRLnull_AKT1_AKT1null_frequency_merged_data.df <- rbind(
   data.frame(Group = "CTRL", tracked.CTRL_frequency_long2),
@@ -420,7 +423,33 @@ CTRL_CTRLnull_AKT1_AKT1null_frequency_merged_data.df.plt <- ggboxplot(CTRL_CTRLn
                                                                       ylab = "Events/min")+
                                                                     theme_pubr()+
                                                                     theme(axis.title.x = element_blank())+
-                                                                    ylim(0,1.3)
+                                                                    ylim(0,1.25)
+
+
+# Redcells only frequency comparison ----
+CTRL.RFP_CTRLnull.RFP_AKT1.RFP_AKT1null.RFP_frequency_merged_data.df <- rbind(
+  data.frame(Group = "CTRL.RFP", tracked.CTRL_frequency.RFP_long2),
+  data.frame(Group = "CTRL_IRF8null.RFP", tracked.CTRL_IRF8null.RFP_frequency_long),
+  data.frame(Group = "AKT1.RFP", tracked.AKT1.frequency.RFP_long2),
+  data.frame(Group = "AKT1_IRF8null.RFP", tracked.AKT1_IRF8null.RFP_frequency_long)
+)
+
+CTRL.RFP_CTRLnull.RFP_AKT1.RFP_AKT1null.RFP_frequency_merged_data.df$RFP <- "TRUE"
+
+CTRL.RFP_CTRLnull.RFP_AKT1.RFP_AKT1null.RFP_frequency_merged_data.df.plt <- ggplot(CTRL.RFP_CTRLnull.RFP_AKT1.RFP_AKT1null.RFP_frequency_merged_data.df, aes(x = Age, y = Frequency, fill = Group, pattern = RFP)) +
+  geom_boxplot_pattern(aes(pattern = RFP, fill = Group),
+    pattern = "stripe", # Applying stripe pattern to all
+    pattern_angle = 45,
+    pattern_density = 0.1,
+    pattern_spacing = 0.05,
+    pattern_color = "red", # All stripes in red
+  )+
+  scale_fill_manual(values = c("CTRL.RFP" = "blue", "CTRL_IRF8null.RFP" = "cyan", "AKT1.RFP" = "red", "AKT1_IRF8null.RFP" = "orange")) +
+  labs(title = "Frequency Comparison (RFP-only): CTRL vs CTRL_IRF8null vs AKT1 vs AKT1null",
+       x = "Age",
+       y = "Events/min") +
+  theme_pubr() +
+  theme(axis.title.x = element_blank())
 
 
 
@@ -568,7 +597,7 @@ ggboxplot(tracked.AKT1_vs_AKT1_IRF8null.RFP.clustcoeff, x = "Age", y = "ClustCoe
 
 
 # Clustering coefficient C(g) comparison with IRF8-/- mutants ----
-tracked.CTRL_vs_AKT1_vs_CTRL_IRF8null_AKT1_IRF8null.clustcoeff_long <- rbind(
+tracked.CTRL_vs_AKT1_vs_CTRL_IRF8null_AKT1_IRF8null.clustcoeff <- rbind(
   data.frame(Group = "CTRL_IRF8null", tracked.CTRL_IRF8null.clustcoeff_long),
   data.frame(Group = "AKT1_IRF8null", tracked.AKT1_IRF8null.clustcoeff_long),
   data.frame(Group = "AKT1", tracked.AKT1.clustcoeff_long),
@@ -576,7 +605,7 @@ tracked.CTRL_vs_AKT1_vs_CTRL_IRF8null_AKT1_IRF8null.clustcoeff_long <- rbind(
 )
 
 
-ggboxplot(tracked.CTRL_vs_AKT1_vs_CTRL_IRF8null_AKT1_IRF8null.clustcoeff_long, x = "Age", y = "ClustCoeff",
+tracked.CTRL_vs_AKT1_vs_CTRL_IRF8null_AKT1_IRF8null.clustcoeff.plt <- ggboxplot(tracked.CTRL_vs_AKT1_vs_CTRL_IRF8null_AKT1_IRF8null.clustcoeff, x = "Age", y = "ClustCoeff",
           fill = "Group",
           palette = c("AKT1_IRF8null" = "orange", "CTRL_IRF8null" = "cyan", "AKT1" = "red", "CTRL" = "blue"),
           add = "boxplot",
