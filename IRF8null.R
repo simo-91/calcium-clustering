@@ -524,7 +524,7 @@ dpf_8_.clustcoeff.RFP_AKT1_IRF8null <- c(ID0322.clustcoeff.RFP, NA, NA, ID0323.c
 
 
 # Step 2: Combine into a dataframe ensuring all vectors have the same length
-tracked.AKT1_IRF8null.RFP.clustcoeff.RFP <- data.frame(
+tracked.AKT1_IRF8null.RFP.clustcoeff <- data.frame(
   "fish no" = c("fish1", "fish2", "fish3", "fish4", "fish5", "fish6", "fish7", "fish8", "fish9"),
   "4dpf" = dpf_4_freq_AKT1_IRF8null.RFP,
   "5dpf" = dpf_5_freq_AKT1_IRF8null.RFP,
@@ -549,20 +549,100 @@ ggplot(tracked.AKT1_IRF8null.RFP.clustcoeff_long, aes(x = Age, y = ClustCoeff, g
        y = "ClustCoeff") +
   theme(legend.position = "none")
 
+# AKT1.RFP vs AKT1.RFP_IRF8null C(g) ----
+tracked.AKT1_vs_AKT1_IRF8null.RFP.clustcoeff <- rbind(
+  data.frame(Group = "AKT1_IRF8null", tracked.AKT1_IRF8null.clustcoeff_long),
+  data.frame(Group = "AKT1.RFP_IRF8null", tracked.AKT1_IRF8null.clustcoeff.RFP_long)
+)
 
-# Clustering coefficient C(g) for IRF8-/- mutants ----
-tracked.AKT1_vs_CTRL_IRF8null_AKT1_IRF8null.clustcoeff_long <- rbind(
+ggboxplot(tracked.AKT1_vs_AKT1_IRF8null.RFP.clustcoeff, x = "Age", y = "ClustCoeff",
+          fill = "Group",
+          palette = c("AKT1.RFP_IRF8null" = "orange","AKT1_IRF8null" = "red"),
+          add = "boxplot",
+          title = "ClustCoeff Comparison: CTRL_IRF8null vs AKT1_IRF8null",
+          xlab = "Age",
+          ylab = "Average C(g)")+
+  theme_pubr()+
+  theme(axis.title.x = element_blank())
+
+
+
+# Clustering coefficient C(g) comparison with IRF8-/- mutants ----
+tracked.CTRL_vs_AKT1_vs_CTRL_IRF8null_AKT1_IRF8null.clustcoeff_long <- rbind(
   data.frame(Group = "CTRL_IRF8null", tracked.CTRL_IRF8null.clustcoeff_long),
   data.frame(Group = "AKT1_IRF8null", tracked.AKT1_IRF8null.clustcoeff_long),
-  data.frame(Group = "AKT1", tracked.AKT1.clustcoeff_long)
+  data.frame(Group = "AKT1", tracked.AKT1.clustcoeff_long),
+  data.frame(Group = "CTRL", tracked.CTRL.clustcoeff_long)
 )
 
 
-ggboxplot(tracked.AKT1_vs_CTRL_IRF8null_AKT1_IRF8null.clustcoeff_long, x = "Age", y = "ClustCoeff",
+ggboxplot(tracked.CTRL_vs_AKT1_vs_CTRL_IRF8null_AKT1_IRF8null.clustcoeff_long, x = "Age", y = "ClustCoeff",
           fill = "Group",
-          palette = c("AKT1_IRF8null" = "orange", "CTRL_IRF8null" = "cyan", "AKT1" = "red"),
+          palette = c("AKT1_IRF8null" = "orange", "CTRL_IRF8null" = "cyan", "AKT1" = "red", "CTRL" = "blue"),
           add = "boxplot",
           title = "ClustCoeff Comparison: CTRL_IRF8null vs AKT1_IRF8null",
+          xlab = "Age",
+          ylab = "Average C(g)")+
+  theme_pubr()+
+  theme(axis.title.x = element_blank())+
+  geom_text(aes(x = 4.20, y = 0.9, label = "ns"), color = "black", size = 5)
+
+# C(g) for RFP only
+# CTRL IRF8null RFP C(g) ----
+# 4dpf
+dpf_4_ctrl_irf8.clustcoeff.RFP  <- c(ID0266.clustcoeff.RFP , ID0267.clustcoeff.RFP , ID0268.clustcoeff.RFP , ID0269.clustcoeff.RFP , 
+                                       ID0270.clustcoeff.RFP , ID0271.clustcoeff.RFP , ID0272.clustcoeff.RFP , ID0273.clustcoeff.RFP , ID0274.clustcoeff.RFP )
+
+# 5dpf
+dpf_5_ctrl_irf8.clustcoeff.RFP  <- c(ID0275.clustcoeff.RFP , ID0276.clustcoeff.RFP , ID0277.clustcoeff.RFP , ID0278.clustcoeff.RFP , 
+                                     ID0279.clustcoeff.RFP , ID0280.clustcoeff.RFP , ID0281.clustcoeff.RFP , ID0282.clustcoeff.RFP , ID0283.clustcoeff.RFP )
+
+# 6dpf
+dpf_6_ctrl_irf8.clustcoeff.RFP  <- c(ID0284.clustcoeff.RFP , ID0285.clustcoeff.RFP , ID0286.clustcoeff.RFP , ID0287.clustcoeff.RFP , 
+                                     ID0288.clustcoeff.RFP , ID0289.clustcoeff.RFP , ID0290.clustcoeff.RFP , NA, NA)
+
+# 8dpf
+dpf_8_ctrl_irf8.clustcoeff.RFP  <- c(ID0291.clustcoeff.RFP , ID0292.clustcoeff.RFP , ID0293.clustcoeff.RFP , ID0294.clustcoeff.RFP , 
+                                     ID0295.clustcoeff.RFP , ID0296.clustcoeff.RFP , ID0297.clustcoeff.RFP , NA, NA)
+
+# Combine into a dataframe
+tracked.CTRL_IRF8null.clustcoeff.RFP <- data.frame(
+  "fish no" = c("fish1", "fish2", "fish3", "fish4", "fish5", "fish6", "fish7", "fish8", "fish9"),
+  "4dpf" = dpf_4_ctrl_irf8.clustcoeff.RFP ,
+  "5dpf" = dpf_5_ctrl_irf8.clustcoeff.RFP ,
+  "6dpf" = dpf_6_ctrl_irf8.clustcoeff.RFP ,
+  "8dpf" = dpf_8_ctrl_irf8.clustcoeff.RFP 
+)
+tracked.CTRL_IRF8null.clustcoeff.RFP[] <- lapply(tracked.CTRL_IRF8null.clustcoeff.RFP, function(x) replace(x, is.na(x), 0))
+colnames(tracked.CTRL_IRF8null.clustcoeff.RFP) <- c("fish no", "4dpf", "5dpf", "6dpf", "8dpf")
+# Reshape the data to long format for plotting or analysis
+tracked.CTRL_IRF8null.clustcoeff.RFP_long <- pivot_longer(tracked.CTRL_IRF8null.clustcoeff.RFP, 
+                                                      cols = c("4dpf", "5dpf", "6dpf", "8dpf"), 
+                                                      names_to = "Age", 
+                                                      values_to = "ClustCoeff")
+
+# Plotting
+ggplot(tracked.CTRL_IRF8null.clustcoeff.RFP_long, aes(x = Age, y = ClustCoeff, group = `fish no`, color = `fish no`)) +
+  geom_line() +
+  theme_minimal() +
+  labs(title = "CTRL_IRF8null RFP Clustering Coefficient by Age",
+       x = "Age (dpf)",
+       y = "Clustering Coefficient") +
+  theme(legend.position = "none")
+
+# C(g) comparison among genos between RFP only ----
+tracked.CTRL.RFP_vs_AKT1.RFP_vs_CTRL.RFP_IRF8null.RFP_AKT1_IRF8null.RFP.clustcoeff.df <- rbind(
+  data.frame(Group = "CTRL_IRF8null", tracked.CTRL_IRF8null.clustcoeff.RFP_long),
+  data.frame(Group = "AKT1_IRF8null", tracked.AKT1_IRF8null.clustcoeff.RFP_long),
+  data.frame(Group = "AKT1", tracked.AKT1.clustcoeff.RFP_long2),
+  data.frame(Group = "CTRL", tracked.CTRL.clustcoeff.RFP_long2)
+)
+
+ggboxplot(tracked.CTRL.RFP_vs_AKT1.RFP_vs_CTRL.RFP_IRF8null.RFP_AKT1_IRF8null.RFP.clustcoeff.df, x = "Age", y = "ClustCoeff",
+          fill = "Group",
+          palette = c("AKT1_IRF8null" = "orange", "CTRL_IRF8null" = "cyan", "AKT1" = "red", "CTRL" = "blue"),
+          add = "boxplot",
+          title = "C(g) in redcells only",
           xlab = "Age",
           ylab = "Average C(g)")+
   theme_pubr()+
