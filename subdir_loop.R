@@ -203,7 +203,7 @@ for (subdir in subdirs_stat) {
   posXY.RFP <- posXY %>%
     subset(redcell==1)
   
-  # Frequency -cell thresholded events divided by 120 sec (2sec per volume) -----
+  # Frequency RFP -cell thresholded events divided by 120 sec (2sec per volume) -----
   posXY.RFP$frequency <- rowSums(RFPt)/120 #events per minute
   frequency.RFP <- mean(rowSums(RFPt)/120)
   saveRDS(posXY.RFP, file = paste0("~/calcium-clustering/data/", id_str, "_dataposXY.RFP.rds"))

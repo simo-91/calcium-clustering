@@ -515,10 +515,10 @@ dpf_8_.clustcoeff_AKT1_IRF8null <- c(ID0322.clustcoeff, NA, NA, ID0323.clustcoef
 # Step 2: Combine into a dataframe ensuring all vectors have the same length
 tracked.AKT1_IRF8null.clustcoeff <- data.frame(
   "fish no" = c("fish1", "fish2", "fish3", "fish4", "fish5", "fish6", "fish7", "fish8", "fish9"),
-  "4dpf" = dpf_4_freq_AKT1_IRF8null,
-  "5dpf" = dpf_5_freq_AKT1_IRF8null,
-  "6dpf" = dpf_6_freq_AKT1_IRF8null,
-  "8dpf" = dpf_8_freq_AKT1_IRF8null
+  "4dpf" = dpf_4_.clustcoeff_AKT1_IRF8null,
+  "5dpf" = dpf_5_.clustcoeff_AKT1_IRF8null,
+  "6dpf" = dpf_6_.clustcoeff_AKT1_IRF8null,
+  "8dpf" = dpf_8_.clustcoeff_AKT1_IRF8null
 )
 
 colnames(tracked.AKT1_IRF8null.clustcoeff) <- c("fish no", "4dpf", "5dpf", "6dpf", "8dpf")
@@ -555,10 +555,10 @@ dpf_8_.clustcoeff.RFP_AKT1_IRF8null <- c(ID0322.clustcoeff.RFP, NA, NA, ID0323.c
 # Step 2: Combine into a dataframe ensuring all vectors have the same length
 tracked.AKT1_IRF8null.RFP.clustcoeff <- data.frame(
   "fish no" = c("fish1", "fish2", "fish3", "fish4", "fish5", "fish6", "fish7", "fish8", "fish9"),
-  "4dpf" = dpf_4_freq_AKT1_IRF8null.RFP,
-  "5dpf" = dpf_5_freq_AKT1_IRF8null.RFP,
-  "6dpf" = dpf_6_freq_AKT1_IRF8null.RFP,
-  "8dpf" = dpf_8_freq_AKT1_IRF8null.RFP
+  "4dpf" = dpf_4_.clustcoeff.RFP_AKT1_IRF8null,
+  "5dpf" = dpf_5_.clustcoeff.RFP_AKT1_IRF8null,
+  "6dpf" = dpf_6_.clustcoeff.RFP_AKT1_IRF8null,
+  "8dpf" = dpf_8_.clustcoeff.RFP_AKT1_IRF8null
 )
 
 colnames(tracked.AKT1_IRF8null.RFP.clustcoeff) <- c("fish no", "4dpf", "5dpf", "6dpf", "8dpf")
@@ -581,7 +581,7 @@ ggplot(tracked.AKT1_IRF8null.RFP.clustcoeff_long, aes(x = Age, y = ClustCoeff, g
 # AKT1.RFP vs AKT1.RFP_IRF8null C(g) ----
 tracked.AKT1_vs_AKT1_IRF8null.RFP.clustcoeff <- rbind(
   data.frame(Group = "AKT1_IRF8null", tracked.AKT1_IRF8null.clustcoeff_long),
-  data.frame(Group = "AKT1.RFP_IRF8null", tracked.AKT1_IRF8null.clustcoeff.RFP_long)
+  data.frame(Group = "AKT1.RFP_IRF8null", tracked.AKT1_IRF8null.RFP.clustcoeff_long)
 )
 
 ggboxplot(tracked.AKT1_vs_AKT1_IRF8null.RFP.clustcoeff, x = "Age", y = "ClustCoeff",
