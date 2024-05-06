@@ -179,7 +179,13 @@ CTRL_AKT1_HRASV12.clustcoeff.RFP.df.plt <- ggplot(CTRL_AKT1_HRASV12.clustcoeff.R
   theme(legend.position = "top")
 
 
-
+# C(g) Normalized by frequency of events per minute
+CTRL_AKT1_HRASV12.clustcoeff_norm_by_freq.RFP.df.plt <- ggplot(CTRL_AKT1_HRASV12.clustcoeff_norm_by_freq.RFP.df, aes(x = Age, y = C_norm_by_freq, fill = Condition)) +
+  geom_boxplot_pattern() +
+  scale_fill_manual(values = c("CTRL" = "blue", "AKT1" = "red", "HRASV12" = "purple")) +
+  labs(x = " ", y = "C(g)/freq", title = "C(g) normalized by freq, in RFP-only cells") +
+  theme_pubr() +
+  theme(legend.position = "top")
 
 
 
@@ -188,7 +194,6 @@ CTRL_AKT1_HRASV12.clustcoeff.RFP.df.plt <- ggplot(CTRL_AKT1_HRASV12.clustcoeff.R
 
 
 # Frequency of events --------
-# CTRL Clustering Coefficient ----
 dpf_4_frequency.RFP <- c(`ID0186_frequency.RFP`, `ID0187_frequency.RFP`, `ID0188_frequency.RFP`, `ID0189_frequency.RFP`, 
                           `ID0190_frequency.RFP`, `ID0191_frequency.RFP`, `ID0192_frequency.RFP`, `ID0193_frequency.RFP`, 
                           `ID0194_frequency.RFP`, `ID0195_frequency.RFP`)
@@ -367,15 +372,6 @@ CTRL_CTRLnull_AKT1_AKT1null_frequency.RFP_merged_data.df <- rbind(
 CTRL_CTRLnull_AKT1_AKT1null_frequency.RFP_merged_data.df <- na.omit(CTRL_CTRLnull_AKT1_AKT1null_frequency.RFP_merged_data.df)
 
 
-ggboxplot(CTRL_CTRLnull_AKT1_AKT1null_frequency.RFP_merged_data.df, x = "Age", y = "Frequency",
-          fill = "Group",
-          palette = c("CTRL.RFP" = "blue", "CTRL_IRF8null.RFP" = "cyan", "AKT1.RFP" = "red", "AKT1_IRF8null.RFP" = "orange"),
-          add = "boxplot",
-          title = "Frequency Redcells: CTRL vs CTRL_IRF8null vs AKT1 vs AKT1null",
-          xlab = "Age",
-          ylab = "Events/min")+
-  theme_pubr()+
-  theme(axis.title.x = element_blank())
 
 
 comparison1 <- CTRL_CTRLnull_AKT1_AKT1null_frequency.RFP_merged_data.df %>%

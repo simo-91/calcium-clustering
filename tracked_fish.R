@@ -1385,7 +1385,7 @@ CTRL_AKT1_HRASV12_mean_Ca_merged_data.df.plt <- ggboxplot(CTRL_AKT1_HRASV12_mean
 
 
 
-# Merge the three dataframes for clustering coefficient C(g) ----
+# Clustering coefficient C(g) merge the three dataframes ----
 CTRL_AKT1_HRASV12.clustcoeff_merged_data.df <- rbind(
   data.frame(Group = "CTRL", tracked.CTRL_clustcoeff_long),
   data.frame(Group = "AKT1", tracked.AKT1.clustcoeff_long),
@@ -1406,6 +1406,20 @@ CTRL_AKT1_HRASV12.clustcoeff_merged_data.df.plt <- ggboxplot(CTRL_AKT1_HRASV12.c
   theme(axis.title.x = element_blank())+
   geom_segment(x = 3.70, xend = 4.30, y = 0.83, yend = 0.83, color = "black", size = 1.5) +
   annotate("text", x = 4, y = 0.850, label = "p = 0.105", vjust = 0, size = 5, color = "black")
+
+
+
+# C(g) normalized by frequency ----
+CTRL_AKT1_HRASV12.clustcoeff_merged_data_normalized_by_freq.df.plt <- ggboxplot(CTRL_AKT1_HRASV12.clustcoeff_merged_data_normalized_by_freq.df, x = "Age", y = "C_Norm_by_freq",
+          fill = "Group",
+          palette = c("CTRL" = "blue", "AKT1" = "red", "HRASV12" = "purple"),
+          add = "boxplot",
+          title = "C(g) normalized by freq: CTRL vs AKT1 vs HRASV12",
+          xlab = "Age",
+          ylab = "C(g)/freq")+
+  theme_pubr()+
+  ylim(0,4.5)+
+  theme(axis.title.x = element_blank())
   
 
 

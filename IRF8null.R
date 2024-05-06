@@ -411,12 +411,12 @@ CTRL_CTRLnull_AKT1_AKT1null_frequency_merged_data.df <- rbind(
   data.frame(Group = "CTRL", tracked.CTRL_frequency_long2),
   data.frame(Group = "CTRL_IRF8null", tracked.CTRL_IRF8null_frequency_long),
   data.frame(Group = "AKT1", tracked.AKT1_frequency_long2),
-  data.frame(Group = "AKT1null", tracked.AKT1_IRF8null_frequency_long)
+  data.frame(Group = "AKT1_IRF8null", tracked.AKT1_IRF8null_frequency_long)
 )
 
 CTRL_CTRLnull_AKT1_AKT1null_frequency_merged_data.df.plt <- ggboxplot(CTRL_CTRLnull_AKT1_AKT1null_frequency_merged_data.df, x = "Age", y = "Frequency",
                                                                       fill = "Group",
-                                                                      palette = c("CTRL" = "blue", "CTRL_IRF8null" = "cyan", "AKT1" = "red", "AKT1null" = "orange"),
+                                                                      palette = c("CTRL" = "blue", "CTRL_IRF8null" = "cyan", "AKT1" = "red", "AKT1_IRF8null" = "orange"),
                                                                       add = "boxplot",
                                                                       title = "Frequency Comparison: CTRL vs CTRL_IRF8null vs AKT1 vs AKT1null",
                                                                       xlab = "Age",
@@ -424,6 +424,22 @@ CTRL_CTRLnull_AKT1_AKT1null_frequency_merged_data.df.plt <- ggboxplot(CTRL_CTRLn
                                                                     theme_pubr()+
                                                                     theme(axis.title.x = element_blank())+
                                                                     ylim(0,1.25)
+
+# C(g) normalized by frequents of events/min CTRL vs CTRLnull vs AKT1 vs AKT1null ----
+tracked.CTRL_vs_AKT1_vs_CTRL_IRF8null_AKT1_IRF8null.clustcoeff_norm_by_freq.plt <- ggboxplot(tracked.CTRL_vs_AKT1_vs_CTRL_IRF8null_AKT1_IRF8null.clustcoeff_norm_by_freq, x = "Age", y = "C_norm_by_freq",
+                                              fill = "Group",
+                                              palette = c("AKT1_IRF8null" = "orange", "CTRL_IRF8null" = "cyan", "AKT1" = "red", "CTRL" = "blue"),
+                                              add = "boxplot",
+                                              title = "C(g) normalized by frequency of events/min",
+                                              xlab = "Age",
+                                              ylab = "C(g)/freq")+
+  theme_pubr()+
+  ylim(0,4.5)+
+  theme(axis.title.x = element_blank())
+
+
+
+
 
 
 # Redcells only frequency comparison ----
@@ -616,6 +632,9 @@ tracked.CTRL_vs_AKT1_vs_CTRL_IRF8null_AKT1_IRF8null.clustcoeff.plt <- ggboxplot(
   theme(axis.title.x = element_blank())+
   geom_text(aes(x = 4.20, y = 0.9, label = "ns"), color = "black", size = 5)
 
+
+
+
 # C(g) for RFP only
 # CTRL IRF8null RFP C(g) ----
 # 4dpf
@@ -662,17 +681,47 @@ ggplot(tracked.CTRL_IRF8null.clustcoeff.RFP_long, aes(x = Age, y = ClustCoeff, g
 # C(g) comparison among genos between RFP only ----
 tracked.CTRL.RFP_vs_AKT1.RFP_vs_CTRL.RFP_IRF8null.RFP_AKT1_IRF8null.RFP.clustcoeff.df <- rbind(
   data.frame(Group = "CTRL_IRF8null", tracked.CTRL_IRF8null.clustcoeff.RFP_long),
-  data.frame(Group = "AKT1_IRF8null", tracked.AKT1_IRF8null.clustcoeff.RFP_long),
+  data.frame(Group = "AKT1_IRF8null", tracked.AKT1_IRF8null.RFP.clustcoeff_long),
   data.frame(Group = "AKT1", tracked.AKT1.clustcoeff.RFP_long2),
   data.frame(Group = "CTRL", tracked.CTRL.clustcoeff.RFP_long2)
 )
 
-ggboxplot(tracked.CTRL.RFP_vs_AKT1.RFP_vs_CTRL.RFP_IRF8null.RFP_AKT1_IRF8null.RFP.clustcoeff.df, x = "Age", y = "ClustCoeff",
+# Adjusting the order of the Group factor so that AKT1.RFP appears first
+tracked.CTRL.RFP_vs_AKT1.RFP_vs_CTRL.RFP_IRF8null.RFP_AKT1_IRF8null.RFP.clustcoeff.df$Group <- factor(
+  tracked.CTRL.RFP_vs_AKT1.RFP_vs_CTRL.RFP_IRF8null.RFP_AKT1_IRF8null.RFP.clustcoeff.df$Group,
+  levels = c("AKT1.RFP", "AKT1_IRF8null.RFP", "CTRL.RFP", "CTRL_IRF8null.RFP")
+)
+
+# Now plotting using ggboxplot
+tracked.CTRL.RFP_vs_AKT1.RFP_vs_CTRL.RFP_IRF8null.RFP_AKT1_IRF8null.RFP.clustcoeff.df.plt <- ggboxplot(
+  tracked.CTRL.RFP_vs_AKT1.RFP_vs_CTRL.RFP_IRF8null.RFP_AKT1_IRF8null.RFP.clustcoeff.df, 
+  x = "Age", 
+  y = "ClustCoeff",
+  fill = "Group",
+  palette = c("AKT1.RFP" = "red", "CTRL.RFP" = "blue", "AKT1_IRF8null.RFP" = "orange", "CTRL_IRF8null.RFP" = "cyan"),
+  add = "boxplot",
+  title = "C(g) in redcells only",
+  xlab = "Age",
+  ylab = "Average C(g)"
+) +
+  theme_pubr() +
+  theme(axis.title.x = element_blank())
+
+
+# C(g) normalized by relative frequencies as events/min
+
+# Adjusting the order of the Group factor so that AKT1.RFP appears first
+tracked.CTRL.RFP_vs_AKT1.RFP_vs_CTRL.RFP_IRF8null.RFP_AKT1_IRF8null.RFP.clustcoeff_normalized_by_freq.df$Group <- factor(
+  tracked.CTRL.RFP_vs_AKT1.RFP_vs_CTRL.RFP_IRF8null.RFP_AKT1_IRF8null.RFP.clustcoeff_normalized_by_freq.df$Group,
+  levels = c("AKT1.RFP", "AKT1_IRF8null.RFP", "CTRL.RFP", "CTRL_IRF8null.RFP")
+)
+tracked.CTRL.RFP_vs_AKT1.RFP_vs_CTRL.RFP_IRF8null.RFP_AKT1_IRF8null.RFP.clustcoeff_normalized_by_freq.df.plt <- ggboxplot(tracked.CTRL.RFP_vs_AKT1.RFP_vs_CTRL.RFP_IRF8null.RFP_AKT1_IRF8null.RFP.clustcoeff_normalized_by_freq.df, x = "Age", y = "C_norm_by_freq",
           fill = "Group",
-          palette = c("AKT1_IRF8null" = "orange", "CTRL_IRF8null" = "cyan", "AKT1" = "red", "CTRL" = "blue"),
+          palette = c("AKT1_IRF8null.RFP" = "orange", "CTRL_IRF8null.RFP" = "cyan", "AKT1.RFP" = "red", "CTRL.RFP" = "blue"),
           add = "boxplot",
-          title = "C(g) in redcells only",
+          title = "C(g) normalized by freq in redcells only",
           xlab = "Age",
-          ylab = "Average C(g)")+
+          ylab = "C(g)/freq")+
   theme_pubr()+
+  ylim(0,5)+
   theme(axis.title.x = element_blank())
