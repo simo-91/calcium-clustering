@@ -1,7 +1,8 @@
+# Libraries ----
 library(pacman)
 p_load(utils, dplyr, tidyverse, ggplot2, plotly, tidyr, reshape2, factoextra, ggdendro,
        grid, RcppCNPy, cowplot, ggpubr, mmand, rstudioapi, reticulate, tcltk, ggfortify,
-       ggpubr, factoextra, parallel, ggpattern, ggsignif, car, gtools, igraph, ggraph)
+       ggpubr, factoextra, parallel, ggpattern, ggsignif, car, gtools, igraph, ggraph, emmeans)
 # Function to choose a directory with platform-independent GUI
 choose_directory = function(caption = 'Select data directory') {
   if (exists('utils::choose.dir')) {
@@ -94,13 +95,93 @@ for (subdir in subdirs_stat) {
   mean_perc_active_cells <- mean(spksSUM$spksSUM)
   assign(paste0(id_str, "_mean_perc_active_cells"), frequency)
   
-  ## Frequency -cell thresholded events divided by 120 sec -----
-  posXY$frequency <- rowSums(spksthresholded)/120 #events per minute
-  frequency <- mean(rowSums(spksthresholded)/120)
-  saveRDS(frequency, file = paste0("~/calcium-clustering/data/", id_str, "_mean_frequency.rds"))
-  write.csv(frequency, file = paste0("~/calcium-clustering/data/", id_str, "_mean_frequency.csv"))
+
   
-  assign(paste0(id_str, "_frequency"), frequency)
+  
+  
+  library(dplyr)
+  library(ggplot2)
+  library(emmeans)
+  
+  # Function to calculate frequency for all cells ----
+  calculate_frequency <- function(id_str, pos_file, spksthresholded_file, output_dir) {
+    tryCatch({
+      # Load data
+      posXY <- readRDS(pos_file)
+      spksthresholded <- readRDS(spksthresholded_file)
+      
+      # Calculate the number of columns that represent one minute (30 columns per minute)
+      columns_per_minute <- 30
+      
+      # Calculate events per minute for each cell
+      frequency_per_cell <- rowSums(spksthresholded) / (ncol(spksthresholded) / columns_per_minute)
+      
+      # Calculate the mean frequency across all cells
+      mean_frequency <- mean(frequency_per_cell)
+      
+      # Save results
+      saveRDS(mean_frequency, file = file.path(output_dir, paste0(id_str, "_mean_frequency.rds")))
+      write.csv(mean_frequency, file = file.path(output_dir, paste0(id_str, "_mean_frequency.csv")))
+      
+      # Assign to global environment
+      assign(paste0(id_str, "_frequency"), mean_frequency, envir = .GlobalEnv)
+    }, error = function(e) {
+      message(paste("Error processing", id_str, ":", e$message))
+    })
+  }
+  
+  # Function to calculate frequency for RFP cells
+  calculate_frequency_RFP <- function(id_str, pos_file, spksthresholded_file, output_dir) {
+    tryCatch({
+      # Load data
+      posXY <- readRDS(pos_file)
+      spksthresholded <- readRDS(spksthresholded_file)
+      
+      # Filter RFP cells
+      rfp_cells <- posXY %>% filter(redcell == 1) %>% pull(Cell)
+      valid_cells <- rownames(spksthresholded) %in% rfp_cells
+      spksthresholded_rfp <- spksthresholded[valid_cells, ]
+      
+      # Calculate the number of columns that represent one minute (30 columns per minute)
+      columns_per_minute <- 30
+      
+      # Calculate events per minute for each RFP cell
+      frequency_per_cell_rfp <- rowSums(spksthresholded_rfp) / (ncol(spksthresholded_rfp) / columns_per_minute)
+      
+      # Calculate the mean frequency across all RFP cells
+      mean_frequency_rfp <- mean(frequency_per_cell_rfp, na.rm = TRUE)
+      
+      # Save results
+      saveRDS(mean_frequency_rfp, file = file.path(output_dir, paste0(id_str, "_mean_frequency_RFP.rds")))
+      write.csv(mean_frequency_rfp, file = file.path(output_dir, paste0(id_str, "_mean_frequency_RFP.csv")))
+      
+      # Assign to global environment
+      assign(paste0(id_str, "_frequency_RFP"), mean_frequency_rfp, envir = .GlobalEnv)
+    }, error = function(e) {
+      message(paste("Error processing RFP cells for", id_str, ":", e$message))
+    })
+  }
+  
+  # Directory for output files
+  output_dir <- "~/calcium-clustering/data/"
+  
+  # List all relevant files
+  pos_files <- list.files(path = "data", pattern = "_posXY\\.rds$", full.names = TRUE)
+  spksthresholded_files <- list.files(path = "data", pattern = "_spksthresholded\\.rds$", full.names = TRUE)
+  
+  # Process each file pair
+  for (i in seq_along(pos_files)) {
+    pos_file <- pos_files[i]
+    spksthresholded_file <- spksthresholded_files[i]
+    id_str <- gsub("_posXY\\.rds", "", basename(pos_file))
+    
+    # Calculate frequencies for all cells
+    calculate_frequency(id_str, pos_file, spksthresholded_file, output_dir)
+    
+    # Calculate frequencies for RFP cells
+    calculate_frequency_RFP(id_str, pos_file, spksthresholded_file, output_dir)
+  }
+  
 
   
   ## Plot total calcium activity/time --------------------------------------
@@ -545,7 +626,7 @@ for (subdir in subdirs_stat) {
   graph.RFP <- delete.edges(graph.RFP, which(E(graph.RFP)$weight <0.30))
   
   id_str.graph.RFP <- paste0(id_str, ".graph.RFP")
-  assign(id_str.graph, graph.RFP)
+  assign(id_str.graph.RFP, graph.RFP)
   
   ## Robustness
   ## cohesion <- cohesion(graph.RFP)
@@ -740,6 +821,16 @@ for (subdir in subdirs_stat) {
          device = "png",  bg = "white",
          width = 20, height = 15, units = "cm", dpi = 320,
          scale = 2)
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
   
   
   # PSD analysis for acquisition rate of 2sec/vol--------------------------------------
