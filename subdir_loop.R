@@ -2,7 +2,8 @@
 library(pacman)
 p_load(utils, dplyr, tidyverse, ggplot2, plotly, tidyr, reshape2, factoextra, ggdendro,
        grid, RcppCNPy, cowplot, ggpubr, mmand, rstudioapi, reticulate, tcltk, ggfortify,
-       ggpubr, factoextra, parallel, ggpattern, ggsignif, car, gtools, igraph, ggraph, emmeans)
+       ggpubr, factoextra, parallel, ggpattern, ggsignif, car, gtools, igraph, ggraph, 
+       emmeans, FSA, rstatix,tcltk)
 # Function to choose a directory with platform-independent GUI
 choose_directory = function(caption = 'Select data directory') {
   if (exists('utils::choose.dir')) {
@@ -21,7 +22,16 @@ subdirs_stat <- subdirs[grep("stat.npy", subdirs)]
 subdirs_stat <- mixedsort(subdirs_stat)
 
 
-id_num <- 321 #starting ID number minus 1
+id_num <- 30 #starting ID number minus 1
+
+# Define a function to calculate event frequency
+calculate_event_frequency <- function(spksthresholded, frame_rate) {
+  event_counts <- rowSums(spksthresholded > 0)
+  total_time <- ncol(spksthresholded) / frame_rate / 60  # Total time in minutes
+  return(event_counts / total_time)
+}
+# Frame rate calculation
+frame_rate <- 1 / 2  # 1 frame every 2 seconds
 
 for (subdir in subdirs_stat) {
   id_num <- id_num + 1
@@ -59,7 +69,7 @@ for (subdir in subdirs_stat) {
   # }
   # rownames(regr_spks) <- rownames(spks)
   # spks <- regr_spks
-  # # -----
+  # #
   
   spks[is.na(spks)] <- 0
   spks <- spks[,50:ncol(spks)] #need to clean it from first 0 and select best window
@@ -94,95 +104,22 @@ for (subdir in subdirs_stat) {
     theme_pubr()
   mean_perc_active_cells <- mean(spksSUM$spksSUM)
   assign(paste0(id_str, "_mean_perc_active_cells"), frequency)
-  
 
   
+  # Calculate frequency for all cells ----
+  event_frequency_all <- calculate_event_frequency(spksthresholded, frame_rate)
+  mean_frequency_all <- mean(event_frequency_all)
+  frequencies_df <- data.frame(Cell = rownames(spksthresholded), Frequency = event_frequency_all)
+  assign(paste0(id_str, ".frequencies.df"), frequencies_df)
+  assign(paste0(id_str, ".frequency"), mean_frequency_all)
   
-  
-  library(dplyr)
-  library(ggplot2)
-  library(emmeans)
-  
-  # Function to calculate frequency for all cells ----
-  calculate_frequency <- function(id_str, pos_file, spksthresholded_file, output_dir) {
-    tryCatch({
-      # Load data
-      posXY <- readRDS(pos_file)
-      spksthresholded <- readRDS(spksthresholded_file)
-      
-      # Calculate the number of columns that represent one minute (30 columns per minute)
-      columns_per_minute <- 30
-      
-      # Calculate events per minute for each cell
-      frequency_per_cell <- rowSums(spksthresholded) / (ncol(spksthresholded) / columns_per_minute)
-      
-      # Calculate the mean frequency across all cells
-      mean_frequency <- mean(frequency_per_cell)
-      
-      # Save results
-      saveRDS(mean_frequency, file = file.path(output_dir, paste0(id_str, "_mean_frequency.rds")))
-      write.csv(mean_frequency, file = file.path(output_dir, paste0(id_str, "_mean_frequency.csv")))
-      
-      # Assign to global environment
-      assign(paste0(id_str, "_frequency"), mean_frequency, envir = .GlobalEnv)
-    }, error = function(e) {
-      message(paste("Error processing", id_str, ":", e$message))
-    })
-  }
-  
-  # Function to calculate frequency for RFP cells
-  calculate_frequency_RFP <- function(id_str, pos_file, spksthresholded_file, output_dir) {
-    tryCatch({
-      # Load data
-      posXY <- readRDS(pos_file)
-      spksthresholded <- readRDS(spksthresholded_file)
-      
-      # Filter RFP cells
-      rfp_cells <- posXY %>% filter(redcell == 1) %>% pull(Cell)
-      valid_cells <- rownames(spksthresholded) %in% rfp_cells
-      spksthresholded_rfp <- spksthresholded[valid_cells, ]
-      
-      # Calculate the number of columns that represent one minute (30 columns per minute)
-      columns_per_minute <- 30
-      
-      # Calculate events per minute for each RFP cell
-      frequency_per_cell_rfp <- rowSums(spksthresholded_rfp) / (ncol(spksthresholded_rfp) / columns_per_minute)
-      
-      # Calculate the mean frequency across all RFP cells
-      mean_frequency_rfp <- mean(frequency_per_cell_rfp, na.rm = TRUE)
-      
-      # Save results
-      saveRDS(mean_frequency_rfp, file = file.path(output_dir, paste0(id_str, "_mean_frequency_RFP.rds")))
-      write.csv(mean_frequency_rfp, file = file.path(output_dir, paste0(id_str, "_mean_frequency_RFP.csv")))
-      
-      # Assign to global environment
-      assign(paste0(id_str, "_frequency_RFP"), mean_frequency_rfp, envir = .GlobalEnv)
-    }, error = function(e) {
-      message(paste("Error processing RFP cells for", id_str, ":", e$message))
-    })
-  }
-  
-  # Directory for output files
-  output_dir <- "~/calcium-clustering/data/"
-  
-  # List all relevant files
-  pos_files <- list.files(path = "data", pattern = "_posXY\\.rds$", full.names = TRUE)
-  spksthresholded_files <- list.files(path = "data", pattern = "_spksthresholded\\.rds$", full.names = TRUE)
-  
-  # Process each file pair
-  for (i in seq_along(pos_files)) {
-    pos_file <- pos_files[i]
-    spksthresholded_file <- spksthresholded_files[i]
-    id_str <- gsub("_posXY\\.rds", "", basename(pos_file))
-    
-    # Calculate frequencies for all cells
-    calculate_frequency(id_str, pos_file, spksthresholded_file, output_dir)
-    
-    # Calculate frequencies for RFP cells
-    calculate_frequency_RFP(id_str, pos_file, spksthresholded_file, output_dir)
-  }
-  
-
+  # Calculate frequency for RFP/redcell only cells
+  RFPt <- subset(spksthresholded, rownames(spksthresholded) %in% positives[posXY$redcell == 1])
+  event_frequency_RFP <- calculate_event_frequency(RFPt, frame_rate)
+  mean_frequency_RFP <- mean(event_frequency_RFP)
+  frequencies_RFP_df <- data.frame(Cell = rownames(RFPt), Frequency = event_frequency_RFP)
+  assign(paste0(id_str, ".frequencies.RFP.df"), frequencies_RFP_df)
+  assign(paste0(id_str, ".frequency.RFP"), mean_frequency_RFP)
   
   ## Plot total calcium activity/time --------------------------------------
   spksSUM2 <- colSums(spks)
@@ -623,7 +560,7 @@ for (subdir in subdirs_stat) {
   
   ## Threshold correlation degree. An interval is chosen because the Pearson correlation coeff goes -1 to 1, BUT -1 means anti-correlation.. so one neuron is active when the other isn't)
   ## Set weight threshold (set to 0.30 as per literature: Avitan et al., 2017 http://dx.doi.org/10.1016/j.cub.2017.06.056)
-  graph.RFP <- delete.edges(graph.RFP, which(E(graph.RFP)$weight <0.30))
+  graph.RFP <- delete.edges(graph.RFP, which(E(graph.RFP)$weight <0.05))
   
   id_str.graph.RFP <- paste0(id_str, ".graph.RFP")
   assign(id_str.graph.RFP, graph.RFP)
