@@ -28,10 +28,6 @@ graph_vars <- ls(pattern = "^ID\\d{4}\\.graph$")
 graph_ids <- as.numeric(gsub("ID(\\d{4})\\.graph", "\\1", graph_vars))
 filtered_graph_vars <- graph_vars[graph_ids >= 152]
 
-# Debugging: Print filtered graph variables
-print("Filtered graph variables starting from ID0152:")
-print(filtered_graph_vars)
-
 # Initialize a list to store results
 results <- list()
 
@@ -39,9 +35,6 @@ results <- list()
 for (var_name in filtered_graph_vars) {
   # Get the graph from the global environment
   graph <- get(var_name)
-  
-  # Calculate the small-worldness
-  sigma <- smallworldness(graph)
   
   # Get the clustering coefficient
   clustcoeff_var_name <- gsub("\\.graph$", ".clustcoeff", var_name)
@@ -59,23 +52,62 @@ for (var_name in filtered_graph_vars) {
   globeff_rfp_var_name <- gsub("\\.graph$", ".globaleff.RFP", var_name)
   globeff_rfp <- if (exists(globeff_rfp_var_name)) get(globeff_rfp_var_name) else NA
   
+  # Get the frequency per minute
+  freq_var_name <- gsub("\\.graph$", ".frequency", var_name)
+  frequency <- if (exists(freq_var_name)) get(freq_var_name) else NA
+  
+  # Get the frequency per minute RFP
+  freq_rfp_var_name <- gsub("\\.graph$", ".frequency.RFP", var_name)
+  frequency_rfp <- if (exists(freq_rfp_var_name)) get(freq_rfp_var_name) else NA
+  
+  # Get the frequency data frame and calculate the median frequency
+  freq_df_var_name <- gsub("\\.graph$", ".frequencies.df", var_name)
+  frequency_median <- if (exists(freq_df_var_name)) {
+    freq_df <- get(freq_df_var_name)
+    median(freq_df$Frequency, na.rm = TRUE)
+  } else {
+    NA
+  }
+  
+  # Get the frequency RFP data frame and calculate the median frequency
+  freq_rfp_df_var_name <- gsub("\\.graph$", ".frequencies.RFP.df", var_name)
+  frequency_rfp_median <- if (exists(freq_rfp_df_var_name)) {
+    freq_rfp_df <- get(freq_rfp_df_var_name)
+    median(freq_rfp_df$Frequency, na.rm = TRUE)
+  } else {
+    NA
+  }
+  
+  # Get the mean degree
+  mean_degree_var_name <- gsub("\\.graph$", ".degree.mean", var_name)
+  mean_degree <- if (exists(mean_degree_var_name)) get(mean_degree_var_name) else NA
+  
+  # Get the mean degree RFP
+  mean_degree_rfp_var_name <- gsub("\\.graph$", ".degree.mean.RFP", var_name)
+  mean_degree_rfp <- if (exists(mean_degree_rfp_var_name)) get(mean_degree_rfp_var_name) else NA
+  
   # Extract ID to cross-reference with the database
   id <- gsub("\\.graph$", "", var_name)
   
   # Cross-reference with the database to get Condition and Age
-  condition <- database_ids[database_ids$`ID number` == id, Condition]
-  age <- database_ids[database_ids$`ID number` == id, dpf]
+  condition <- database_ids[database_ids$ID_number == id, Condition]
+  age <- database_ids[database_ids$ID_number == id, dpf]
   
   # Store the results
   results[[var_name]] <- list(
     ID = id,
     Condition = condition,
     Age = age,
-    smallworldness = sigma,
     clustering_coefficient = clustcoeff,
     clustering_coefficient_rfp = clustcoeff_rfp,
     global_efficiency = globeff,
-    global_efficiency_rfp = globeff_rfp
+    global_efficiency_rfp = globeff_rfp,
+    frequency = frequency,
+    frequency_rfp = frequency_rfp,
+    frequency_median = frequency_median,
+    frequency_rfp_median = frequency_rfp_median,
+    mean_degree = mean_degree,
+    mean_degree_rfp = mean_degree_rfp
   )
 }
 
@@ -83,9 +115,6 @@ for (var_name in filtered_graph_vars) {
 results_df <- do.call(rbind, lapply(results, as.data.frame))
 results_df <- as.data.frame(results_df)
 
-# Print the results
-print("Calculated metrics:")
-print(results_df)
 
 
 # Data viz -----
@@ -123,3 +152,6 @@ for (feature in features) {
   print(p)  # Display the plot
   ggsave(filename = paste0("boxplot_", feature, ".png"), plot = p)  # Save the plot
 }
+
+
+

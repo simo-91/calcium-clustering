@@ -22,7 +22,7 @@ subdirs_stat <- subdirs[grep("stat.npy", subdirs)]
 subdirs_stat <- mixedsort(subdirs_stat)
 
 
-id_num <- 30 #starting ID number minus 1
+id_num <- 177 #starting ID number minus 1
 
 # Define a function to calculate event frequency
 calculate_event_frequency <- function(spksthresholded, frame_rate) {
@@ -33,7 +33,12 @@ calculate_event_frequency <- function(spksthresholded, frame_rate) {
 # Frame rate calculation
 frame_rate <- 1 / 2  # 1 frame every 2 seconds
 
+# Initialize a progress bar
+total_subdirs <- length(subdirs_stat)
+pb_main <- txtProgressBar(min = 0, max = total_subdirs, style = 3)
+
 for (subdir in subdirs_stat) {
+  setTxtProgressBar(pb_main, id_num)
   id_num <- id_num + 1
   id_str <- sprintf("ID%04d", id_num)
   
@@ -79,6 +84,7 @@ for (subdir in subdirs_stat) {
   spks[is.na(spks)] <- 0 #NAs replaced with 0
   saveRDS(spks, file = paste0("~/calcium-clustering/data/", id_str, "_spks.rds"))
   write.csv(spks, file = paste0("~/calcium-clustering/data/", id_str, "_spks.csv"))
+  assign(paste0(id_str, "_spks"), spks)
   
   ## Cutoff function <- anything below 2*(row sd/cell) is 0, anytlong above is 1
   cutoff <- function(x) {
@@ -91,6 +97,8 @@ for (subdir in subdirs_stat) {
   spksthresholded <- t(apply(spks, 1, cutoff))
   saveRDS(spksthresholded, file = paste0("~/calcium-clustering/data/", id_str, "_spksthresholded.rds"))
   write.csv(spksthresholded, file = paste0("~/calcium-clustering/data/", id_str, "_spksthresholded.csv"))
+  assign(paste0(id_str, "_spksthresholded"), spksthresholded)
+  
   
   ## Calculating percentage of active cells over time -------------------------
   spksSUM <- colSums(spksthresholded)
@@ -197,7 +205,7 @@ for (subdir in subdirs_stat) {
           axis.text.y = element_blank(),
           axis.text.x = element_blank(),
           plot.title = element_text(colour = "red", hjust = .5))+
-  ggtitle(paste0(id_str, final_subdir, " hclust"), subtitle = sprintf("Mean frequency is: %s events/min", round(frequency, digits = 3)))
+  ggtitle(paste0(id_str, final_subdir, " hclust"), subtitle = sprintf("Mean frequency is: %s events/min", round(mean_frequency_all, digits = 3)))
   
   ## GRID raster/sums
   plots <- align_plots(raster.hc, spksSUM.plt, align = 'v', axis = 'l')
@@ -759,17 +767,6 @@ for (subdir in subdirs_stat) {
          width = 20, height = 15, units = "cm", dpi = 320,
          scale = 2)
   
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
   # PSD analysis for acquisition rate of 2sec/vol--------------------------------------
   fft <- apply(spks, 1, fft)
 
@@ -804,6 +801,10 @@ for (subdir in subdirs_stat) {
   assign(paste0(id_str, ".psd.RFP.mean"), psd.RFP.mean)
   
   
-  setTxtProgressBar(pb_general, subdir)
+  
+  
+  assign(paste0(id_str, "_posXY"), posXY)
+  
+  
 }
-close(pb_general)
+close(pb_main)
