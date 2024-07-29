@@ -1,0 +1,119 @@
+---
+title: "Features by Age and Condition"
+author: "Simo"
+date: "2024-07-08"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(ggplot2)
+library(plotly)
+library(dplyr)
+library(ggpubr)
+library(knitr)
+# Load your data here
+results_df <- read.csv("results_df_8Jul2024.csv")
+load("29Jul2024.RData")
+```
+
+```{r Clustering Coefficient}
+suppressMessages({
+p1 <- ggplot(results_df, aes(Age, clustering_coefficient, color = Condition)) +
+  # geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  ggtitle("Clustering Coefficient by Age and Condition")
+ggplotly(p1)
+})
+print(merged_results_dt[which(P_value < 0.07)])
+text_box <- data.frame(
+  Content = merged_results_dt[which(P_value < 0.07)]
+)
+kable(text_box, format = "html", table.attr = "style='width: 100%; border: 1px solid black; padding: 10px; margin: 10px 0;'")
+
+```
+
+```{r Clustering Coefficient RFP}
+suppressMessages({
+p2 <- ggplot(results_df, aes(Age, clustering_coefficient_rfp, color = Condition)) +
+  # geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  ggtitle("Clustering Coefficient RFP by Age and Condition")
+ggplotly(p2)
+})
+```
+
+```{r Global Efficiency}
+suppressMessages({
+p3 <- ggplot(results_df, aes(Age, global_efficiency, color = Condition)) +
+  # geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  ggtitle("Global Efficiency by Age and Condition")
+ggplotly(p3)
+})
+```
+
+```{r Global Efficiency RFP}
+suppressMessages({
+p4 <- ggplot(results_df, aes(Age, global_efficiency_rfp, color = Condition)) +
+  # geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  ggtitle("Global Efficiency RFP by Age and Condition")
+ggplotly(p4)
+})
+```
+
+```{r Frequency Median}
+suppressMessages({
+p5 <- ggplot(results_df, aes(Age, frequency_median, color = Condition)) +
+  # geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  ggtitle("Frequency Median by Age and Condition")
+ggplotly(p5)
+})
+```
+
+```{r Frequency RFP Median}
+suppressMessages({
+p6 <- ggplot(results_df, aes(Age, frequency_rfp_median, color = Condition)) +
+  # geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  ggtitle("Frequency RFP Median by Age and Condition")
+ggplotly(p6)
+})
+```
+
+```{r Mean Degree}
+suppressMessages({
+p7 <- ggplot(results_df, aes(Age, mean_degree, color = Condition)) +
+  # geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  ggtitle("Mean Degree by Age and Condition")
+ggplotly(p7)
+})
+```
+
+```{r Mean Degree RFP}
+suppressMessages({
+p8 <- ggplot(results_df, aes(Age, mean_degree_rfp, color = Condition)) +
+  # geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  ggtitle("Mean Degree RFP by Age and Condition")
+ggplotly(p8)
+})
+```
+
+# Boxplots
+```{r Clustering Coefficient boxplot, fig.dim = c(10, 8)}
+ggplotly(ggplotly(ggplot(results_df, aes(x = Condition, y = clustering_coefficient, fill = Condition)) +
+    geom_boxplot() +
+    facet_wrap(vars(Age), scales = "free_y") +
+    theme_pubr() +
+    labs(title = "Clustering Coefficient across All Conditions and Ages",
+         x = "Condition",
+         y = "Clustering Coefficient") +
+    theme(axis.text.x = element_text(angle = 45, hjust = 1),
+          axis.title.x = element_blank())))
+ctrl_akt1_hrasv12_clustcoeff.plt
+ctrl_akt1_hrasv12_IRF8null_clustcoeff.plt
+```
