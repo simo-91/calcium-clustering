@@ -28,7 +28,7 @@ p1 <- ggplot(results_df, aes(Age, clustering_coefficient, color = Condition)) +
 ggplotly(p1)
 })
 
-datatable(clustering_coefficient_p_values[which(P_value < 0.09)],   options = list(
+datatable(clustering_coefficient_all_p_values[which(P_value < 0.09)],   options = list(
     pageLength = 10,
     autoWidth = TRUE,
     dom = 't'  # This option removes the search box and the pagination controls
@@ -47,7 +47,7 @@ p2 <- ggplot(results_df, aes(Age, clustering_coefficient_rfp, color = Condition)
 ggplotly(p2)
 })
 
-datatable(lustering_coefficient_rfp_p_values[which(P_value < 0.09)],   options = list(
+datatable(clustering_coefficient_rfp_p_values[which(P_value < 0.09)],   options = list(
     pageLength = 10,
     autoWidth = TRUE,
     dom = 't'  # This option removes the search box and the pagination controls
@@ -85,7 +85,14 @@ p4 <- ggplot(results_df, aes(Age, global_efficiency_rfp, color = Condition)) +
 ggplotly(p4)
 })
 
-
+datatable(global_efficiency_rfp_p_values[which(P_value < 0.09)],   options = list(
+    pageLength = 10,
+    autoWidth = TRUE,
+    dom = 't'  # This option removes the search box and the pagination controls
+  ),
+  class = "hover",
+  rownames = FALSE
+)
 ```
 
 ```{r Frequency Median}
@@ -96,6 +103,15 @@ p5 <- ggplot(results_df, aes(Age, frequency_median, color = Condition)) +
   ggtitle("Frequency Median by Age and Condition")
 ggplotly(p5)
 })
+
+datatable(frequency_p_values[which(P_value < 0.09)],   options = list(
+    pageLength = 10,
+    autoWidth = TRUE,
+    dom = 't'  # This option removes the search box and the pagination controls
+  ),
+  class = "hover",
+  rownames = FALSE
+)
 ```
 
 ```{r Frequency RFP Median}
@@ -106,6 +122,15 @@ p6 <- ggplot(results_df, aes(Age, frequency_rfp_median, color = Condition)) +
   ggtitle("Frequency RFP Median by Age and Condition")
 ggplotly(p6)
 })
+
+datatable(frequency_rfp_p_values[which(P_value < 0.09)],   options = list(
+    pageLength = 10,
+    autoWidth = TRUE,
+    dom = 't'  # This option removes the search box and the pagination controls
+  ),
+  class = "hover",
+  rownames = FALSE
+)
 ```
 
 ```{r Mean Degree}
