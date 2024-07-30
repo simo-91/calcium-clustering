@@ -283,3 +283,210 @@ perm_test_results_clustcoeff_rfp.df <- rbind(results_rfp_clustcoeff_dt, irf8null
 
 # Print the merged results
 print(perm_test_results_clustcoeff_rfp.df)
+
+
+# Global efficiency ----
+# Perm test for CTRL vs AKT1 vs HRASV12 global_efficiency ----
+# Function to calculate the median difference
+median_diff <- function(x, y) {
+  return(abs(median(x) - median(y)))
+}
+
+# Function to perform permutation test
+perm_test <- function(group1, group2, num_perm = 10000) {
+  observed_diff <- median_diff(group1, group2)
+  combined <- c(group1, group2)
+  perm_diffs <- replicate(num_perm, {
+    perm_sample <- sample(combined)
+    perm_group1 <- perm_sample[1:length(group1)]
+    perm_group2 <- perm_sample[(length(group1) + 1):length(combined)]
+    median_diff(perm_group1, perm_group2)
+  })
+  p_value <- mean(perm_diffs >= observed_diff)
+  return(list(observed_diff = observed_diff, p_value = p_value))
+}
+
+# Unique ages in the dataset
+ages <- unique(results_df$Age)
+
+# Initialize a list to store results
+results_global_efficiency_list <- list()
+
+# Loop through each age group
+for (age in ages) {
+  age_data <- results_df %>% filter(Age == age)
+  
+  akt1_data <- age_data %>% filter(Condition == "AKT1") %>% pull(global_efficiency)
+  ctrl_data <- age_data %>% filter(Condition == "CTRL") %>% pull(global_efficiency)
+  hrasv12_data <- age_data %>% filter(Condition == "HRASV12") %>% pull(global_efficiency)
+  
+  test_akt1_ctrl <- perm_test(akt1_data, ctrl_data)
+  test_akt1_hrasv12 <- perm_test(akt1_data, hrasv12_data)
+  test_ctrl_hrasv12 <- perm_test(ctrl_data, hrasv12_data)
+  
+  results_global_efficiency_list[[as.character(age)]] <- list(
+    "AKT1_vs_CTRL" = test_akt1_ctrl,
+    "AKT1_vs_HRASV12" = test_akt1_hrasv12,
+    "CTRL_vs_HRASV12" = test_ctrl_hrasv12
+  )
+}
+
+# Convert results_global_efficiency_list to data.table
+results_global_efficiency_dt <- data.table(Age = integer(),
+                                           Comparison = character(),
+                                           Observed_Difference = numeric(),
+                                           P_value = numeric())
+
+for (age in names(results_global_efficiency_list)) {
+  results_global_efficiency_dt <- rbind(results_global_efficiency_dt, data.table(
+    Age = as.integer(age),
+    Comparison = "AKT1_vs_CTRL",
+    Observed_Difference = results_global_efficiency_list[[age]]$AKT1_vs_CTRL$observed_diff,
+    P_value = results_global_efficiency_list[[age]]$AKT1_vs_CTRL$p_value
+  ))
+  
+  results_global_efficiency_dt <- rbind(results_global_efficiency_dt, data.table(
+    Age = as.integer(age),
+    Comparison = "AKT1_vs_HRASV12",
+    Observed_Difference = results_global_efficiency_list[[age]]$AKT1_vs_HRASV12$observed_diff,
+    P_value = results_global_efficiency_list[[age]]$AKT1_vs_HRASV12$p_value
+  ))
+  
+  results_global_efficiency_dt <- rbind(results_global_efficiency_dt, data.table(
+    Age = as.integer(age),
+    Comparison = "CTRL_vs_HRASV12",
+    Observed_Difference = results_global_efficiency_list[[age]]$CTRL_vs_HRASV12$observed_diff,
+    P_value = results_global_efficiency_list[[age]]$CTRL_vs_HRASV12$p_value
+  ))
+}
+
+# Perm test for CTRL vs AKT1 vs HRASV12 IRF8 mutants global_efficiency ----
+# Filter the dataframe to include only _IRF8null conditions
+irf8null_conditions <- results_df %>% filter(grepl("_IRF8null", Condition))
+
+# Unique ages in the dataset
+irf8null_ages <- unique(irf8null_conditions$Age)
+
+# Initialize a list to store results
+irf8null_global_efficiency_results_list <- list()
+
+# Loop through each age group
+for (age in irf8null_ages) {
+  age_data <- irf8null_conditions %>% filter(Age == age)
+  
+  akt1_irf8null_data <- age_data %>% filter(Condition == "AKT1_IRF8null") %>% pull(global_efficiency)
+  ctrl_irf8null_data <- age_data %>% filter(Condition == "CTRL_IRF8null") %>% pull(global_efficiency)
+  hrasv12_irf8null_data <- age_data %>% filter(Condition == "HRASV12_IRF8null") %>% pull(global_efficiency)
+  
+  test_akt1_ctrl_irf8null <- perm_test(akt1_irf8null_data, ctrl_irf8null_data)
+  test_akt1_hrasv12_irf8null <- perm_test(akt1_irf8null_data, hrasv12_irf8null_data)
+  test_ctrl_hrasv12_irf8null <- perm_test(ctrl_irf8null_data, hrasv12_irf8null_data)
+  
+  irf8null_global_efficiency_results_list[[as.character(age)]] <- list(
+    "AKT1_IRF8null_vs_CTRL_IRF8null" = test_akt1_ctrl_irf8null,
+    "AKT1_IRF8null_vs_HRASV12_IRF8null" = test_akt1_hrasv12_irf8null,
+    "CTRL_IRF8null_vs_HRASV12_IRF8null" = test_ctrl_hrasv12_irf8null
+  )
+}
+
+# Convert irf8null_global_efficiency_results_list to data.table
+irf8null_global_efficiency_results_dt <- data.table(Age = integer(),
+                                                    Comparison = character(),
+                                                    Observed_Difference = numeric(),
+                                                    P_value = numeric())
+
+for (age in names(irf8null_global_efficiency_results_list)) {
+  irf8null_global_efficiency_results_dt <- rbind(irf8null_global_efficiency_results_dt, data.table(
+    Age = as.integer(age),
+    Comparison = "AKT1_IRF8null_vs_CTRL_IRF8null",
+    Observed_Difference = irf8null_global_efficiency_results_list[[age]]$AKT1_IRF8null_vs_CTRL_IRF8null$observed_diff,
+    P_value = irf8null_global_efficiency_results_list[[age]]$AKT1_IRF8null_vs_CTRL_IRF8null$p_value
+  ))
+  
+  irf8null_global_efficiency_results_dt <- rbind(irf8null_global_efficiency_results_dt, data.table(
+    Age = as.integer(age),
+    Comparison = "AKT1_IRF8null_vs_HRASV12_IRF8null",
+    Observed_Difference = irf8null_global_efficiency_results_list[[age]]$AKT1_IRF8null_vs_HRASV12_IRF8null$observed_diff,
+    P_value = irf8null_global_efficiency_results_list[[age]]$AKT1_IRF8null_vs_HRASV12_IRF8null$p_value
+  ))
+  
+  irf8null_global_efficiency_results_dt <- rbind(irf8null_global_efficiency_results_dt, data.table(
+    Age = as.integer(age),
+    Comparison = "CTRL_IRF8null_vs_HRASV12_IRF8null",
+    Observed_Difference = irf8null_global_efficiency_results_list[[age]]$CTRL_IRF8null_vs_HRASV12_IRF8null$observed_diff,
+    P_value = irf8null_global_efficiency_results_list[[age]]$CTRL_IRF8null_vs_HRASV12_IRF8null$p_value
+  ))
+}
+
+# Print the data.table
+print(irf8null_global_efficiency_results_dt)
+
+
+# Merge the two data tables into one
+global_efficiency_p_values <- rbind(
+  results_global_efficiency_dt,
+  irf8null_global_efficiency_results_dt
+)
+
+# Print the merged data.table
+print(global_efficiency_p_values)
+
+# Perm test for IRF8+/+ vs IRF8-/- ----
+# Function to perform permutation test for AKT1 vs AKT1_IRF8null, HRASV12 vs HRASV12_IRF8null, CTRL vs CTRL_IRF8null
+perm_test_irf8_comparisons <- function(results_df, condition1, condition2) {
+  # Unique ages in the dataset
+  ages <- unique(results_df$Age)
+  
+  # Initialize a list to store results
+  results_list <- list()
+  
+  # Loop through each age group
+  for (age in ages) {
+    age_data <- results_df %>% filter(Age == age)
+    
+    data1 <- age_data %>% filter(Condition == condition1) %>% pull(global_efficiency)
+    data2 <- age_data %>% filter(Condition == condition2) %>% pull(global_efficiency)
+    
+    test_result <- perm_test(data1, data2)
+    
+    results_list[[as.character(age)]] <- list(
+      Comparison = paste(condition1, "vs", condition2, sep = "_"),
+      Observed_Difference = test_result$observed_diff,
+      P_value = test_result$p_value
+    )
+  }
+  
+  # Convert results_list to data.table
+  results_dt <- data.table(Age = integer(), Comparison = character(), Observed_Difference = numeric(), P_value = numeric())
+  
+  for (age in names(results_list)) {
+    results_dt <- rbind(results_dt, data.table(
+      Age = as.integer(age),
+      Comparison = results_list[[age]]$Comparison,
+      Observed_Difference = results_list[[age]]$Observed_Difference,
+      P_value = results_list[[age]]$P_value
+    ))
+  }
+  
+  return(results_dt)
+}
+
+# Perform permutation tests for AKT1 vs AKT1_IRF8null
+akt1_vs_akt1_irf8null_dt <- perm_test_irf8_comparisons(results_df, "AKT1", "AKT1_IRF8null")
+
+# Perform permutation tests for HRASV12 vs HRASV12_IRF8null
+hrasv12_vs_hrasv12_irf8null_dt <- perm_test_irf8_comparisons(results_df, "HRASV12", "HRASV12_IRF8null")
+
+# Perform permutation tests for CTRL vs CTRL_IRF8null
+ctrl_vs_ctrl_irf8null_dt <- perm_test_irf8_comparisons(results_df, "CTRL", "CTRL_IRF8null")
+
+# Merge all results into the global_efficiency_p_values data.table
+global_efficiency_p_values <- rbind(
+  global_efficiency_p_values,
+  akt1_vs_akt1_irf8null_dt,
+  hrasv12_vs_hrasv12_irf8null_dt,
+  ctrl_vs_ctrl_irf8null_dt
+)
+
+# Print the merged data.table
+print(global_efficiency_p_values)

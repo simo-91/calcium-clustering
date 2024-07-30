@@ -1,3 +1,9 @@
+library(pacman)
+p_load(utils, dplyr, tidyverse, ggplot2, plotly, tidyr, reshape2, factoextra, ggdendro,
+       grid, RcppCNPy, cowplot, ggpubr, mmand, rstudioapi, reticulate, tcltk, ggfortify,
+       ggpubr, factoextra, parallel, ggpattern, ggsignif, car, gtools, igraph, ggraph, 
+       emmeans, FSA, rstatix,tcltk, data.table)
+
 # data viz
 # Convert Age to a factor for better plotting
 results_df <- results_df %>%

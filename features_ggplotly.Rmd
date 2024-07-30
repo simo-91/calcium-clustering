@@ -6,18 +6,20 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE)
 library(ggplot2)
 library(plotly)
 library(dplyr)
 library(ggpubr)
 library(knitr)
+library(DT)
+library(data.table)
 # Load your data here
 results_df <- read.csv("results_df_8Jul2024.csv")
-load("29Jul2024.RData")
+load("30Jul2024.RData")
 ```
 
-```{r Clustering Coefficient}
+```{r Clustering Coefficient, warning=FALSE}
 suppressMessages({
 p1 <- ggplot(results_df, aes(Age, clustering_coefficient, color = Condition)) +
   # geom_point() +
@@ -25,12 +27,15 @@ p1 <- ggplot(results_df, aes(Age, clustering_coefficient, color = Condition)) +
   ggtitle("Clustering Coefficient by Age and Condition")
 ggplotly(p1)
 })
-print(merged_results_dt[which(P_value < 0.07)])
-text_box <- data.frame(
-  Content = merged_results_dt[which(P_value < 0.07)]
-)
-kable(text_box, format = "html", table.attr = "style='width: 100%; border: 1px solid black; padding: 10px; margin: 10px 0;'")
 
+datatable(clustering_coefficient_p_values[which(P_value < 0.09)],   options = list(
+    pageLength = 10,
+    autoWidth = TRUE,
+    dom = 't'  # This option removes the search box and the pagination controls
+  ),
+  class = "hover",
+  rownames = FALSE
+)
 ```
 
 ```{r Clustering Coefficient RFP}
@@ -41,6 +46,15 @@ p2 <- ggplot(results_df, aes(Age, clustering_coefficient_rfp, color = Condition)
   ggtitle("Clustering Coefficient RFP by Age and Condition")
 ggplotly(p2)
 })
+
+datatable(lustering_coefficient_rfp_p_values[which(P_value < 0.09)],   options = list(
+    pageLength = 10,
+    autoWidth = TRUE,
+    dom = 't'  # This option removes the search box and the pagination controls
+  ),
+  class = "hover",
+  rownames = FALSE
+)
 ```
 
 ```{r Global Efficiency}
@@ -51,6 +65,15 @@ p3 <- ggplot(results_df, aes(Age, global_efficiency, color = Condition)) +
   ggtitle("Global Efficiency by Age and Condition")
 ggplotly(p3)
 })
+
+datatable(global_efficiency_p_values[which(P_value < 0.09)],   options = list(
+    pageLength = 10,
+    autoWidth = TRUE,
+    dom = 't'  # This option removes the search box and the pagination controls
+  ),
+  class = "hover",
+  rownames = FALSE
+)
 ```
 
 ```{r Global Efficiency RFP}
@@ -61,6 +84,8 @@ p4 <- ggplot(results_df, aes(Age, global_efficiency_rfp, color = Condition)) +
   ggtitle("Global Efficiency RFP by Age and Condition")
 ggplotly(p4)
 })
+
+
 ```
 
 ```{r Frequency Median}
