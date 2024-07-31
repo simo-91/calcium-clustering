@@ -155,7 +155,7 @@ for (feature in features) {
 
 
 
-# Top 5 principal components (PC) explain this much % of the data..
+# Top 5 principal components (PC) explain this much % of the data.. ----
 # Custom function to extract the cumulative variance for the top 5 PCs
 get_top5pc_variance <- function(ID) {
   var_name <- paste0(ID, ".pca.eigenvalues")
@@ -165,3 +165,26 @@ get_top5pc_variance <- function(ID) {
 # Add the Top5PC_XVariance column to results_df
 results_df <- results_df %>%
   mutate(Top5PC_XVariance = sapply(ID, get_top5pc_variance))
+
+# RFP
+get_top5pc_variance_rfp <- function(ID) {
+  var_name <- paste0(ID, ".pca.RFP.eigenvalues")
+  eval(parse(text = paste0(var_name, "$cumulative.variance.percent[5]")))
+}
+
+# Add the Top5PC_XVariance column to results_df
+results_df <- results_df %>%
+  mutate(Top5PC_XVariance_rfp = sapply(ID, get_top5pc_variance))
+
+
+# Add "big_community" column to results_df (how many communities with more than 20 members)
+# Function to get the big community value for a given ID
+get_big_community <- function(id) {
+  # Construct the variable name
+  var_name <- paste0(id, ".big_communities")
+  # Return the value of the variable
+  return(get(var_name))
+}
+
+# Add the new column to results_df
+results_df$big_community <- sapply(results_df$ID, get_big_community)
