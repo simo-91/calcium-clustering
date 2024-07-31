@@ -2,7 +2,11 @@
 title: "Features by Age and Condition"
 author: "Simo"
 date: "2024-07-08"
-output: html_document
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    theme: flatly
 ---
 
 ```{r setup, include=FALSE}
@@ -16,9 +20,10 @@ library(DT)
 library(data.table)
 # Load your data here
 results_df <- read.csv("results_df_8Jul2024.csv")
-load("30Jul2024.RData")
+load("31Jul2024.RData")
 ```
 
+# Clustering Coefficient
 ```{r Clustering Coefficient, warning=FALSE}
 suppressMessages({
 p1 <- ggplot(results_df, aes(Age, clustering_coefficient, color = Condition)) +
@@ -28,7 +33,7 @@ p1 <- ggplot(results_df, aes(Age, clustering_coefficient, color = Condition)) +
 ggplotly(p1)
 })
 
-datatable(clustering_coefficient_all_p_values[which(P_value < 0.09)],   options = list(
+datatable(clustering_coefficient_all_p_values[which(P_value < 0.09)], options = list(
     pageLength = 10,
     autoWidth = TRUE,
     dom = 't'  # This option removes the search box and the pagination controls
@@ -38,6 +43,7 @@ datatable(clustering_coefficient_all_p_values[which(P_value < 0.09)],   options 
 )
 ```
 
+# Clustering Coefficient RFP
 ```{r Clustering Coefficient RFP}
 suppressMessages({
 p2 <- ggplot(results_df, aes(Age, clustering_coefficient_rfp, color = Condition)) +
@@ -47,7 +53,7 @@ p2 <- ggplot(results_df, aes(Age, clustering_coefficient_rfp, color = Condition)
 ggplotly(p2)
 })
 
-datatable(clustering_coefficient_rfp_p_values[which(P_value < 0.09)],   options = list(
+datatable(clustering_coefficient_rfp_p_values[which(P_value < 0.09)], options = list(
     pageLength = 10,
     autoWidth = TRUE,
     dom = 't'  # This option removes the search box and the pagination controls
@@ -57,6 +63,7 @@ datatable(clustering_coefficient_rfp_p_values[which(P_value < 0.09)],   options 
 )
 ```
 
+# Global Efficiency
 ```{r Global Efficiency}
 suppressMessages({
 p3 <- ggplot(results_df, aes(Age, global_efficiency, color = Condition)) +
@@ -66,7 +73,7 @@ p3 <- ggplot(results_df, aes(Age, global_efficiency, color = Condition)) +
 ggplotly(p3)
 })
 
-datatable(global_efficiency_p_values[which(P_value < 0.09)],   options = list(
+datatable(global_efficiency_p_values[which(P_value < 0.09)], options = list(
     pageLength = 10,
     autoWidth = TRUE,
     dom = 't'  # This option removes the search box and the pagination controls
@@ -76,6 +83,7 @@ datatable(global_efficiency_p_values[which(P_value < 0.09)],   options = list(
 )
 ```
 
+# Global Efficiency RFP
 ```{r Global Efficiency RFP}
 suppressMessages({
 p4 <- ggplot(results_df, aes(Age, global_efficiency_rfp, color = Condition)) +
@@ -85,7 +93,7 @@ p4 <- ggplot(results_df, aes(Age, global_efficiency_rfp, color = Condition)) +
 ggplotly(p4)
 })
 
-datatable(global_efficiency_rfp_p_values[which(P_value < 0.09)],   options = list(
+datatable(global_efficiency_rfp_p_values[which(P_value < 0.09)], options = list(
     pageLength = 10,
     autoWidth = TRUE,
     dom = 't'  # This option removes the search box and the pagination controls
@@ -95,6 +103,7 @@ datatable(global_efficiency_rfp_p_values[which(P_value < 0.09)],   options = lis
 )
 ```
 
+# Frequency Median
 ```{r Frequency Median}
 suppressMessages({
 p5 <- ggplot(results_df, aes(Age, frequency_median, color = Condition)) +
@@ -104,7 +113,7 @@ p5 <- ggplot(results_df, aes(Age, frequency_median, color = Condition)) +
 ggplotly(p5)
 })
 
-datatable(frequency_p_values[which(P_value < 0.09)],   options = list(
+datatable(frequency_p_values[which(P_value < 0.09)], options = list(
     pageLength = 10,
     autoWidth = TRUE,
     dom = 't'  # This option removes the search box and the pagination controls
@@ -114,6 +123,7 @@ datatable(frequency_p_values[which(P_value < 0.09)],   options = list(
 )
 ```
 
+# Frequency RFP Median
 ```{r Frequency RFP Median}
 suppressMessages({
 p6 <- ggplot(results_df, aes(Age, frequency_rfp_median, color = Condition)) +
@@ -123,7 +133,7 @@ p6 <- ggplot(results_df, aes(Age, frequency_rfp_median, color = Condition)) +
 ggplotly(p6)
 })
 
-datatable(frequency_rfp_p_values[which(P_value < 0.09)],   options = list(
+datatable(frequency_rfp_p_values[which(P_value < 0.09)], options = list(
     pageLength = 10,
     autoWidth = TRUE,
     dom = 't'  # This option removes the search box and the pagination controls
@@ -133,6 +143,7 @@ datatable(frequency_rfp_p_values[which(P_value < 0.09)],   options = list(
 )
 ```
 
+# Mean Degree
 ```{r Mean Degree}
 suppressMessages({
 p7 <- ggplot(results_df, aes(Age, mean_degree, color = Condition)) +
@@ -141,8 +152,18 @@ p7 <- ggplot(results_df, aes(Age, mean_degree, color = Condition)) +
   ggtitle("Mean Degree by Age and Condition")
 ggplotly(p7)
 })
+
+datatable(mean_degree_all_p_values[which(P_value < 0.09)], options = list(
+    pageLength = 10,
+    autoWidth = TRUE,
+    dom = 't'  # This option removes the search box and the pagination controls
+  ),
+  class = "hover",
+  rownames = FALSE
+)
 ```
 
+# Mean Degree RFP
 ```{r Mean Degree RFP}
 suppressMessages({
 p8 <- ggplot(results_df, aes(Age, mean_degree_rfp, color = Condition)) +
@@ -151,7 +172,37 @@ p8 <- ggplot(results_df, aes(Age, mean_degree_rfp, color = Condition)) +
   ggtitle("Mean Degree RFP by Age and Condition")
 ggplotly(p8)
 })
+
+datatable(mean_degree_all_rfp_p_values[which(P_value < 0.09)], options = list(
+    pageLength = 10,
+    autoWidth = TRUE,
+    dom = 't'  # This option removes the search box and the pagination controls
+  ),
+  class = "hover",
+  rownames = FALSE
+)
 ```
+
+# Top 5 PC explain ..%.. of the data
+```{r PCA, warning=FALSE}
+suppressMessages({
+p9 <- ggplot(results_df, aes(Age, Top5PC_XVariance, color = Condition)) +
+  geom_point() +
+  geom_smooth(method = "lm", se = FALSE) +
+  ggtitle("Top 5 PC explain x% of data")
+ggplotly(p9)
+})
+
+# datatable(Top5PC_XVariance_all_p_values[which(P_value < 0.09)], options = list(
+#     pageLength = 10,
+#     autoWidth = TRUE,
+#     dom = 't'  # This option removes the search box and the pagination controls
+#   ),
+#   class = "hover",
+#   rownames = FALSE
+# )
+```
+
 
 # Boxplots
 ```{r Clustering Coefficient boxplot, fig.dim = c(10, 8)}

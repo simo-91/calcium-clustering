@@ -155,3 +155,13 @@ for (feature in features) {
 
 
 
+# Top 5 principal components (PC) explain this much % of the data..
+# Custom function to extract the cumulative variance for the top 5 PCs
+get_top5pc_variance <- function(ID) {
+  var_name <- paste0(ID, ".pca.eigenvalues")
+  eval(parse(text = paste0(var_name, "$cumulative.variance.percent[5]")))
+}
+
+# Add the Top5PC_XVariance column to results_df
+results_df <- results_df %>%
+  mutate(Top5PC_XVariance = sapply(ID, get_top5pc_variance))
