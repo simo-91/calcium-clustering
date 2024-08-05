@@ -23,13 +23,33 @@ results_df <- read.csv("results_df_8Jul2024.csv")
 load("31Jul2024.RData")
 ```
 
+
+```{r Medians, message=FALSE, warning=FALSE, include=FALSE}
+medians_df <- results_df %>%
+  group_by(Age, Condition) %>%
+  summarize(
+    median_clustering_coefficient = median(clustering_coefficient),
+    median_clustering_coefficient_rfp = median(clustering_coefficient_rfp),
+    median_global_efficiency = median(global_efficiency),
+    median_global_efficiency_rfp = median(global_efficiency_rfp),
+    median_frequency_median = median(frequency_median),
+    median_frequency_rfp_median = median(frequency_rfp_median),
+    median_mean_degree = median(mean_degree),
+    median_mean_degree_rfp = median(mean_degree_rfp),
+    median_Top5PC_XVariance = median(Top5PC_XVariance),
+    median_big_community = median(big_community),
+    .groups = 'drop'
+  )
+```
 # Clustering Coefficient
 ```{r Clustering Coefficient, warning=FALSE}
 suppressMessages({
 p1 <- ggplot(results_df, aes(Age, clustering_coefficient, color = Condition)) +
-  # geom_point() +
-  geom_smooth(method = "lm", se = FALSE) +
-  ggtitle("Clustering Coefficient by Age and Condition")
+  geom_point(alpha = 0.3) +
+  geom_line(data = medians_df, aes(Age, median_clustering_coefficient, color = Condition), size = 1) +
+  ggtitle("Clustering Coefficient by Age and Condition") +
+  labs(y = "Clustering Coefficient")
+
 ggplotly(p1)
 })
 
@@ -47,8 +67,8 @@ datatable(clustering_coefficient_all_p_values[which(P_value < 0.09)], options = 
 ```{r Clustering Coefficient RFP}
 suppressMessages({
 p2 <- ggplot(results_df, aes(Age, clustering_coefficient_rfp, color = Condition)) +
-  # geom_point() +
-  geom_smooth(method = "lm", se = FALSE) +
+  geom_point(alpha = 0.3) +
+  geom_line(data = medians_df, aes(Age, median_clustering_coefficient_rfp, color = Condition), size = 1) +
   ggtitle("Clustering Coefficient RFP by Age and Condition")
 ggplotly(p2)
 })
@@ -67,8 +87,8 @@ datatable(clustering_coefficient_rfp_p_values[which(P_value < 0.09)], options = 
 ```{r Global Efficiency}
 suppressMessages({
 p3 <- ggplot(results_df, aes(Age, global_efficiency, color = Condition)) +
-  # geom_point() +
-  geom_smooth(method = "lm", se = FALSE) +
+  geom_point(alpha = 0.3) +
+  geom_line(data = medians_df, aes(Age, median_global_efficiency, color = Condition), size = 1) +
   ggtitle("Global Efficiency by Age and Condition")
 ggplotly(p3)
 })
@@ -87,8 +107,8 @@ datatable(global_efficiency_p_values[which(P_value < 0.09)], options = list(
 ```{r Global Efficiency RFP}
 suppressMessages({
 p4 <- ggplot(results_df, aes(Age, global_efficiency_rfp, color = Condition)) +
-  # geom_point() +
-  geom_smooth(method = "lm", se = FALSE) +
+  geom_point(alpha = 0.3) +
+  geom_line(data = medians_df, aes(Age, median_global_efficiency_rfp, color = Condition), size = 1) +
   ggtitle("Global Efficiency RFP by Age and Condition")
 ggplotly(p4)
 })
@@ -107,8 +127,8 @@ datatable(global_efficiency_rfp_p_values[which(P_value < 0.09)], options = list(
 ```{r Frequency Median}
 suppressMessages({
 p5 <- ggplot(results_df, aes(Age, frequency_median, color = Condition)) +
-  # geom_point() +
-  geom_smooth(method = "lm", se = FALSE) +
+  geom_point(alpha = 0.3) +
+  geom_line(data = medians_df, aes(Age, median_frequency_median, color = Condition), size = 1) +
   ggtitle("Frequency Median by Age and Condition")
 ggplotly(p5)
 })
@@ -127,8 +147,8 @@ datatable(frequency_p_values[which(P_value < 0.09)], options = list(
 ```{r Frequency RFP Median}
 suppressMessages({
 p6 <- ggplot(results_df, aes(Age, frequency_rfp_median, color = Condition)) +
-  # geom_point() +
-  geom_smooth(method = "lm", se = FALSE) +
+  geom_point(alpha = 0.3) +
+  geom_line(data = medians_df, aes(Age, median_frequency_rfp_median, color = Condition), size = 1) +
   ggtitle("Frequency RFP Median by Age and Condition")
 ggplotly(p6)
 })
@@ -147,8 +167,8 @@ datatable(frequency_rfp_p_values[which(P_value < 0.09)], options = list(
 ```{r Mean Degree}
 suppressMessages({
 p7 <- ggplot(results_df, aes(Age, mean_degree, color = Condition)) +
-  # geom_point() +
-  geom_smooth(method = "lm", se = FALSE) +
+  geom_point(alpha = 0.3) +
+  geom_line(data = medians_df, aes(Age, median_mean_degree, color = Condition), size = 1) +
   ggtitle("Mean Degree by Age and Condition")
 ggplotly(p7)
 })
@@ -167,8 +187,8 @@ datatable(mean_degree_all_p_values[which(P_value < 0.09)], options = list(
 ```{r Mean Degree RFP}
 suppressMessages({
 p8 <- ggplot(results_df, aes(Age, mean_degree_rfp, color = Condition)) +
-  # geom_point() +
-  geom_smooth(method = "lm", se = FALSE) +
+  geom_point(alpha = 0.3) +
+  geom_line(data = medians_df, aes(Age, median_mean_degree_rfp, color = Condition), size = 1) +
   ggtitle("Mean Degree RFP by Age and Condition")
 ggplotly(p8)
 })
@@ -187,13 +207,34 @@ datatable(mean_degree_all_rfp_p_values[which(P_value < 0.09)], options = list(
 ```{r PCA, warning=FALSE}
 suppressMessages({
 p9 <- ggplot(results_df, aes(Age, Top5PC_XVariance, color = Condition)) +
-  geom_point() +
-  geom_smooth(method = "lm", se = FALSE) +
+  geom_point(alpha = 0.3) +
+  geom_line(data = medians_df, aes(Age, median_Top5PC_XVariance, color = Condition), size = 1) +
   ggtitle("Top 5 PC explain x% of data")
 ggplotly(p9)
 })
 
-# datatable(Top5PC_XVariance_all_p_values[which(P_value < 0.09)], options = list(
+datatable(Top5PC_XVariance_all_p_values[which(P_value < 0.09)], options = list(
+    pageLength = 10,
+    autoWidth = TRUE,
+    dom = 't'  # This option removes the search box and the pagination controls
+  ),
+  class = "hover",
+  rownames = FALSE
+)
+```
+
+
+# Number of big communities (>20 members)
+```{r big_communities, warning=FALSE}
+suppressMessages({
+p10 <- ggplot(results_df, aes(Age, big_community, color = Condition)) +
+  geom_point(alpha = 0.3) +
+  geom_line(data = medians_df, aes(Age, median_big_community, color = Condition), size = 1) +
+  ggtitle("Number of big communities (>20 members)")
+ggplotly(p10)
+})
+
+# datatable([which(P_value < 0.09)], options = list(
 #     pageLength = 10,
 #     autoWidth = TRUE,
 #     dom = 't'  # This option removes the search box and the pagination controls
@@ -203,18 +244,3 @@ ggplotly(p9)
 # )
 ```
 
-
-# Boxplots
-```{r Clustering Coefficient boxplot, fig.dim = c(10, 8)}
-ggplotly(ggplotly(ggplot(results_df, aes(x = Condition, y = clustering_coefficient, fill = Condition)) +
-    geom_boxplot() +
-    facet_wrap(vars(Age), scales = "free_y") +
-    theme_pubr() +
-    labs(title = "Clustering Coefficient across All Conditions and Ages",
-         x = "Condition",
-         y = "Clustering Coefficient") +
-    theme(axis.text.x = element_text(angle = 45, hjust = 1),
-          axis.title.x = element_blank())))
-ctrl_akt1_hrasv12_clustcoeff.plt
-ctrl_akt1_hrasv12_IRF8null_clustcoeff.plt
-```
