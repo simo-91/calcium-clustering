@@ -38,6 +38,7 @@ medians_df <- results_df %>%
     median_mean_degree_rfp = median(mean_degree_rfp),
     median_Top5PC_XVariance = median(Top5PC_XVariance),
     median_big_community = median(big_community),
+    median_RFPtoNon_normalized = median(RFPtoNonRFP_normalized),
     .groups = 'drop'
   )
 ```
@@ -242,5 +243,26 @@ ggplotly(p10)
 #   class = "hover",
 #   rownames = FALSE
 # )
+```
+
+# RFP-to-NonRFP connections (normalized by no. of RFP cells)
+```{r rfp-to_non-connections-normalized, warning=FALSE}
+suppressMessages({
+p11 <- ggplot(results_df, aes(Age, RFPtoNonRFP_normalized, color = Condition)) +
+  geom_point(alpha = 0.3) +
+  geom_line(data = medians_df, aes(Age, median_RFPtoNon_normalized, color = Condition), size = 1) +
+  ggtitle("Proportions of RFP-nonRFP connections")
+ggplotly(p11)
+})
+
+
+datatable(RFPtoNonRFP_normalized_all_p_values[which(P_value < 0.09)], options = list(
+    pageLength = 10,
+    autoWidth = TRUE,
+    dom = 't'  # This option removes the search box and the pagination controls
+  ),
+  class = "hover",
+  rownames = FALSE
+)
 ```
 

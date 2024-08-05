@@ -1788,21 +1788,6 @@ Top5PC_XVariance_IRF8null_vs_regular_p_values <- results_dt
 
 Top5PC_XVariance_all_p_values <- rbind(Top5PC_XVariance_p_values, Top5PC_XVariance_IRF8null_p_values, Top5PC_XVariance_IRF8null_vs_regular_p_values)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # # for CTRLvsAKT1vsHRASV12 Top5PC_XVariance_rfp ----
 # # Unique ages in the dataset
 # ages <- unique(results_df$Age)
@@ -1978,3 +1963,185 @@ Top5PC_XVariance_all_p_values <- rbind(Top5PC_XVariance_p_values, Top5PC_XVarian
 # }
 # 
 # Top5PC_XVariance_rfp_IRF8null_vs_regular_p_values <- results_dt
+
+
+# for CTRLvsAKT1vsHRASV12 RFPtoNonRFP_normalized ----
+# Unique ages in the dataset
+ages <- unique(results_df$Age)
+
+# Initialize a list to store results
+results_list <- list()
+
+# Loop through each age group
+for (age in ages) {
+  age_data <- results_df %>% filter(Age == age)
+  
+  akt1_data <- age_data %>% filter(Condition == "AKT1") %>% pull(RFPtoNonRFP_normalized)
+  ctrl_data <- age_data %>% filter(Condition == "CTRL") %>% pull(RFPtoNonRFP_normalized)
+  hrasv12_data <- age_data %>% filter(Condition == "HRASV12") %>% pull(RFPtoNonRFP_normalized)
+  
+  test_akt1_ctrl <- perm_test(akt1_data, ctrl_data)
+  test_akt1_hrasv12 <- perm_test(akt1_data, hrasv12_data)
+  test_ctrl_hrasv12 <- perm_test(ctrl_data, hrasv12_data)
+  
+  results_list[[as.character(age)]] <- list(
+    "AKT1_vs_CTRL" = test_akt1_ctrl,
+    "AKT1_vs_HRASV12" = test_akt1_hrasv12,
+    "CTRL_vs_HRASV12" = test_ctrl_hrasv12
+  )
+}
+
+# Convert results_list to data.table
+results_dt <- data.table(Age = integer(),
+                         Comparison = character(),
+                         Observed_Difference = numeric(),
+                         P_value = numeric())
+
+for (age in names(results_list)) {
+  results_dt <- rbind(results_dt, data.table(
+    Age = as.integer(age),
+    Comparison = "AKT1_vs_CTRL",
+    Observed_Difference = results_list[[age]]$AKT1_vs_CTRL$observed_diff,
+    P_value = results_list[[age]]$AKT1_vs_CTRL$p_value
+  ))
+  
+  results_dt <- rbind(results_dt, data.table(
+    Age = as.integer(age),
+    Comparison = "AKT1_vs_HRASV12",
+    Observed_Difference = results_list[[age]]$AKT1_vs_HRASV12$observed_diff,
+    P_value = results_list[[age]]$AKT1_vs_HRASV12$p_value
+  ))
+  
+  results_dt <- rbind(results_dt, data.table(
+    Age = as.integer(age),
+    Comparison = "CTRL_vs_HRASV12",
+    Observed_Difference = results_list[[age]]$CTRL_vs_HRASV12$observed_diff,
+    P_value = results_list[[age]]$CTRL_vs_HRASV12$p_value
+  ))
+}
+
+RFPtoNonRFP_normalized_p_values <- results_dt
+
+# for CTRL_IRF8null vs AKT1_IRF8null vs HRASV12_IRF8null RFPtoNonRFP_normalized ----
+# Unique ages in the dataset
+ages <- unique(results_df$Age)
+
+# Initialize a list to store results
+results_list <- list()
+
+# Loop through each age group
+for (age in ages) {
+  age_data <- results_df %>% filter(Age == age)
+  
+  akt1_data <- age_data %>% filter(Condition == "AKT1_IRF8null") %>% pull(RFPtoNonRFP_normalized)
+  ctrl_data <- age_data %>% filter(Condition == "CTRL_IRF8null") %>% pull(RFPtoNonRFP_normalized)
+  hrasv12_data <- age_data %>% filter(Condition == "HRASV12_IRF8null") %>% pull(RFPtoNonRFP_normalized)
+  
+  test_akt1_ctrl <- perm_test(akt1_data, ctrl_data)
+  test_akt1_hrasv12 <- perm_test(akt1_data, hrasv12_data)
+  test_ctrl_hrasv12 <- perm_test(ctrl_data, hrasv12_data)
+  
+  results_list[[as.character(age)]] <- list(
+    "AKT1_IRF8null_vs_CTRL_IRF8null" = test_akt1_ctrl,
+    "AKT1_IRF8null_vs_HRASV12_IRF8null" = test_akt1_hrasv12,
+    "CTRL_IRF8null_vs_HRASV12_IRF8null" = test_ctrl_hrasv12
+  )
+}
+
+# Convert results_list to data.table
+results_dt <- data.table(Age = integer(),
+                         Comparison = character(),
+                         Observed_Difference = numeric(),
+                         P_value = numeric())
+
+for (age in names(results_list)) {
+  results_dt <- rbind(results_dt, data.table(
+    Age = as.integer(age),
+    Comparison = "AKT1_IRF8null_vs_CTRL_IRF8null",
+    Observed_Difference = results_list[[age]]$`AKT1_IRF8null_vs_CTRL_IRF8null`$observed_diff,
+    P_value = results_list[[age]]$`AKT1_IRF8null_vs_CTRL_IRF8null`$p_value
+  ))
+  
+  results_dt <- rbind(results_dt, data.table(
+    Age = as.integer(age),
+    Comparison = "AKT1_IRF8null_vs_HRASV12_IRF8null",
+    Observed_Difference = results_list[[age]]$`AKT1_IRF8null_vs_HRASV12_IRF8null`$observed_diff,
+    P_value = results_list[[age]]$`AKT1_IRF8null_vs_HRASV12_IRF8null`$p_value
+  ))
+  
+  results_dt <- rbind(results_dt, data.table(
+    Age = as.integer(age),
+    Comparison = "CTRL_IRF8null_vs_HRASV12_IRF8null",
+    Observed_Difference = results_list[[age]]$`CTRL_IRF8null_vs_HRASV12_IRF8null`$observed_diff,
+    P_value = results_list[[age]]$`CTRL_IRF8null_vs_HRASV12_IRF8null`$p_value
+  ))
+}
+
+RFPtoNonRFP_normalized_IRF8null_p_values <- results_dt
+
+# for AKT1 vs AKT1_IRF8null, CTRL vs CTRL_IRF8null, HRASV12 vs HRASV12_IRF8null RFPtoNonRFP_normalized ----
+# Unique ages in the dataset
+ages <- unique(results_df$Age)
+
+# Initialize a list to store results
+results_list <- list()
+
+# Loop through each age group
+for (age in ages) {
+  age_data <- results_df %>% filter(Age == age)
+  
+  akt1_data <- age_data %>% filter(Condition == "AKT1") %>% pull(RFPtoNonRFP_normalized)
+  akt1_irf8null_data <- age_data %>% filter(Condition == "AKT1_IRF8null") %>% pull(RFPtoNonRFP_normalized)
+  
+  ctrl_data <- age_data %>% filter(Condition == "CTRL") %>% pull(RFPtoNonRFP_normalized)
+  ctrl_irf8null_data <- age_data %>% filter(Condition == "CTRL_IRF8null") %>% pull(RFPtoNonRFP_normalized)
+  
+  hrasv12_data <- age_data %>% filter(Condition == "HRASV12") %>% pull(RFPtoNonRFP_normalized)
+  hrasv12_irf8null_data <- age_data %>% filter(Condition == "HRASV12_IRF8null") %>% pull(RFPtoNonRFP_normalized)
+  
+  test_akt1_vs_akt1_irf8null <- perm_test(akt1_data, akt1_irf8null_data)
+  test_ctrl_vs_ctrl_irf8null <- perm_test(ctrl_data, ctrl_irf8null_data)
+  test_hrasv12_vs_hrasv12_irf8null <- perm_test(hrasv12_data, hrasv12_irf8null_data)
+  
+  results_list[[as.character(age)]] <- list(
+    "AKT1_vs_AKT1_IRF8null" = test_akt1_vs_akt1_irf8null,
+    "CTRL_vs_CTRL_IRF8null" = test_ctrl_vs_ctrl_irf8null,
+    "HRASV12_vs_HRASV12_IRF8null" = test_hrasv12_vs_hrasv12_irf8null
+  )
+}
+
+# Convert results_list to data.table
+results_dt <- data.table(Age = integer(),
+                         Comparison = character(),
+                         Observed_Difference = numeric(),
+                         P_value = numeric())
+
+for (age in names(results_list)) {
+  results_dt <- rbind(results_dt, data.table(
+    Age = as.integer(age),
+    Comparison = "AKT1_vs_AKT1_IRF8null",
+    Observed_Difference = results_list[[age]]$`AKT1_vs_AKT1_IRF8null`$observed_diff,
+    P_value = results_list[[age]]$`AKT1_vs_AKT1_IRF8null`$p_value
+  ))
+  
+  results_dt <- rbind(results_dt, data.table(
+    Age = as.integer(age),
+    Comparison = "HRASV12_vs_HRASV12_IRF8null",
+    Observed_Difference = results_list[[age]]$`HRASV12_vs_HRASV12_IRF8null`$observed_diff,
+    P_value = results_list[[age]]$`HRASV12_vs_HRASV12_IRF8null`$p_value
+  ))
+}
+
+RFPtoNonRFP_normalized_IRF8null_vs_regular_p_values <- results_dt
+
+# Combine all results
+RFPtoNonRFP_normalized_all_p_values <- rbind(
+  RFPtoNonRFP_normalized_p_values, 
+  RFPtoNonRFP_normalized_IRF8null_p_values, 
+  RFPtoNonRFP_normalized_IRF8null_vs_regular_p_values
+)
+
+# View the combined results
+print(RFPtoNonRFP_normalized_all_p_values)
+
+    
