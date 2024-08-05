@@ -27,11 +27,11 @@ for (graph_name in graph_names) {
   redcell_indices <- which(posXY$redcell == 1)
   non_redcell_indices <- which(posXY$redcell == 0)
   
-  # Debug: print the indices and some vertex IDs
-  cat("Graph name:", graph_name, "\n")
-  cat("Total nodes:", vcount(graph), "\n")
-  cat("Redcell indices:", redcell_indices[1:10], "\n")
-  cat("Non-redcell indices:", non_redcell_indices[1:10], "\n")
+  # # Debug: print the indices and some vertex IDs
+  # cat("Graph name:", graph_name, "\n")
+  # cat("Total nodes:", vcount(graph), "\n")
+  # cat("Redcell indices:", redcell_indices[1:10], "\n")
+  # cat("Non-redcell indices:", non_redcell_indices[1:10], "\n")
   
   # Initialize a counter for connections
   red_to_non_red_connections <- 0

@@ -20,7 +20,7 @@ library(DT)
 library(data.table)
 # Load your data here
 results_df <- read.csv("results_df_8Jul2024.csv")
-load("31Jul2024.RData")
+load("5Aug2024.RData")
 ```
 
 
@@ -266,3 +266,23 @@ datatable(RFPtoNonRFP_normalized_all_p_values[which(P_value < 0.09)], options = 
 )
 ```
 
+# Percentage of redcells in big communities
+```{r Redcells in big communities, warning=FALSE}
+suppressMessages({
+p12 <- ggplot(results_df, aes(Age, Percentage_in_Big_Communities, color = Condition)) +
+  geom_point(alpha = 0.3) +
+  geom_line(data = medians_df, aes(Age, median_RFPtoNon_normalized, color = Condition), size = 1) +
+  ggtitle("Proportions of RFP-nonRFP connections")
+ggplotly(p11)
+})
+
+
+datatable(RFPtoNonRFP_normalized_all_p_values[which(P_value < 0.09)], options = list(
+    pageLength = 10,
+    autoWidth = TRUE,
+    dom = 't'  # This option removes the search box and the pagination controls
+  ),
+  class = "hover",
+  rownames = FALSE
+)
+```
